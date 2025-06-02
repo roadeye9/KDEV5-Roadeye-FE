@@ -1,0 +1,22 @@
+
+## 컴포넌트 작성 규칙
+1. 모든 컴포넌트는  shadcn을 통해서 구성할 것
+2. 한 컴포넌트에서 두 가지 이상의 기능을 하고 있는 경우 개별 기능으로분리한 컴포넌트로 나눌 것
+
+
+## 패키지 규칙 
+- api
+    - [도메인]/index.ts 도메인은 해당 도메인의 모든 api 함수를 모아둔 파일
+    - ex
+        - src/api/members/index.ts
+        - src/api/company/index.ts
+- assets
+    - 정적 파일들을 관리
+
+- components
+    - ui
+        - shadcn 컴포넌트를 포함
+    - [도메인]/Components.tsx 각 도메인에 해당하는 컴포넌트들을 넣을 것
+- pages
+    - routes에 등록되는 페이지들
+    
