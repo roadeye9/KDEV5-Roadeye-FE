@@ -2,8 +2,9 @@ import './styles/global.scss';
 import './styles/global.css';
 
 import React from 'react';
-import { createRoot } from 'react-dom/client';
 import App from './app';
+import { NextUIProvider } from '@nextui-org/react';
+import { createRoot } from 'react-dom/client';
 
 // Ensure React is available in the global scope
 window.React = React;
@@ -11,6 +12,11 @@ window.React = React;
 const container = document.querySelector('#root');
 const root = createRoot(container as HTMLElement);
 
+
 root.render(
-    <App />
+    <React.StrictMode>
+        <NextUIProvider>
+            <App />
+        </NextUIProvider>
+    </React.StrictMode>
 );

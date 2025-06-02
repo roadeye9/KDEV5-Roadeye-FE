@@ -9,9 +9,10 @@ import { AuthProvider } from '@/contexts/auth';
 import AuthLayout from '@/layouts/AuthLayout';
 import NotFoundPage from '@/pages/error/NotFound';
 import LandingPage from '@/pages/LandingPage';
+import PlatformLayout from '@/layouts/PlatformLayout';
 
 const LoginPage = React.lazy(() => import('@/pages/LoginPage'));
-
+const Dashboard = React.lazy(() => import('@/pages/Dashboard'));
 
 // Lazy loading for pages
 // const GithubCallback = React.lazy(() => import('@/pages/auth/GithubCallback'));
@@ -40,9 +41,6 @@ const BrandingLayout = () => {
 
 
 
-function Main(){
-  return <div>1234</div>
-}
 
 const router = createBrowserRouter([
   {
@@ -51,13 +49,6 @@ const router = createBrowserRouter([
     children: [
       {
         path: '/',
-        // element: (
-        //   <Suspense fallback={<WaitingView />}>
-        //     <PrivateRoute>
-        //       <DefaultLayout />
-        //     </PrivateRoute>
-        //   </Suspense>
-        // ),
         children: [
           { index: true, element: <LandingPage /> },
         ],
@@ -73,6 +64,17 @@ const router = createBrowserRouter([
       element: <LoginPage />
     }
     ]
+  },
+  {
+     path: '/:companyCode',
+     element: <PlatformLayout />,
+     errorElement: <NotFoundPage />,
+     children: [
+      {
+        path: 'dashboard',
+        element: <Dashboard />
+     }
+     ]
   }
 ]);
 
