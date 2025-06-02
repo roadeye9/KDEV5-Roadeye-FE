@@ -7,8 +7,11 @@ import { Toaster } from '@/components/ui/toaster';
 import WaitingView from '@/components/WaitingView';
 import { AuthProvider } from '@/contexts/auth';
 import AuthLayout from '@/layouts/AuthLayout';
-import DefaultLayout from '@/layouts/DefaultLayout';
 import NotFoundPage from '@/pages/error/NotFound';
+import LandingPage from '@/pages/LandingPage';
+
+const LoginPage = React.lazy(() => import('@/pages/LoginPage'));
+
 
 // Lazy loading for pages
 // const GithubCallback = React.lazy(() => import('@/pages/auth/GithubCallback'));
@@ -25,39 +28,50 @@ const Root = () => {
   );
 };
 
+
+const BrandingLayout = () => {
+  return (
+    <>
+    <Outlet />
+    <Toaster />
+    </>
+  )
+}
+
+
+
 function Main(){
   return <div>1234</div>
 }
 
 const router = createBrowserRouter([
   {
-    element: <Root />,
+    element: <BrandingLayout/>,
     errorElement: <NotFoundPage />,
     children: [
       {
         path: '/',
-        element: (
-          <Suspense fallback={<WaitingView />}>
-            <PrivateRoute>
-              <DefaultLayout />
-            </PrivateRoute>
-          </Suspense>
-        ),
+        // element: (
+        //   <Suspense fallback={<WaitingView />}>
+        //     <PrivateRoute>
+        //       <DefaultLayout />
+        //     </PrivateRoute>
+        //   </Suspense>
+        // ),
         children: [
-          { index: true, element: <Main/> },
+          { index: true, element: <LandingPage /> },
         ],
       },
-      {
-        path: '/',
-        element: (
-          <Suspense fallback={<WaitingView />}>
-            <AuthLayout />
-          </Suspense>
-        ),
-        children: [
-          { path: 'login', element: <Main/> }
-        ]
-      },
+    ]
+  }, 
+  { 
+    element: <AuthLayout/>,
+    errorElement: <NotFoundPage />,
+    children: [
+    {
+      path: '/login',
+      element: <LoginPage />
+    }
     ]
   }
 ]);
