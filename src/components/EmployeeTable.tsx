@@ -119,24 +119,14 @@ export default function EmployeeTable() {
     }, []);
 
     return (
-        <div className="h-full px-1">
-            <div className="flex justify-between items-center mb-4">
+        <div className="h-full flex flex-col ">
+            <div className="flex justify-between items-center mb-4 pt-3">
                 <div className="flex items-center gap-4">
-                    <Button color="primary" variant="light" radius="sm">
-                        Update
-                    </Button>
-                    <span className="text-default-400">4 Selected</span>
-                    <Button variant="light" radius="sm">
-                        Filter 4
-                    </Button>
-                    <Button variant="light" radius="sm">
-                        Sort
-                    </Button>
-                    <span className="text-default-400">120 Results</span>
+                   
                 </div>
                 <div className="flex gap-4">
                     <Button color="primary" radius="sm">
-                        Add New
+                        직원 추가
                     </Button>
                     <Button variant="light" radius="sm">
                         Import/Export
@@ -146,50 +136,54 @@ export default function EmployeeTable() {
                     </Button>
                 </div>
             </div>
-            <div className="overflow-x-auto">
-                <Table 
-                    aria-label="Employee table"
-                    className="mt-4 min-w-[1200px]"
-                    radius="none"
-                    shadow="none"
-                    isCompact={true}
-                    removeWrapper
-                    classNames={{
-                        td: [
-                            "border border-divider",
-                        ],
-                        th: "border border-divider bg-white",
-                        table: "border border-divider w-full",
-                        tr: [
-                            "even:bg-gray-50",
-                            "odd:bg-white",
-                        ],
-                        wrapper: "overflow-x-auto",
-                    }}
-                >
-                    <TableHeader columns={columns}>
-                        {(column) => (
-                            <TableColumn  key={column.uid}>{column.name}</TableColumn>
-                        )}
-                    </TableHeader>
-                    <TableBody items={[...users, {id: 101}, {id:102}, {id:103}, {id:104}, {id:105}, {id:106}, {id:107}, {id:108}, {id:109}, {id:110}, {id:111}, {id:112}, {id:113}, {id:114}, {id:115}, {id:116}, {id:117}, {id:118}, {id:119}, {id:120}]}>
-                        {(item) => 
-                            item.id >= 100 ? (
-                                <TableRow key={item.id}>
-                                    {columns.map((col) => (
-                                        <TableCell key={col.uid}>&nbsp;</TableCell>
-                                    ))}
-                                </TableRow>
-                            ) : (
-                                <TableRow key={item.id}>
-                                    {(columnKey) => (
-                                        <TableCell>{renderCell(item, columnKey)}</TableCell>
-                                    )}
-                                </TableRow>
-                            )
-                        }
-                    </TableBody>
-                </Table>
+            <div className="border border-divider flex-1">
+                <div className="h-[calc(100vh-200px)] min-h-[400px] overflow-auto">
+                    <Table 
+                        aria-label="Employee table"
+                        className="min-w-[1200px]"
+                        radius="none"
+                        shadow="none"
+                        isCompact={true}
+                        removeWrapper
+                        classNames={{
+                            td: [
+                                "border border-divider",
+                                "first:border-l-0",
+                            ],
+                            th: "border border-divider bg-white sticky top-0 z-10 first:border-l-0",
+                            table: "w-full",
+                            tr: [
+                                "even:bg-gray-50",
+                                "odd:bg-white",
+                            ],
+                        }}
+                    >
+                        <TableHeader columns={columns}>
+                            {(column) => (
+                                <TableColumn key={column.uid}>{column.name}</TableColumn>
+                            )}
+                        </TableHeader>
+                        <TableBody 
+                            items={[...users, {id: 101}, {id:102}, {id:103}, {id:104}, {id:105}, {id:106}, {id:107}, {id:108}, {id:109}, {id:110}, {id:111}, {id:112}, {id:113}, {id:114}, {id:115}, {id:116}, {id:117}, {id:118}, {id:119}, {id:120}]}
+                        >
+                            {(item) => 
+                                item.id >= 100 ? (
+                                    <TableRow key={item.id}>
+                                        {columns.map((col) => (
+                                            <TableCell key={col.uid}>&nbsp;</TableCell>
+                                        ))}
+                                    </TableRow>
+                                ) : (
+                                    <TableRow key={item.id}>
+                                        {(columnKey) => (
+                                            <TableCell>{renderCell(item, columnKey)}</TableCell>
+                                        )}
+                                    </TableRow>
+                                )
+                            }
+                        </TableBody>
+                    </Table>
+                </div>
             </div>
         </div>
     );
