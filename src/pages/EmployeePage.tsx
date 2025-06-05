@@ -1,8 +1,10 @@
 import EmployeeTable from "@/components/EmployeeTable";
 import { EmployeeHeader } from "@/components/employee/EmployeeHeader";
 import { EmployeeFooter } from "@/components/employee/EmployeeFooter";
+import { useEmployee } from "@/hooks/pages/useEmployee";
 
 export const EmployeePage = () => {
+    const {employees} = useEmployee();
     return (
         <div className="flex flex-col min-h-[calc(100vh-80px)] divide-y divide-gray-200">
             <div className="border-b border-gray-200">

@@ -50,25 +50,25 @@ interface SignInResponse {
 }
 
 export const createEmployee = async (employeeData: CreateEmployeeRequest) => {
-    await axiosInstance.post<Employee>('/api/employees', employeeData, {
+    await axiosInstance.post<Employee>('/employees', employeeData, {
         useTenant: true,
     });
 };
 
 export const updateEmployee = async (employeeId: number, employeeData: UpdateEmployeeRequest) => {
-    await axiosInstance.put<Employee>(`/api/employees/${employeeId}`, employeeData, {
+    await axiosInstance.put<Employee>(`/employees/${employeeId}`, employeeData, {
         useTenant: true,
     });
 };
 
 export const deleteEmployee = async (employeeId: number) => {
-    await axiosInstance.delete(`/api/employees/${employeeId}`, {
+    await axiosInstance.delete(`/employees/${employeeId}`, {
         useTenant: true,
     });
 };
 
 export const getEmployees = async (pageRequest: PageRequest): Promise<PageResponse<Employee>> => {
-    const response = await axiosInstance.get<PageResponse<Employee>>('/api/employees', {
+    const response = await axiosInstance.get<PageResponse<Employee>>('/employees', {
         params: pageRequest,
         useTenant: true,
     });
@@ -76,6 +76,6 @@ export const getEmployees = async (pageRequest: PageRequest): Promise<PageRespon
 };
 
 export const signIn = async (signInRequest: SignInRequest): Promise<SignInResponse> => {
-    const response = await axiosInstance.post<SignInResponse>('/api/employees/sign-in', signInRequest);
+    const response = await axiosInstance.post<SignInResponse>('/employees/sign-in', signInRequest);
     return response.data;
 };

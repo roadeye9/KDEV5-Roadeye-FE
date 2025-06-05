@@ -1,7 +1,7 @@
 import { getMy } from "@/api/auth";
-import { UserProvider, useUser } from "@/contexts/UserContext";
+import { useUser } from "@/contexts/UserContext";
 import { useNavigate } from "react-router-dom";
-import React, { useLayoutEffect } from "react";
+import { useLayoutEffect } from "react";
 import { PropsWithChildren } from "react";
 
 const PlatformProtection = ({children}: PropsWithChildren) => {
