@@ -136,7 +136,7 @@ export default function EmployeeTable() {
                     </Button>
                 </div>
             </div>
-            <div className="border border-divider flex-1">
+            <div className="ml-2 border border-divider flex-1">
                 <div className="h-[calc(100vh-200px)] min-h-[400px] overflow-auto">
                     <Table 
                         aria-label="Employee table"

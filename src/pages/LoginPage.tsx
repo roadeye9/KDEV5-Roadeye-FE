@@ -3,15 +3,12 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { useNavigate } from 'react-router-dom';
+import { useSignIn } from '@/hooks/pages/useSignIn';
 
 const LoginPage = () => {
   const navigate = useNavigate();
+  const {handleOnChange, handleSubmit}  = useSignIn()
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    // TODO: 로그인 로직 구현
-    navigate('/dashboard');
-  };
 
   return (
     <div className="min-h-screen bg-[#F5F6F8] flex">
@@ -34,6 +31,7 @@ const LoginPage = () => {
                 name="companyCode"
                 type="text"
                 required
+                onChange={(e) => handleOnChange("tenantId", e.target.value)}
                 className="mt-1 block w-full bg-gray-50 border-gray-200"
                 placeholder="기업 코드를 입력해주세요"
               />
@@ -48,7 +46,9 @@ const LoginPage = () => {
                 name="username"
                 type="text"
                 required
+                onChange={(e) => handleOnChange("username", e.target.value)}
                 className="mt-1 block w-full bg-gray-50 border-gray-200"
+              
                 placeholder="아이디를 입력해주세요"
               />
             </div>
@@ -62,6 +62,7 @@ const LoginPage = () => {
                 name="password"
                 type="password"
                 required
+                onChange={(e)=> handleOnChange("password", e.target.value)}
                 className="mt-1 block w-full bg-gray-50 border-gray-200"
                 placeholder="비밀번호를 입력해주세요"
               />
