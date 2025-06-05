@@ -33,7 +33,7 @@ export default defineConfig({
     port: config.server.port ,
       proxy: {
         '/api': {
-          target: 'http://localhost:8080',
+          target: 'https://dev-api-hq.roadeye.my',
           changeOrigin: true,
           rewrite: (path) => path.replace(/^\/api/, '/api')
         }

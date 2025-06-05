@@ -4,11 +4,11 @@ import { checkAndTenantId, delayFulfilled, waitingFulfilled } from "./intercepto
 // import {checkAndSetToken, delayFulfilled, handleTokenError, waitingFulfilled} from "@/api/Interceptors";
 
 export const axiosInstance = axios.create({
-    baseURL: `${import.meta.env.VITE_API}/api`,
+    baseURL: `http://localhost:3000/api`,
     timeout: 5000,
     withCredentials: true,
     useAuth: true,
-    useTenant: true
+    useTenant: true,
 })
 
 axiosInstance.interceptors.request.use(checkAndTenantId);
