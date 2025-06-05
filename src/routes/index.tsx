@@ -10,6 +10,7 @@ import AuthLayout from '@/layouts/AuthLayout';
 import NotFoundPage from '@/pages/error/NotFound';
 import LandingPage from '@/pages/LandingPage';
 import PlatformLayout from '@/layouts/PlatformLayout';
+import EmployeePage from '@/pages/EmployeePage';
 
 const LoginPage = React.lazy(() => import('@/pages/LoginPage'));
 const Dashboard = React.lazy(() => import('@/pages/Dashboard'));
@@ -66,13 +67,17 @@ const router = createBrowserRouter([
     ]
   },
   {
-     path: '/:companyCode',
+     path: '/manage',
      element: <PlatformLayout />,
      errorElement: <NotFoundPage />,
      children: [
       {
         path: 'dashboard',
         element: <Dashboard />
+     },
+     {
+      path: 'employee',
+      element: <EmployeePage/>  
      }
      ]
   }
@@ -82,3 +87,4 @@ export default function AppRoutes() {
   return <RouterProvider router={router} />;
 }
 
+  

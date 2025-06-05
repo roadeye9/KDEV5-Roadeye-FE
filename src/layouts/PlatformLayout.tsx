@@ -1,19 +1,22 @@
 import { Toaster } from "@/components/ui/toaster";
-import { Outlet } from "react-router-dom";
-import { Bell, Settings, User, LayoutDashboard, Truck, Inbox, ShoppingBag, Users, HelpCircle, Settings as SettingsIcon } from "lucide-react";
+import { Outlet, useNavigate } from "react-router-dom";
+import { Bell, Settings, User, LayoutDashboard, Truck, Inbox, ShoppingBag, Users, HelpCircle, Settings as SettingsIcon, UserCog } from "lucide-react";
 import { Button, Card, CardBody } from "@nextui-org/react";
 
 const MENU_ITEMS = [
-    { icon: LayoutDashboard, label: "Dashboard" },
-    { icon: Truck, label: "Tracking" },
-    { icon: Inbox, label: "Inbox", badge: 3 },
-    { icon: ShoppingBag, label: "Orders" },
-    { icon: Users, label: "Customers" },
-    { icon: HelpCircle, label: "Help & Support" },
-    { icon: SettingsIcon, label: "Settings" },
+    { icon: LayoutDashboard, label: "Dashboard", url: "/manage" },
+    { icon: Truck, label: "Tracking", url: "/manage/tracking" },
+    { icon: Inbox, label: "Inbox", badge: 3, url: "/manage/inbox" },
+    { icon: ShoppingBag, label: "Orders", url: "/manage/orders" },
+    { icon: Users, label: "Customers", url: "/manage/customers" },
+    { icon: UserCog, label: "직원 관리", url: "/manage/employee" },
+    { icon: HelpCircle, label: "Help & Support", url: "/manage/support" },
+    { icon: SettingsIcon, label: "Settings", url: "/manage/settings" },
 ];
 
 const PlatformLayout = () => {
+    const navigate = useNavigate();
+
     return (
         <div className="flex min-h-screen bg-gray-50">
             {/* 왼쪽 사이드바 */}
@@ -45,6 +48,7 @@ const PlatformLayout = () => {
                             key={index}
                             variant="light"
                             className="w-full justify-start gap-3 mb-1 px-2 h-11"
+                            onClick={() => navigate(item.url)}
                         >
                             <item.icon size={20} />
                             <span>{item.label}</span>
@@ -56,32 +60,15 @@ const PlatformLayout = () => {
                         </Button>
                     ))}
                 </nav>
-
-                {/* Free Trial 섹션 */}
-                <div className="mt-auto p-4 bg-gray-50 rounded-lg">
-                    <div className="flex justify-between items-center mb-2">
-                        <span className="text-sm font-medium">Free trial</span>
-                        <span className="text-xs text-gray-500">7 days left</span>
-                    </div>
-                    <div className="w-full h-1 bg-gray-200 rounded-full overflow-hidden">
-                        <div className="w-1/4 h-full bg-blue-500"></div>
-                    </div>
-                    <p className="text-xs text-gray-500 mt-2">
-                        Get better experience and boost your workflow!
-                    </p>
-                    <Button className="w-full mt-3" color="primary" size="sm">
-                        Upgrade now
-                    </Button>
-                </div>
             </div>
 
             {/* 메인 콘텐츠 영역 */}
-            <Card className="flex-1 p-4 m-5 bg-gray-100" shadow="sm">
-                <CardBody>
+            <Card className="flex-1 bg-gray-100" shadow="sm" radius="none">
+                <CardBody className="p-0">
                     <Outlet />
-                    <Toaster />
                 </CardBody>
             </Card>
+            <Toaster />
         </div>
     );
 }
