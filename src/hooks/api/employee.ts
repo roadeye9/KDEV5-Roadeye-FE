@@ -1,6 +1,7 @@
 import { Employee } from '@/api/auth';
-import { getEmployees } from '@/api/employee';
-import { useQuery } from '@tanstack/react-query';
+import { createEmployee, getEmployees } from '@/api/employee';
+import { queryClient } from '@/app';
+import { useMutation, useQuery} from '@tanstack/react-query';
 
 export interface EmployeeQueryParams {
     page: number;
@@ -10,6 +11,7 @@ export interface EmployeeQueryParams {
 
 export const EMPLOYEE_QUERY_KEY = {
     all: ['employees'] as const,
+    add: ['employee-add'] as const,
     list: (params: EmployeeQueryParams) => [...EMPLOYEE_QUERY_KEY.all, 'list', params] as const,
 };
 
@@ -19,3 +21,13 @@ export const useEmployeeQuery = (params: EmployeeQueryParams) => {
         queryFn: () => getEmployees(params),
     });
 };
+
+export const useEmployeeMutation = () => {
+    return useMutation({
+        mutationKey: EMPLOYEE_QUERY_KEY.add,    
+        mutationFn: createEmployee,
+        onSuccess: () => {
+            queryClient.refetchQueries({ queryKey: EMPLOYEE_QUERY_KEY.list({ page: 0, size: 20 }) });
+        }
+    })
+}

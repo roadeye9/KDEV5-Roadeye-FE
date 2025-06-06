@@ -1,5 +1,5 @@
+import { Employee } from './auth';
 import { axiosInstance } from './axiosInstance';
-import { useMutation } from '@tanstack/react-query';
 
 interface CreateEmployeeRequest {
   loginId: string;
@@ -8,13 +8,6 @@ interface CreateEmployeeRequest {
   position: string;
 }
 
-interface Employee {
-  employeeId: number;
-  tenantId: number;
-  loginId: string;
-  name: string;
-  position: string;
-}
 
 interface UpdateEmployeeRequest {
   name: string;
