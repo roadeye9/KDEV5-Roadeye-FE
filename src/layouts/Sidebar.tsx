@@ -3,15 +3,14 @@ import { Bell, Settings, User, LayoutDashboard, Truck, Inbox, ShoppingBag, Users
 import { Button, Card, CardBody } from "@nextui-org/react";
 
 const MENU_ITEMS = [
-    { icon: LayoutDashboard, label: "Dashboard", url: "/manage" },
-    { icon: Truck, label: "Tracking", url: "/manage/tracking" },
-    { icon: Inbox, label: "Inbox", badge: 3, url: "/manage/inbox" },
-    { icon: ShoppingBag, label: "Orders", url: "/manage/orders" },
-    { icon: Users, label: "Customers", url: "/manage/customers" },
+    // { icon: LayoutDashboard, label: "Dashboard", url: "/manage" },
+    // { icon: Truck, label: "Tracking", url: "/manage/tracking" },
+    // { icon: Inbox, label: "Inbox", badge: 3, url: "/manage/inbox" },
+    // { icon: ShoppingBag, label: "Orders", url: "/manage/orders" },
+    // { icon: Users, label: "Customers", url: "/manage/customers" },
     { icon: UserCog, label: "직원 관리", url: "/manage/employee" },
-    { icon: HelpCircle, label: "Help & Support", url: "/manage/support" },
-    { icon: SettingsIcon, label: "Settings", url: "/manage/settings" },
-];
+    { icon: Truck, label: "차량 관리", url: "/manage/vehicle" },
+    ];
 const Sidebar = () => {
     const navigate = useNavigate();
     return (

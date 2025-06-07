@@ -15,6 +15,8 @@ import EmployeePage from '@/pages/EmployeePage';
 const LoginPage = React.lazy(() => import('@/pages/LoginPage'));
 const Dashboard = React.lazy(() => import('@/pages/Dashboard'));
 
+const VehiclePage = React.lazy(() => import('@/pages/VehiclePage'));
+
 // Lazy loading for pages
 // const GithubCallback = React.lazy(() => import('@/pages/auth/GithubCallback'));
 // const Today = React.lazy(() => import('@/pages/today/Today'));
@@ -78,6 +80,10 @@ const router = createBrowserRouter([
      {
       path: 'employee',
       element: <EmployeePage/>  
+     }, 
+     {
+      path: 'vehicle',
+      element: <VehiclePage/>
      }
      ]
   }
