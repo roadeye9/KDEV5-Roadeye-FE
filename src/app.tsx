@@ -7,9 +7,7 @@ export const queryClient = new QueryClient()
 function App() {
   return (
     <QueryClientProvider client={queryClient}>
-      <ThemeProvider>
         <AppRoutes />
-      </ThemeProvider>
     </QueryClientProvider>
   )
 }

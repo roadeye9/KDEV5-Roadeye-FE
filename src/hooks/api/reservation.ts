@@ -1,5 +1,5 @@
 import { PageRequest } from "@/api/vehicle";
-import { CreateReservationRequest, RESERVATION_QUERY_KEY, createReservation, getReservationsByCarWithAfterNow } from "@/api/reservation";
+import { CreateReservationRequest, RESERVATION_QUERY_KEY, approveReservation, createReservation, getReservationsByCarWithAfterNow } from "@/api/reservation";
 import { useMutation, useQuery } from "@tanstack/react-query";
 
 export const useReservationMutation = () => {
@@ -16,3 +16,9 @@ export const useEmployeeQuery = (carId: number) => {
     });
 };
 
+export const useReservationHooks = () => {
+    return useMutation({
+        mutationKey: RESERVATION_QUERY_KEY.approve,
+        mutationFn: approveReservation,
+    })
+}

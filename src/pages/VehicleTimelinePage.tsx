@@ -1,11 +1,13 @@
 import React, { useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { Card, CardBody, CardHeader, Button, Input } from '@nextui-org/react';
+import { Card, CardBody, CardHeader, Button, Input, Select, SelectItem } from '@nextui-org/react';
 import { useVehicleQuery } from '@/hooks/api/vehicle';
 import { VehicleTimeline } from '@/components/vehicle/VehicleTimeline';
 import { useReservationMutation, useEmployeeQuery } from '@/hooks/api/reservation';
 import moment from 'moment';
 import { toast } from 'react-hot-toast';
+import EmptyState from '@/components/vehicle/EmptyState';
+import { ReservePurpose, RESERVE_PURPOSE_LABELS } from '@/types/reservation';
 
 const VehicleTimelinePage = () => {
     const { vehicleId } = useParams();
@@ -17,7 +19,7 @@ const VehicleTimelinePage = () => {
     const { data: reservations } = useEmployeeQuery(Number(vehicleId));
     
     // 예약 생성 mutation
-    const { mutate: createReservation, isLoading } = useReservationMutation();
+    const { mutate: createReservation, isPending } = useReservationMutation();
 
     const [formData, setFormData] = useState({
         startTime: '',
@@ -56,7 +58,7 @@ const VehicleTimelinePage = () => {
                 rentStartAt: formData.startTime,
                 rentEndAt: formData.endTime,
                 reserveReason: formData.purpose,
-                reservedAt: moment().toISOString()  
+                reservedAt: moment().toISOString()
             },
             {
                 onSuccess: () => {
@@ -100,7 +102,7 @@ const VehicleTimelinePage = () => {
         id: reservation.reservationId,
         start: reservation.rentStartAt,
         end: reservation.rentEndAt,
-        title: `${reservation.reserveReason} - ${reservation.reserverName}`,
+        title: `${RESERVE_PURPOSE_LABELS[reservation.reserveReason as ReservePurpose]} - ${reservation.reserverName}`,
         color: getStatusColor(reservation.reserveStatus)
     })) || [];
 
@@ -125,9 +127,11 @@ const VehicleTimelinePage = () => {
                             </CardHeader>
                             <CardBody>
                                 <div className="h-[600px]">
-                                    <VehicleTimeline 
-                                        events={timelineEvents}
-                                    />
+                                    {timelineEvents.length === 0 ? (
+                                        <EmptyState />
+                                    ) : (
+                                        <VehicleTimeline events={timelineEvents} />
+                                    )}
                                 </div>
                             </CardBody>
                         </Card>
@@ -150,7 +154,7 @@ const VehicleTimelinePage = () => {
                                         value={formData.startTime}
                                         onValueChange={(value) => handleInputChange('startTime', value)}
                                         isRequired
-                                        isDisabled={isLoading}
+                                        isDisabled={isPending}
                                     />
                                     <Input
                                         type="datetime-local"
@@ -159,20 +163,26 @@ const VehicleTimelinePage = () => {
                                         value={formData.endTime}
                                         onValueChange={(value) => handleInputChange('endTime', value)}
                                         isRequired
-                                        isDisabled={isLoading}
+                                        isDisabled={isPending}
                                     />
-                                    <Input
+                                    <Select
                                         label="사용 목적"
-                                        placeholder="사용 목적을 입력하세요"
-                                        value={formData.purpose}
-                                        onValueChange={(value) => handleInputChange('purpose', value)}
+                                        placeholder="사용 목적을 선택하세요"
+                                        selectedKeys={formData.purpose ? [formData.purpose] : []}
+                                        onChange={(e) => handleInputChange('purpose', e.target.value)}
                                         isRequired
-                                        isDisabled={isLoading}
-                                    />
+                                        isDisabled={isPending}
+                                    >
+                                        {Object.entries(RESERVE_PURPOSE_LABELS).map(([key, label]) => (
+                                            <SelectItem key={key} value={key}>
+                                                {label}
+                                            </SelectItem>
+                                        ))}
+                                    </Select>
                                     <Button 
                                         color="primary" 
                                         type="submit"
-                                        isLoading={isLoading}
+                                        isLoading={isPending}
                                     >
                                         예약하기
                                     </Button>

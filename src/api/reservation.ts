@@ -26,7 +26,7 @@ export interface CreateReservationRequest {
 export const RESERVATION_QUERY_KEY = {
     all: ['reservations'] as const,
     add: ['reservation-add'] as const,
-    
+    approve: ['reservation-approve'] as const,
     car: (id: number) => ['reservation-car', id] as const,
     list: (params: PageRequest) => [...RESERVATION_QUERY_KEY.all, 'list', params] as const,
 };
@@ -51,6 +51,10 @@ export const getReservations = async (params: PageRequest) => {
 export const updateReservationStatus = async (reservationId: number, status: string): Promise<void> => {
     await axiosInstance.patch(`/reservation/${reservationId}/status`, { status });
 };
+
+export const approveReservation = async (reservationId: number): Promise<void> => {
+    await axiosInstance.patch(`/reservation/${reservationId}/approve`);
+}
 
 
 
