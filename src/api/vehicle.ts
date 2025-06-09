@@ -6,9 +6,12 @@ export type PageInfo = {
     total: number;
 }
 
-export type PagedModel<T> = {
+export interface PagedModel<T> {
     data: T[];
-    pageInfo: PageInfo;
+    totalElements: number;
+    totalPages: number;
+    size: number;
+    page: number;
 }
 
 export type Response<T> = {

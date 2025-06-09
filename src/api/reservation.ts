@@ -3,6 +3,7 @@ import { PagedModel, PageRequest } from "./vehicle";
 
 export interface Reservation {
     reservationId: number;
+    carId: number;
     carName: string;
     licenseNumber: string;
     reserverName: string;
@@ -38,6 +39,17 @@ export const getReservationsByCarWithAfterNow = async (carId: number) => {
 
 export const createReservation = async (request: CreateReservationRequest): Promise<void> => {
     await axiosInstance.post('/reservation', request);
+};
+
+// 전체 예약 목록 조회
+export const getReservations = async (params: PageRequest) => {
+    const { data } = await axiosInstance.get<PagedModel<Reservation>>(`/reservation?page=${params.page}&size=${params.size}&sort=createdAt,desc`);
+    return data;
+};
+
+// 예약 상태 변경
+export const updateReservationStatus = async (reservationId: number, status: string): Promise<void> => {
+    await axiosInstance.patch(`/reservation/${reservationId}/status`, { status });
 };
 
 

@@ -18,6 +18,7 @@ const Dashboard = React.lazy(() => import('@/pages/Dashboard'));
 const VehiclePage = React.lazy(() => import('@/pages/VehiclePage'));
 const VehicleReservationPage = React.lazy(() => import('@/pages/VehicleReservationPage'));
 const VehicleTimelinePage = React.lazy(() => import('@/pages/VehicleTimelinePage'));
+const ReservationsPage = React.lazy(() => import('@/pages/ReservationsPage'));
 
 // Lazy loading for pages
 // const GithubCallback = React.lazy(() => import('@/pages/auth/GithubCallback'));
@@ -94,6 +95,10 @@ const router = createBrowserRouter([
      {
       path: 'vehicle-reservation/:vehicleId/timeline',
       element: <VehicleTimelinePage/>
+     },
+     {
+      path: 'reservations',
+      element: <ReservationsPage/>
      }
      ]
   }

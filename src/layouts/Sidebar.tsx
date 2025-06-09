@@ -10,8 +10,10 @@ const MENU_ITEMS = [
     // { icon: Users, label: "Customers", url: "/manage/customers" },
     { icon: UserCog, label: "직원 관리", url: "/manage/employee" },
     { icon: Truck, label: "차량 관리", url: "/manage/vehicle" },
-    { icon: Calendar, label: "예약 관리", url: "/manage/vehicle-reservation" },
-    ];
+    { icon: Calendar, label: "차량 예약", url: "/manage/vehicle-reservation" },
+    { icon: Calendar, label: "전체 예약 관리", url: "/manage/reservations" },
+] as const;
+
 const Sidebar = () => {
     const navigate = useNavigate();
     return (
@@ -49,11 +51,6 @@ const Sidebar = () => {
                         >
                             <item.icon size={20} />
                             <span>{item.label}</span>
-                            {item.badge && (
-                                <span className="ml-auto bg-gray-100 px-2 rounded-full text-xs">
-                                    {item.badge}
-                                </span>
-                            )}
                         </Button>
                     ))}
                 </nav>
