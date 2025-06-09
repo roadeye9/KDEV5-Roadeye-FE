@@ -4,7 +4,7 @@ import { checkAndTenantId, delayFulfilled, waitingFulfilled } from "./intercepto
 // import {checkAndSetToken, delayFulfilled, handleTokenError, waitingFulfilled} from "@/api/Interceptors";
 
 export const axiosInstance = axios.create({
-    baseURL: `http://localhost:3000/api`,
+    baseURL: `https://dev-api-hq.roadeye.my/api`,
     timeout: 5000,
     withCredentials: true,
     useAuth: true,
