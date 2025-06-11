@@ -68,5 +68,13 @@ export const patchVehicle = async ({id, vehicle} : {id: number, vehicle: Pick<Ve
     await axiosInstance.patch(`/cars/${id}`, vehicle);
 }
 
-// TODO: search ignition
-// TODO count ignition 
+export interface Period {  
+    start: string;
+    end: string;
+}
+
+export const  getReservationByAvailable = async (period: Period,page: PageRequest) => {
+    const {data} = await axiosInstance.get<PagedModel<Vehicle>>(`/reservation/cars/available?start=${period.start}&end=${period.end}&page=${page.page}&size=${page.size}`);
+
+    return data;
+}

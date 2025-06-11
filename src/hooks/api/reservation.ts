@@ -1,4 +1,4 @@
-import { PageRequest } from "@/api/vehicle";
+import { getReservationByAvailable, PageRequest, Period } from "@/api/vehicle";
 import { CreateReservationRequest, RESERVATION_QUERY_KEY, approveReservation, createReservation, getReservationsByCarWithAfterNow } from "@/api/reservation";
 import { useMutation, useQuery } from "@tanstack/react-query";
 
@@ -20,5 +20,12 @@ export const useReservationHooks = () => {
     return useMutation({
         mutationKey: RESERVATION_QUERY_KEY.approve,
         mutationFn: approveReservation,
+    })
+}
+
+export const useReservationByAvailable = (period: Period, page: PageRequest) => {
+    return useQuery({
+        queryKey: RESERVATION_QUERY_KEY.available(period, page),
+        queryFn: () => getReservationByAvailable(period, page),
     })
 }

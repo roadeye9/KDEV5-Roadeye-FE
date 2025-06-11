@@ -2,10 +2,11 @@ import React from 'react';
 import { Table, TableHeader, TableColumn, TableBody, TableRow, TableCell, Button, Image, Tooltip } from '@nextui-org/react';
 import { Vehicle } from '@/api/vehicle';
 import { useNavigate } from 'react-router-dom';
+import { useReservationMutation } from '@/hooks/api/reservation';
 
 interface VehicleReservationListProps {
     vehicles: Vehicle[];
-    onReserve?: (vehicleId: number) => void;
+    onReserve: (vehicleId: number) => void;
 }
 
 export const VehicleReservationList: React.FC<VehicleReservationListProps> = ({
@@ -13,11 +14,6 @@ export const VehicleReservationList: React.FC<VehicleReservationListProps> = ({
     onReserve
 }) => {
     const navigate = useNavigate();
-
-    const handleReserve = (vehicleId: number) => {
-            navigate(`/manage/vehicle-reservation/${vehicleId}/timeline`);
-    };
-
     return (
         <Table 
             aria-label="차량 목록 테이블"
@@ -62,7 +58,7 @@ export const VehicleReservationList: React.FC<VehicleReservationListProps> = ({
                         <TableCell>
                             <Button 
                                 color="primary"
-                                onPress={() => handleReserve(vehicle.id)}
+                                onPress={() => onReserve(vehicle.id)}
                                 size="sm"
                             >
                                 예약하기

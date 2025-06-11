@@ -1,5 +1,5 @@
 import { axiosInstance } from "./axiosInstance";
-import { PagedModel, PageRequest } from "./vehicle";
+import { PagedModel, PageRequest, Period, Vehicle } from "./vehicle";
 
 export interface Reservation {
     reservationId: number;
@@ -29,6 +29,7 @@ export const RESERVATION_QUERY_KEY = {
     approve: ['reservation-approve'] as const,
     car: (id: number) => ['reservation-car', id] as const,
     list: (params: PageRequest) => [...RESERVATION_QUERY_KEY.all, 'list', params] as const,
+    available: (period: Period, page: PageRequest) => [...RESERVATION_QUERY_KEY.all, 'available', period, page] as const,
 };
 
 // 차량 예약 조회 단 현재 시간 이후 기준
@@ -55,6 +56,7 @@ export const updateReservationStatus = async (reservationId: number, status: str
 export const approveReservation = async (reservationId: number): Promise<void> => {
     await axiosInstance.patch(`/reservation/${reservationId}/approve`);
 }
+
 
 
 
