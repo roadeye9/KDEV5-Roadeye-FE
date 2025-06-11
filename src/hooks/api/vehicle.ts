@@ -1,11 +1,12 @@
-import { deleteVehicle, getVehicles, PageRequest, patchVehicle, postVehicle } from "@/api/vehicle";
+import { deleteVehicle, getVehicles, getVehiclesAll, PageRequest, patchVehicle, postVehicle } from "@/api/vehicle";
 import { useMutation, useQuery } from "@tanstack/react-query";
 
 export const VEHICLE_QUERY_KEY = {
     all: ['vehicles'] as const,
+    allDetails: ['vehicles-details'] as const,
     add: ['vehicle-add'] as const,
     delete: ['vehicle-delete'] as const,
-    patch: ['vehicle-patch'] as const,  
+    patch: ['vehicle-patch'] as const,
     list: (params: PageRequest) => [...VEHICLE_QUERY_KEY.all, 'list', params] as const,
 }
 
@@ -15,8 +16,16 @@ export const useVehicleQuery = (params: PageRequest) => {
         queryFn: () => getVehicles(params),
     });
 }
+
+export const useVehicleAllQuery = () => {
+    return useQuery({
+        queryKey: VEHICLE_QUERY_KEY.allDetails,
+        queryFn: getVehiclesAll,
+    });
+}
+
 export const useVehicleMutation = () => {
-    return useMutation({        
+    return useMutation({
         mutationKey: VEHICLE_QUERY_KEY.add,
         mutationFn: postVehicle,
     });
