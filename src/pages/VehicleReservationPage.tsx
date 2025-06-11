@@ -2,7 +2,6 @@ import React, { useState } from 'react';
 import { Card, CardBody, CardHeader, Spinner, Button, DateRangePicker, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, Select, SelectItem } from '@nextui-org/react';
 import { VehicleReservationList } from '@/components/vehicle/VehicleReservationList';
 import { MyReservationList } from '@/components/vehicle/MyReservationList';
-import { useVehicleQuery } from '@/hooks/api/vehicle';
 import { useReservationByAvailable, useReservationMutation } from '@/hooks/api/reservation';
 import dayjs from 'dayjs';
 import { parseDateTime, CalendarDateTime } from '@internationalized/date';
@@ -36,9 +35,6 @@ const VehicleReservationPage = () => {
     const {mutate: reserveVehicle, isPending} = useReservationMutation();
     const vehicles = vehiclesData?.data || [];
 
-    const handleSearch = () => {
-        refetch();
-    };
 
     const handleDateRangeChange = (value: { start: CalendarDateTime; end: CalendarDateTime } | null) => {
         if (value) {

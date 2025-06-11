@@ -1,5 +1,5 @@
 import { Outlet, useNavigate } from "react-router-dom";
-import { Bell, Settings, User, LayoutDashboard, Truck, Inbox, ShoppingBag, Users, HelpCircle, Settings as SettingsIcon, UserCog, Calendar, MapIcon, PinIcon, MapPinIcon } from "lucide-react";
+import { Bell, Settings, User, LayoutDashboard, Truck, Inbox, ShoppingBag, Users, HelpCircle, Settings as SettingsIcon, UserCog, Calendar } from "lucide-react";
 import { Button, Card, CardBody } from "@nextui-org/react";
 
 const MENU_ITEMS = [
@@ -11,6 +11,7 @@ const MENU_ITEMS = [
     { icon: UserCog, label: "직원 관리", url: "/manage/employee" },
     { icon: Truck, label: "차량 관리", url: "/manage/vehicle" },
     { icon: Calendar, label: "차량 예약", url: "/manage/vehicle-reservation" },
+    { icon: ClipboardList, label: "내 예약 현황", url: "/manage/my-reservations" },
     { icon: Calendar, label: "전체 예약 관리", url: "/manage/reservations" },
     { icon: MapPinIcon, label: "차량 관제", url: "/manage/vehicle-control" },
 ];
@@ -18,7 +19,7 @@ const Sidebar = () => {
     const navigate = useNavigate();
     return (
         <>
-            {/* 왼쪽 사이드바 */}
+          {/* 왼쪽 사이드바 */}
             <div className="w-[240px] p-4 flex flex-col">
                 {/* 로고 영역 */}
                 <div className="flex items-center gap-2 px-2 py-4">
@@ -55,7 +56,7 @@ const Sidebar = () => {
                     ))}
                 </nav>
             </div>
-        </>
+</>
     )
 }
 

@@ -15,6 +15,8 @@ export interface Reservation {
     rejectReason: string;
 }
 
+export interface MyReservation extends Omit<Reservation, 'reserverName' | 'approverName'> {
+    status: string;}
 export interface CreateReservationRequest {
     carId: number;
     rentStartAt: string;
@@ -30,6 +32,7 @@ export const RESERVATION_QUERY_KEY = {
     car: (id: number) => ['reservation-car', id] as const,
     list: (params: PageRequest) => [...RESERVATION_QUERY_KEY.all, 'list', params] as const,
     available: (period: Period, page: PageRequest) => [...RESERVATION_QUERY_KEY.all, 'available', period, page] as const,
+    my: (page: PageRequest) => [...RESERVATION_QUERY_KEY.all, 'my', page] as const,
 };
 
 // 차량 예약 조회 단 현재 시간 이후 기준
@@ -61,4 +64,8 @@ export const approveReservation = async (reservationId: number): Promise<void> =
 
 
 
+export const getReservationsByMe = async (page: PageRequest) => {
+    const {data} = await axiosInstance.get<PagedModel<MyReservation>>(`/reservation/my?page=${page.page}&size=${page.size}`);
 
+    return data;
+}

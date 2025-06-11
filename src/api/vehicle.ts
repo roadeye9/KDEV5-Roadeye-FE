@@ -100,3 +100,4 @@ export const getReservationByAvailable = async (period: Period, page: PageReques
 
     return data;
 }
+

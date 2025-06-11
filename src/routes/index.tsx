@@ -2,9 +2,7 @@ import React, { Suspense } from 'react';
 
 import { createBrowserRouter, Outlet, RouterProvider } from 'react-router-dom';
 
-import { PrivateRoute } from '@/components/auth/PrivateRoute';
 import { Toaster } from '@/components/ui/toaster';
-import WaitingView from '@/components/WaitingView';
 import { AuthProvider } from '@/contexts/auth';
 import AuthLayout from '@/layouts/AuthLayout';
 import NotFoundPage from '@/pages/error/NotFound';
@@ -21,6 +19,7 @@ const VehicleTimelinePage = React.lazy(() => import('@/pages/VehicleTimelinePage
 const ReservationsPage = React.lazy(() => import('@/pages/ReservationsPage'));
 const VehicleControlPage = React.lazy(() => import('@/pages/VehicleControlPage'));
 
+const MyReservationsPage = React.lazy(() => import('@/pages/MyReservationsPage'));
 // Lazy loading for pages
 // const GithubCallback = React.lazy(() => import('@/pages/auth/GithubCallback'));
 // const Today = React.lazy(() => import('@/pages/today/Today'));
@@ -61,15 +60,15 @@ const router = createBrowserRouter([
         ],
       },
     ]
-  },
-  {
-    element: <AuthLayout />,
+  }, 
+  { 
+    element: <AuthLayout/>,
     errorElement: <NotFoundPage />,
     children: [
-      {
-        path: '/login',
-        element: <LoginPage />
-      }
+    {
+      path: '/login',
+      element: <LoginPage />
+    }
     ]
   },
   {
@@ -104,12 +103,21 @@ const router = createBrowserRouter([
       {
         path: 'vehicle-control',
         element: <VehicleControlPage />
-      }
-    ]
+      },
+    {
+      path: 'reservations',
+      element: <ReservationsPage/>
+     },
+     {
+      path: 'my-reservations',
+      element: <MyReservationsPage/>
+     }
+     ]
   }
-])
+]);
 
 export default function AppRoutes() {
   return <RouterProvider router={router} />;
 }
 
+  
