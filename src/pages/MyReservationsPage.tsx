@@ -60,7 +60,7 @@ const MyReservationsPage = () => {
                 
                 {isLoading ? (
                     <div className="flex justify-center items-center h-40">
-                        <Spinner size="g" />
+                        <Spinner size="lg" />
                     </div>
                 ) : !reservationsData?.data || reservationsData.data.length === 0 ? (
                     <div className="text-center text-gray-500 py-8">
