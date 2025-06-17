@@ -14,12 +14,8 @@ const LoginPage = React.lazy(() => import('@/pages/LoginPage'));
 const Dashboard = React.lazy(() => import('@/pages/Dashboard'));
 
 const VehiclePage = React.lazy(() => import('@/pages/VehiclePage'));
-const VehicleReservationPage = React.lazy(() => import('@/pages/VehicleReservationPage'));
-const VehicleTimelinePage = React.lazy(() => import('@/pages/VehicleTimelinePage'));
-const ReservationsPage = React.lazy(() => import('@/pages/ReservationsPage'));
 const VehicleControlPage = React.lazy(() => import('@/pages/VehicleControlPage'));
 
-const MyReservationsPage = React.lazy(() => import('@/pages/MyReservationsPage'));
 // Lazy loading for pages
 // const GithubCallback = React.lazy(() => import('@/pages/auth/GithubCallback'));
 // const Today = React.lazy(() => import('@/pages/today/Today'));
@@ -60,15 +56,15 @@ const router = createBrowserRouter([
         ],
       },
     ]
-  }, 
-  { 
-    element: <AuthLayout/>,
+  },
+  {
+    element: <AuthLayout />,
     errorElement: <NotFoundPage />,
     children: [
-    {
-      path: '/login',
-      element: <LoginPage />
-    }
+      {
+        path: '/login',
+        element: <LoginPage />
+      }
     ]
   },
   {
@@ -89,30 +85,10 @@ const router = createBrowserRouter([
         element: <VehiclePage />
       },
       {
-        path: 'vehicle-reservation',
-        element: <VehicleReservationPage />
-      },
-      {
-        path: 'vehicle-reservation/:vehicleId/timeline',
-        element: <VehicleTimelinePage />
-      },
-      {
-        path: 'reservations',
-        element: <ReservationsPage />
-      },
-      {
         path: 'vehicle-control',
         element: <VehicleControlPage />
       },
-    {
-      path: 'reservations',
-      element: <ReservationsPage/>
-     },
-     {
-      path: 'my-reservations',
-      element: <MyReservationsPage/>
-     }
-     ]
+    ]
   }
 ]);
 
@@ -120,4 +96,3 @@ export default function AppRoutes() {
   return <RouterProvider router={router} />;
 }
 
-  

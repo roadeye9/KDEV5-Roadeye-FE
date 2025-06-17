@@ -94,10 +94,3 @@ export interface Period {
     start: string;
     end: string;
 }
-
-export const getReservationByAvailable = async (period: Period, page: PageRequest) => {
-    const { data } = await axiosInstance.get<PagedModel<Vehicle>>(`/reservation/cars/available?start=${period.start}&end=${period.end}&page=${page.page}&size=${page.size}`);
-
-    return data;
-}
-

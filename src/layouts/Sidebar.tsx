@@ -10,16 +10,13 @@ const MENU_ITEMS = [
     // { icon: Users, label: "Customers", url: "/manage/customers" },
     { icon: UserCog, label: "직원 관리", url: "/manage/employee" },
     { icon: Truck, label: "차량 관리", url: "/manage/vehicle" },
-    { icon: Calendar, label: "차량 예약", url: "/manage/vehicle-reservation" },
-    { icon: ClipboardList, label: "내 예약 현황", url: "/manage/my-reservations" },
-    { icon: Calendar, label: "전체 예약 관리", url: "/manage/reservations" },
     { icon: MapPin, label: "차량 관제", url: "/manage/vehicle-control" },
 ];
 const Sidebar = () => {
     const navigate = useNavigate();
     return (
         <>
-          {/* 왼쪽 사이드바 */}
+            {/* 왼쪽 사이드바 */}
             <div className="w-[240px] p-4 flex flex-col">
                 {/* 로고 영역 */}
                 <div className="flex items-center gap-2 px-2 py-4">
@@ -56,7 +53,7 @@ const Sidebar = () => {
                     ))}
                 </nav>
             </div>
-</>
+        </>
     )
 }
 
