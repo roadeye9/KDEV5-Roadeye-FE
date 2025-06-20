@@ -1,0 +1,649 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RoadEye - 운행일지</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/driving-logs.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <style>
+        /* 필터 섹션 스타일 */
+        .filters-section {
+            background: white;
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        .filters-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+        }
+
+        .filter-group {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .filter-group label {
+            font-size: 14px;
+            color: #2d3436;
+            font-weight: 500;
+        }
+
+        .filter-group select,
+        .filter-group input {
+            padding: 8px 12px;
+            border: 2px solid #dfe6e9;
+            border-radius: 6px;
+            font-size: 14px;
+            color: #2d3436;
+            transition: all 0.3s ease;
+        }
+
+        .filter-group select:focus,
+        .filter-group input:focus {
+            border-color: #0984e3;
+            outline: none;
+        }
+
+        .filter-actions {
+            display: flex;
+            gap: 10px;
+            margin-top: 20px;
+        }
+
+        .filter-btn {
+            padding: 8px 16px;
+            border: none;
+            border-radius: 6px;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .filter-btn.apply {
+            background-color: #0984e3;
+            color: white;
+        }
+
+        .filter-btn.reset {
+            background-color: #dfe6e9;
+            color: #2d3436;
+        }
+
+        .filter-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+
+        /* 운행일지 목록 스타일 */
+        .logs-section {
+            background: white;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        .log-item {
+            border-bottom: 1px solid #dfe6e9;
+            transition: all 0.3s ease;
+        }
+
+        .log-item:last-child {
+            border-bottom: none;
+        }
+
+        .log-header {
+            padding: 15px 20px;
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: #f8f9fa;
+        }
+
+        .log-header:hover {
+            background: #f1f2f6;
+        }
+
+        .log-title {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .vehicle-info {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .vehicle-info i {
+            color: #0984e3;
+        }
+
+        .vehicle-details {
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
+        }
+
+        .vehicle-number {
+            font-weight: 500;
+            color: #2d3436;
+        }
+
+        .vehicle-model {
+            font-size: 12px;
+            color: #636e72;
+        }
+
+        .reservation-info {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            color: #636e72;
+            font-size: 14px;
+        }
+
+        .log-content {
+            padding: 0;
+            max-height: 0;
+            overflow: hidden;
+            transition: all 0.3s ease;
+        }
+
+        .log-item.active .log-content {
+            padding: 20px;
+            max-height: 1000px;
+        }
+
+        .log-details {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .detail-row {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            padding: 10px;
+            background: #f8f9fa;
+            border-radius: 6px;
+        }
+
+        .detail-item {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        .detail-label {
+            font-size: 12px;
+            color: #636e72;
+        }
+
+        .detail-value {
+            font-size: 14px;
+            color: #2d3436;
+            font-weight: 500;
+        }
+
+        .trip-map {
+            width: 100%;
+            height: 300px;
+            background: #dfe6e9;
+            border-radius: 6px;
+            margin: 15px 0;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 15px;
+            margin: 15px 0;
+        }
+
+        .stat-card {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 6px;
+            text-align: center;
+        }
+
+        .stat-value {
+            font-size: 24px;
+            font-weight: 600;
+            color: #0984e3;
+            margin-bottom: 5px;
+        }
+
+        .stat-label {
+            font-size: 12px;
+            color: #636e72;
+        }
+
+        /* 반응형 스타일 */
+        @media (max-width: 768px) {
+            .filters-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .filter-actions {
+                flex-direction: column;
+            }
+
+            .filter-btn {
+                width: 100%;
+                justify-content: center;
+            }
+
+            .log-header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 10px;
+            }
+
+            .reservation-info {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 5px;
+            }
+        }
+
+        /* 테이블 스타일 */
+        .logs-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .logs-table th,
+        .logs-table td {
+            padding: 15px;
+            text-align: left;
+            border-bottom: 1px solid #dfe6e9;
+        }
+
+        .logs-table th {
+            background-color: #f8f9fa;
+            font-weight: 500;
+            color: #2d3436;
+        }
+
+        .logs-table th i {
+            margin-right: 8px;
+            color: #0984e3;
+        }
+
+        .logs-table tbody tr:hover {
+            background-color: #f8f9fa;
+        }
+
+        .vehicle-info {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        .vehicle-number {
+            font-weight: 500;
+            color: #2d3436;
+        }
+
+        .vehicle-model {
+            font-size: 12px;
+            color: #636e72;
+        }
+
+        .trip-info {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+            color: #636e72;
+            font-size: 14px;
+        }
+
+        .view-btn {
+            padding: 6px 12px;
+            border: none;
+            border-radius: 6px;
+            background-color: #0984e3;
+            color: white;
+            font-size: 14px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .view-btn:hover {
+            background-color: #0870c0;
+            transform: translateY(-2px);
+        }
+
+        @media (max-width: 768px) {
+            .logs-table {
+                display: block;
+                overflow-x: auto;
+            }
+
+            .logs-table th,
+            .logs-table td {
+                white-space: nowrap;
+            }
+        }
+
+        /* 다운로드 버튼 스타일 */
+        .content-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .download-btn {
+            padding: 8px 16px;
+            background-color: #2ecc71;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            font-size: 14px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .download-btn:hover {
+            background-color: #27ae60;
+            transform: translateY(-2px);
+        }
+
+        .download-btn i {
+            font-size: 16px;
+        }
+    </style>
+</head>
+<body>
+    <!-- 모바일 메뉴 토글 버튼 -->
+    <button class="menu-toggle" onclick="toggleSidebar()">
+        <i class="fas fa-bars"></i>
+    </button>
+
+    <div class="dashboard-container">
+        <!-- 사이드바 네비게이션 -->
+        <nav class="sidebar">
+            <div class="logo">
+                <a href="dashboard.html" class="logo-link">
+                    <i class="fas fa-car-side"></i>
+                    <h2>RoadEye</h2>
+                </a>
+            </div>
+            <ul class="nav-menu">
+                <li><a href="user-management.html"><i class="fas fa-users"></i>사용자 관리</a></li>
+                <li><a href="vehicle-management.html"><i class="fas fa-car"></i>차량 관리</a></li>
+                <li><a href="reservation-management.html"><i class="fas fa-calendar-alt"></i>예약 관리</a></li>
+                <li><a href="vehicle-monitoring.html"><i class="fas fa-map-marked-alt"></i>실시간 차량관제</a></li>
+                <li><a href="#" class="active"><i class="fas fa-clipboard-list"></i>운행일지</a></li>
+            </ul>
+            <div class="user-info">
+                <div class="user-profile">
+                    <i class="fas fa-user-circle"></i>
+                    <span class="user-name">김커널</span>
+                </div>
+                <button class="logout-btn" onclick="location.href='index.html'">
+                    <i class="fas fa-sign-out-alt"></i>
+                    로그아웃
+                </button>
+            </div>
+        </nav>
+
+        <!-- 메인 컨텐츠 -->
+        <main class="main-content">
+            <header class="content-header">
+                <h1>
+                    <i class="fas fa-clipboard-list"></i>
+                    운행일지
+                </h1>
+                <button class="download-btn" onclick="downloadExcel()">
+                    <i class="fas fa-file-excel"></i>
+                    엑셀 다운로드
+                </button>
+            </header>
+
+            <!-- 필터 섹션 -->
+            <section class="filters-section">
+                <div class="filters-grid">
+                    <div class="filter-group">
+                        <label>
+                            <i class="fas fa-car"></i>
+                            차량 선택
+                        </label>
+                        <select id="vehicle-filter">
+                            <option value="">전체 차량</option>
+                            <option value="12가3456">소나타 (12가 3456)</option>
+                            <option value="34나5678">그랜저 (34나 5678)</option>
+                            <option value="56다7890">K8 (56다 7890)</option>
+                        </select>
+                    </div>
+                    <div class="filter-group">
+                        <label>
+                            <i class="fas fa-calendar"></i>
+                            기간 선택
+                        </label>
+                        <input type="date" id="start-date">
+                    </div>
+                    <div class="filter-group">
+                        <label>
+                            <i class="fas fa-calendar"></i>
+                            종료일
+                        </label>
+                        <input type="date" id="end-date">
+                    </div>
+                    <div class="filter-group">
+                        <label>
+                            <i class="fas fa-user"></i>
+                            운전자
+                        </label>
+                        <select id="driver-filter">
+                            <option value="">전체 운전자</option>
+                            <option value="홍길동">홍길동</option>
+                            <option value="김철수">김철수</option>
+                            <option value="이영희">이영희</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="filter-actions">
+                    <button class="filter-btn apply" onclick="applyFilters()">
+                        <i class="fas fa-search"></i>
+                        검색
+                    </button>
+                    <button class="filter-btn reset" onclick="resetFilters()">
+                        <i class="fas fa-undo"></i>
+                        초기화
+                    </button>
+                </div>
+            </section>
+
+            <!-- 운행일지 목록 -->
+            <section class="logs-section">
+                <table class="logs-table">
+                    <thead>
+                        <tr>
+                            <th>
+                                <i class="fas fa-calendar"></i>
+                                예약 기간
+                            </th>
+                            <th>
+                                <i class="fas fa-car"></i>
+                                차량정보
+                            </th>
+                            <th>
+                                <i class="fas fa-user"></i>
+                                예약자
+                            </th>
+                            <th>
+                                <i class="fas fa-route"></i>
+                                운행정보
+                            </th>
+                            <th>
+                                <i class="fas fa-cog"></i>
+                                관리
+                            </th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>2024-03-21 ~ 2024-03-23</td>
+                            <td>
+                                <div class="vehicle-info">
+                                    <span class="vehicle-number">12가 3456</span>
+                                    <span class="vehicle-model">소나타</span>
+                                </div>
+                            </td>
+                            <td>홍길동</td>
+                            <td>
+                                <div class="trip-info">
+                                    <div>운행 횟수: 3회</div>
+                                    <div>총 145km</div>
+                                </div>
+                            </td>
+                            <td>
+                                <button class="view-btn" onclick="location.href='driving-log-detail.html?id=1'">
+                                    <i class="fas fa-eye"></i>
+                                    상세보기
+                                </button>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>2024-03-18 ~ 2024-03-19</td>
+                            <td>
+                                <div class="vehicle-info">
+                                    <span class="vehicle-number">34나 5678</span>
+                                    <span class="vehicle-model">그랜저</span>
+                                </div>
+                            </td>
+                            <td>김철수</td>
+                            <td>
+                                <div class="trip-info">
+                                    <div>운행 횟수: 2회</div>
+                                    <div>총 95km</div>
+                                </div>
+                            </td>
+                            <td>
+                                <button class="view-btn" onclick="location.href='driving-log-detail.html?id=2'">
+                                    <i class="fas fa-eye"></i>
+                                    상세보기
+                                </button>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </section>
+        </main>
+    </div>
+
+    <!-- SheetJS CDN 추가 -->
+    <script src="https://cdn.sheetjs.com/xlsx-0.20.1/package/dist/xlsx.full.min.js"></script>
+
+    <script>
+        // 사이드바 토글
+        function toggleSidebar() {
+            const sidebar = document.querySelector('.sidebar');
+            sidebar.classList.toggle('active');
+        }
+
+        // 운행일지 상세 정보 토글
+        function toggleLogDetails(header) {
+            const logItem = header.parentElement;
+            logItem.classList.toggle('active');
+        }
+
+        // 엑셀 다운로드 함수
+        function downloadExcel() {
+            // 테이블 데이터 수집
+            const table = document.querySelector('.logs-table');
+            const rows = Array.from(table.querySelectorAll('tbody tr'));
+            
+            // 엑셀 데이터 준비
+            const excelData = rows.map(row => {
+                const cells = Array.from(row.querySelectorAll('td'));
+                return {
+                    '예약 기간': cells[0].textContent,
+                    '차량번호': cells[1].querySelector('.vehicle-number').textContent,
+                    '차량모델': cells[1].querySelector('.vehicle-model').textContent,
+                    '예약자': cells[2].textContent,
+                    '운행 횟수': cells[3].querySelector('.trip-info div:first-child').textContent,
+                    '총 주행거리': cells[3].querySelector('.trip-info div:last-child').textContent
+                };
+            });
+
+            // 워크북 생성
+            const wb = XLSX.utils.book_new();
+            const ws = XLSX.utils.json_to_sheet(excelData);
+
+            // 열 너비 설정
+            const colWidths = [
+                { wch: 20 }, // 예약 기간
+                { wch: 12 }, // 차량번호
+                { wch: 10 }, // 차량모델
+                { wch: 10 }, // 예약자
+                { wch: 12 }, // 운행 횟수
+                { wch: 12 }  // 총 주행거리
+            ];
+            ws['!cols'] = colWidths;
+
+            // 워크시트를 워크북에 추가
+            XLSX.utils.book_append_sheet(wb, ws, "운행일지");
+
+            // 파일 다운로드
+            const today = new Date().toISOString().slice(0, 10);
+            XLSX.writeFile(wb, `운행일지_${today}.xlsx`);
+        }
+
+        // 필터 적용
+        function applyFilters() {
+            const vehicle = document.getElementById('vehicle-filter').value;
+            const startDate = document.getElementById('start-date').value;
+            const endDate = document.getElementById('end-date').value;
+            const driver = document.getElementById('driver-filter').value;
+
+            // TODO: 필터 적용 로직 구현
+            console.log('Applying filters:', { vehicle, startDate, endDate, driver });
+            
+            // 필터링된 데이터로 테이블 업데이트 후 알림
+            alert('필터가 적용되었습니다.');
+        }
+
+        // 필터 초기화
+        function resetFilters() {
+            document.getElementById('vehicle-filter').value = '';
+            document.getElementById('start-date').value = '';
+            document.getElementById('end-date').value = '';
+            document.getElementById('driver-filter').value = '';
+
+            // TODO: 초기 데이터 로드
+            alert('필터가 초기화되었습니다.');
+        }
+
+        // 화면 크기가 변경될 때 사이드바 상태 조정
+        window.addEventListener('resize', function() {
+            const sidebar = document.querySelector('.sidebar');
+            if (window.innerWidth > 768) {
+                sidebar.classList.remove('active');
+            }
+        });
+    </script>
+</body>
+</html> 

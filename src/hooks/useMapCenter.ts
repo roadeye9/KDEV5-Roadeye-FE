@@ -5,7 +5,7 @@ export interface Coordinate {
     lng: number;
 }
 
-const DEFAULT_COORDINATE: Coordinate = { lat: 37.494589, lng: 126.868346 };
+const DEFAULT_COORDINATE: Coordinate = { lat: 36.2683, lng: 127.6358 };
 
 export default function useMapCenter() {
     const [center, setCenter] = useState<Coordinate>(DEFAULT_COORDINATE);

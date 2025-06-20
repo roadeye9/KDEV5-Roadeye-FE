@@ -1,0 +1,818 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RoadEye - 실시간 차량관제</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <script>
+        (function() {
+            window.__FIGMA_CHANNEL__ = 'd7tf0ifn';
+            const script = document.createElement('script');
+            script.src = 'https://www.figma.com/api/plugins/figma-to-html/inject.js';
+            document.head.appendChild(script);
+        })();
+    </script>
+</head>
+<body>
+    <!-- 모바일 메뉴 토글 버튼 -->
+    <button class="menu-toggle" onclick="toggleSidebar()">
+        <i class="fas fa-bars"></i>
+    </button>
+
+    <div class="dashboard-container">
+        <!-- 사이드바 네비게이션 -->
+        <nav class="sidebar">
+            <div class="logo">
+                <a href="dashboard.html" class="logo-link">
+                    <i class="fas fa-car-side"></i>
+                    <h2>RoadEye</h2>
+                </a>
+            </div>
+            <ul class="nav-menu">
+                <li><a href="user-management.html"><i class="fas fa-users"></i>사용자 관리</a></li>
+                <li><a href="vehicle-management.html"><i class="fas fa-car"></i>차량 관리</a></li>
+                <li><a href="reservation-management.html"><i class="fas fa-calendar-alt"></i>예약 관리</a></li>
+                <li><a href="#" class="active"><i class="fas fa-map-marked-alt"></i>실시간 차량관제</a></li>
+                <li><a href="driving-logs.html"><i class="fas fa-clipboard-list"></i>운행일지</a></li>
+            </ul>
+            <div class="user-info">
+                <div class="user-profile">
+                    <i class="fas fa-user-circle"></i>
+                    <span class="user-name">김커널</span>
+                </div>
+                <button class="logout-btn" onclick="location.href='index.html'">
+                    <i class="fas fa-sign-out-alt"></i>
+                    로그아웃
+                </button>
+            </div>
+        </nav>
+
+        <!-- 메인 컨텐츠 -->
+        <main class="main-content">
+            <header class="content-header">
+                <h1>
+                    <i class="fas fa-map-marked-alt"></i>
+                    실시간 차량관제
+                </h1>
+                <div class="header-actions">
+                    <span class="date">
+                        <i class="far fa-clock"></i>
+                        <span id="current-time">14:30:25</span>
+                    </span>
+                </div>
+            </header>
+
+            <div class="monitoring-container">
+                <!-- 운행중인 차량 목록 패널 -->
+                <div class="vehicle-list-panel">
+                    <div class="panel-header">
+                        <h2>운행중인 차량</h2>
+                        <div class="panel-actions">
+                            <button class="refresh-btn" onclick="refreshVehicles()">
+                                <i class="fas fa-sync-alt"></i>
+                            </button>
+                        </div>
+                    </div>
+                    <!-- 차량 목록/상세 정보 컨테이너 -->
+                    <div class="panel-content">
+                        <!-- 차량 목록 -->
+                        <div class="vehicle-cards">
+                            <div class="vehicle-card" onclick="selectVehicle(this, '1')">
+                                <div class="card-header">
+                                    <label class="show-on-map">
+                                        <input type="checkbox" checked onchange="toggleVehicleOnMap(this, '1')">
+                                        <span class="checkmark"></span>
+                                    </label>
+                                    <div class="vehicle-info">
+                                        <h3>소나타</h3>
+                                        <span class="vehicle-number">12가 3456</span>
+                                    </div>
+                                </div>
+                                <div class="card-body">
+                                    <div class="status-info">
+                                        <span class="status driving">
+                                            <i class="fas fa-circle"></i>
+                                            운행중
+                                        </span>
+                                        <span class="driver">
+                                            <i class="fas fa-user"></i>
+                                            홍길동
+                                        </span>
+                                    </div>
+                                    <div class="location-info">
+                                        <i class="fas fa-map-marker-alt"></i>
+                                        서울시 강남구 테헤란로
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="vehicle-card" onclick="selectVehicle(this, '2')">
+                                <div class="card-header">
+                                    <label class="show-on-map">
+                                        <input type="checkbox" checked onchange="toggleVehicleOnMap(this, '2')">
+                                        <span class="checkmark"></span>
+                                    </label>
+                                    <div class="vehicle-info">
+                                        <h3>그랜저</h3>
+                                        <span class="vehicle-number">34나 5678</span>
+                                    </div>
+                                </div>
+                                <div class="card-body">
+                                    <div class="status-info">
+                                        <span class="status driving">
+                                            <i class="fas fa-circle"></i>
+                                            운행중
+                                        </span>
+                                        <span class="driver">
+                                            <i class="fas fa-user"></i>
+                                            김철수
+                                        </span>
+                                    </div>
+                                    <div class="location-info">
+                                        <i class="fas fa-map-marker-alt"></i>
+                                        서울시 서초구 반포대로
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <!-- 차량 상세 정보 -->
+                        <div class="vehicle-detail">
+                            <div class="detail-header">
+                                <h3>차량 상세 정보</h3>
+                                <button class="back-btn" onclick="closeDetailPanel()">
+                                    <i class="fas fa-arrow-left"></i>
+                                    목록으로
+                                </button>
+                            </div>
+                            <div class="detail-content">
+                                <div class="detail-section">
+                                    <h4>기본 정보</h4>
+                                    <div class="info-grid">
+                                        <div class="info-item">
+                                            <label>차량명</label>
+                                            <span id="detail-vehicle-name">소나타</span>
+                                        </div>
+                                        <div class="info-item">
+                                            <label>차량번호</label>
+                                            <span id="detail-vehicle-number">12가 3456</span>
+                                        </div>
+                                        <div class="info-item">
+                                            <label>운전자</label>
+                                            <span id="detail-driver">홍길동</span>
+                                        </div>
+                                        <div class="info-item">
+                                            <label>상태</label>
+                                            <span id="detail-status" class="status driving">운행중</span>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="detail-section">
+                                    <h4>운행 정보</h4>
+                                    <div class="info-grid">
+                                        <div class="info-item">
+                                            <label>현재 위치</label>
+                                            <span id="detail-location">서울시 강남구 테헤란로</span>
+                                        </div>
+                                        <div class="info-item">
+                                            <label>운행 시작</label>
+                                            <span id="detail-start-time">2024-03-21 09:00</span>
+                                        </div>
+                                        <div class="info-item">
+                                            <label>예상 종료</label>
+                                            <span id="detail-end-time">2024-03-21 18:00</span>
+                                        </div>
+                                        <div class="info-item">
+                                            <label>운행 목적</label>
+                                            <span id="detail-purpose">업무 미팅</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 지도와 상세정보 컨테이너 -->
+                <div class="map-detail-container">
+                    <!-- 지도 영역 -->
+                    <div class="map-container">
+                        <img src="map.png" alt="지도" class="map-image">
+                        <canvas id="map-overlay" class="map-overlay"></canvas>
+                        <div id="vehicle-markers"></div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <style>
+    .monitoring-container {
+        display: flex;
+        gap: 20px;
+        height: calc(100vh - 100px);
+    }
+
+    /* 차량 목록 패널 스타일 */
+    .vehicle-list-panel {
+        width: 300px;
+        background: white;
+        border-radius: 10px;
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        display: flex;
+        flex-direction: column;
+        overflow: hidden;
+    }
+
+    .panel-header {
+        padding: 20px;
+        border-bottom: 1px solid #dfe6e9;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+    .panel-header h2 {
+        font-size: 18px;
+        margin: 0;
+        color: #2d3436;
+    }
+
+    .refresh-btn {
+        background: none;
+        border: none;
+        color: #0984e3;
+        cursor: pointer;
+        padding: 5px;
+        border-radius: 5px;
+        transition: all 0.3s ease;
+    }
+
+    .refresh-btn:hover {
+        background-color: #f1f2f6;
+        transform: rotate(180deg);
+    }
+
+    .panel-content {
+        flex: 1;
+        position: relative;
+        overflow: hidden;
+    }
+
+    .vehicle-cards {
+        height: 100%;
+        padding: 20px;
+        overflow-y: auto;
+        display: flex;
+        flex-direction: column;
+        gap: 15px;
+        transition: transform 0.3s ease;
+    }
+
+    .vehicle-cards.detail-shown {
+        position: absolute;
+        width: 100%;
+        transform: translateX(-100%);
+    }
+
+    .vehicle-detail {
+        position: absolute;
+        top: 0;
+        left: 100%;
+        width: 100%;
+        height: 100%;
+        background: white;
+        transition: transform 0.3s ease;
+        padding: 20px;
+        overflow-y: auto;
+    }
+
+    .vehicle-detail.shown {
+        transform: translateX(-100%);
+    }
+
+    .detail-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 20px;
+    }
+
+    .detail-header h3 {
+        margin: 0;
+        font-size: 18px;
+        color: #2d3436;
+    }
+
+    .back-btn {
+        background: none;
+        border: none;
+        color: #0984e3;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        padding: 8px;
+        border-radius: 6px;
+        transition: all 0.3s ease;
+    }
+
+    .back-btn:hover {
+        background: #f1f2f6;
+    }
+
+    .detail-section {
+        margin-bottom: 24px;
+    }
+
+    .detail-section h4 {
+        font-size: 16px;
+        color: #2d3436;
+        margin: 0 0 16px 0;
+    }
+
+    .info-grid {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 16px;
+    }
+
+    .info-item {
+        display: flex;
+        flex-direction: column;
+        gap: 4px;
+    }
+
+    .info-item label {
+        font-size: 12px;
+        color: #636e72;
+    }
+
+    .info-item span {
+        font-size: 14px;
+        color: #2d3436;
+    }
+
+    .vehicle-card {
+        background: #f8f9fa;
+        border-radius: 8px;
+        padding: 15px;
+        cursor: pointer;
+        transition: all 0.3s ease;
+    }
+
+    .vehicle-card:hover {
+        background: #f1f2f6;
+        transform: translateY(-2px);
+    }
+
+    .vehicle-card.selected {
+        border: 2px solid #0984e3;
+        background: #f1f2f6;
+    }
+
+    .card-header {
+        display: flex;
+        align-items: center;
+        gap: 15px;
+        margin-bottom: 10px;
+    }
+
+    .vehicle-info {
+        flex: 1;
+    }
+
+    .vehicle-info h3 {
+        margin: 0;
+        font-size: 16px;
+        color: #2d3436;
+    }
+
+    .vehicle-number {
+        font-size: 14px;
+        color: #636e72;
+    }
+
+    /* 체크박스 스타일 */
+    .show-on-map {
+        display: inline-flex;
+        align-items: center;
+        position: relative;
+        cursor: pointer;
+        user-select: none;
+    }
+
+    .show-on-map input {
+        position: absolute;
+        opacity: 0;
+        width: 0;
+        height: 0;
+    }
+
+    .checkmark {
+        width: 24px;
+        height: 24px;
+        background-color: #dfe6e9;
+        border-radius: 4px;
+        position: relative;
+        transition: all 0.3s ease;
+    }
+
+    .show-on-map:hover .checkmark {
+        background-color: #b2bec3;
+    }
+
+    .show-on-map input:checked ~ .checkmark {
+        background-color: #0984e3;
+    }
+
+    .checkmark:after {
+        content: '';
+        position: absolute;
+        display: none;
+        left: 9px;
+        top: 5px;
+        width: 6px;
+        height: 11px;
+        border: solid white;
+        border-width: 0 2px 2px 0;
+        transform: rotate(45deg);
+    }
+
+    .show-on-map input:checked ~ .checkmark:after {
+        display: block;
+    }
+
+    .status-info {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 8px;
+    }
+
+    .status {
+        display: flex;
+        align-items: center;
+        gap: 5px;
+        font-size: 14px;
+    }
+
+    .status.driving {
+        color: #00b894;
+    }
+
+    .status.driving i {
+        font-size: 8px;
+    }
+
+    .driver {
+        display: flex;
+        align-items: center;
+        gap: 5px;
+        font-size: 14px;
+        color: #636e72;
+    }
+
+    .location-info {
+        display: flex;
+        align-items: center;
+        gap: 5px;
+        font-size: 14px;
+        color: #636e72;
+    }
+
+    /* 지도 컨테이너 스타일 */
+    .map-detail-container {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        gap: 20px;
+    }
+
+    .map-container {
+        flex: 1;
+        background: white;
+        border-radius: 10px;
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        overflow: hidden;
+        position: relative;
+    }
+
+    .map-image {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        position: absolute;
+        top: 0;
+        left: 0;
+    }
+
+    .map-overlay {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        pointer-events: none;
+    }
+
+    #vehicle-markers {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        pointer-events: none;
+    }
+
+    .vehicle-marker {
+        position: absolute;
+        width: 30px;
+        height: 30px;
+        transform: translate(-50%, -50%);
+        cursor: pointer;
+        pointer-events: auto;
+        transition: all 0.3s ease;
+    }
+
+    .vehicle-marker i {
+        font-size: 24px;
+        color: #0984e3;
+        filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.2));
+    }
+
+    .vehicle-marker.selected i {
+        color: #00b894;
+        transform: scale(1.2);
+    }
+
+    .vehicle-marker .vehicle-tooltip {
+        position: absolute;
+        bottom: 100%;
+        left: 50%;
+        transform: translateX(-50%);
+        background: white;
+        padding: 4px 8px;
+        border-radius: 4px;
+        font-size: 12px;
+        white-space: nowrap;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        display: none;
+    }
+
+    .vehicle-marker:hover .vehicle-tooltip {
+        display: block;
+    }
+
+    /* 반응형 스타일 */
+    @media (max-width: 768px) {
+        .monitoring-container {
+            flex-direction: column;
+            height: auto;
+        }
+
+        .vehicle-list-panel {
+            width: 100%;
+            height: 300px;
+        }
+
+        .map-container {
+            height: 400px;
+        }
+
+        .info-grid {
+            grid-template-columns: 1fr;
+        }
+    }
+    </style>
+
+    <script>
+    // 차량 데이터
+    const vehicleData = {
+        '1': {
+            name: '소나타',
+            number: '12가 3456',
+            driver: '홍길동',
+            status: '운행중',
+            location: '서울시 강남구 테헤란로',
+            startTime: '2024-03-21 09:00',
+            endTime: '2024-03-21 18:00',
+            purpose: '업무 미팅',
+            position: { x: 30, y: 40 },
+            route: [
+                { x: 30, y: 40 },
+                { x: 35, y: 45 },
+                { x: 40, y: 42 },
+                { x: 45, y: 48 }
+            ]
+        },
+        '2': {
+            name: '그랜저',
+            number: '34나 5678',
+            driver: '김철수',
+            status: '운행중',
+            location: '서울시 서초구 반포대로',
+            startTime: '2024-03-21 10:00',
+            endTime: '2024-03-21 17:00',
+            purpose: '거래처 방문',
+            position: { x: 60, y: 70 },
+            route: [
+                { x: 60, y: 70 },
+                { x: 65, y: 65 },
+                { x: 70, y: 68 },
+                { x: 75, y: 72 }
+            ]
+        }
+    };
+
+    let selectedVehicleId = null;
+    const canvas = document.getElementById('map-overlay');
+    const ctx = canvas.getContext('2d');
+    const markersContainer = document.getElementById('vehicle-markers');
+
+    // 캔버스 크기 설정
+    function resizeCanvas() {
+        const container = canvas.parentElement;
+        canvas.width = container.offsetWidth;
+        canvas.height = container.offsetHeight;
+    }
+
+    // 초기화 및 이벤트 리스너 설정
+    window.addEventListener('load', () => {
+        resizeCanvas();
+        initializeVehicleMarkers();
+        drawAllRoutes();
+    });
+
+    window.addEventListener('resize', () => {
+        resizeCanvas();
+        drawAllRoutes();
+    });
+
+    // 차량 마커 초기화
+    function initializeVehicleMarkers() {
+        markersContainer.innerHTML = '';
+        Object.entries(vehicleData).forEach(([id, data]) => {
+            if (document.querySelector(`input[type="checkbox"][onchange="toggleVehicleOnMap(this, '${id}')"]`).checked) {
+                createVehicleMarker(id, data);
+            }
+        });
+    }
+
+    // 차량 마커 생성
+    function createVehicleMarker(id, data) {
+        const marker = document.createElement('div');
+        marker.className = 'vehicle-marker';
+        marker.innerHTML = `
+            <i class="fas fa-car"></i>
+            <div class="vehicle-tooltip">${data.name} (${data.number})</div>
+        `;
+        marker.style.left = `${data.position.x}%`;
+        marker.style.top = `${data.position.y}%`;
+        marker.onclick = () => selectVehicle(document.querySelector(`.vehicle-card[onclick*="'${id}'"]`), id);
+        markersContainer.appendChild(marker);
+    }
+
+    // 모든 경로 그리기
+    function drawAllRoutes() {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        Object.entries(vehicleData).forEach(([id, data]) => {
+            if (document.querySelector(`input[type="checkbox"][onchange="toggleVehicleOnMap(this, '${id}')"]`).checked) {
+                drawRoute(data.route, id === selectedVehicleId);
+            }
+        });
+    }
+
+    // 경로 그리기
+    function drawRoute(route, isSelected) {
+        if (!route || route.length < 2) return;
+
+        ctx.beginPath();
+        ctx.moveTo(
+            (route[0].x / 100) * canvas.width,
+            (route[0].y / 100) * canvas.height
+        );
+
+        for (let i = 1; i < route.length; i++) {
+            ctx.lineTo(
+                (route[i].x / 100) * canvas.width,
+                (route[i].y / 100) * canvas.height
+            );
+        }
+
+        ctx.strokeStyle = isSelected ? '#00b894' : '#0984e3';
+        ctx.lineWidth = isSelected ? 3 : 2;
+        ctx.stroke();
+    }
+
+    // 차량 선택
+    function selectVehicle(card, vehicleId) {
+        // 이전 선택 해제
+        document.querySelectorAll('.vehicle-card').forEach(c => {
+            c.classList.remove('selected');
+        });
+        document.querySelectorAll('.vehicle-marker').forEach(m => {
+            m.classList.remove('selected');
+        });
+        
+        // 새로운 선택
+        card.classList.add('selected');
+        selectedVehicleId = vehicleId;
+        
+        // 마커 선택 상태 업데이트
+        const marker = markersContainer.children[Array.from(markersContainer.children).findIndex(m => 
+            m.querySelector('.vehicle-tooltip').textContent.includes(vehicleData[vehicleId].number)
+        )];
+        if (marker) {
+            marker.classList.add('selected');
+        }
+        
+        // 차량 목록을 왼쪽으로 슬라이드하고 상세 정보 표시
+        document.querySelector('.vehicle-cards').classList.add('detail-shown');
+        document.querySelector('.vehicle-detail').classList.add('shown');
+        
+        // 차량 데이터로 상세 정보 업데이트
+        updateVehicleDetails(vehicleId);
+        
+        // 경로 다시 그리기
+        drawAllRoutes();
+    }
+
+    // 지도에 차량 표시 토글
+    function toggleVehicleOnMap(checkbox, vehicleId) {
+        if (checkbox.checked) {
+            createVehicleMarker(vehicleId, vehicleData[vehicleId]);
+        } else {
+            const marker = Array.from(markersContainer.children).find(m => 
+                m.querySelector('.vehicle-tooltip').textContent.includes(vehicleData[vehicleId].number)
+            );
+            if (marker) {
+                marker.remove();
+            }
+            if (selectedVehicleId === vehicleId) {
+                closeDetailPanel();
+            }
+        }
+        drawAllRoutes();
+    }
+
+    // 상세 정보 패널 닫기
+    function closeDetailPanel() {
+        // 상세 정보 숨기기
+        document.querySelector('.vehicle-cards').classList.remove('detail-shown');
+        document.querySelector('.vehicle-detail').classList.remove('shown');
+        
+        // 선택 상태 초기화
+        document.querySelectorAll('.vehicle-card').forEach(card => {
+            card.classList.remove('selected');
+        });
+        document.querySelectorAll('.vehicle-marker').forEach(marker => {
+            marker.classList.remove('selected');
+        });
+        selectedVehicleId = null;
+        drawAllRoutes();
+    }
+
+    // 차량 상세 정보 업데이트
+    function updateVehicleDetails(vehicleId) {
+        const data = vehicleData[vehicleId];
+        document.getElementById('detail-vehicle-name').textContent = data.name;
+        document.getElementById('detail-vehicle-number').textContent = data.number;
+        document.getElementById('detail-driver').textContent = data.driver;
+        document.getElementById('detail-status').textContent = data.status;
+        document.getElementById('detail-location').textContent = data.location;
+        document.getElementById('detail-start-time').textContent = data.startTime;
+        document.getElementById('detail-end-time').textContent = data.endTime;
+        document.getElementById('detail-purpose').textContent = data.purpose;
+    }
+
+    // 차량 목록 새로고침
+    function refreshVehicles() {
+        const refreshBtn = document.querySelector('.refresh-btn i');
+        refreshBtn.style.transform = 'rotate(360deg)';
+        
+        // 실제로는 서버에서 새로운 데이터를 가져와야 함
+        setTimeout(() => {
+            refreshBtn.style.transform = 'rotate(0deg)';
+            initializeVehicleMarkers();
+            drawAllRoutes();
+            alert('차량 목록이 새로고침되었습니다.');
+        }, 1000);
+    }
+
+    // 사이드바 토글
+    function toggleSidebar() {
+        document.querySelector('.sidebar').classList.toggle('active');
+    }
+
+    // 화면 크기가 변경될 때 사이드바 상태 조정
+    window.addEventListener('resize', function() {
+        const sidebar = document.querySelector('.sidebar');
+        if (window.innerWidth > 768) {
+            sidebar.classList.remove('active');
+        }
+    });
+    </script>
+</body>
+</html> 

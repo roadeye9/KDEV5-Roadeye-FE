@@ -21,6 +21,7 @@ export const useVehicleAllQuery = () => {
     return useQuery({
         queryKey: VEHICLE_QUERY_KEY.allDetails,
         queryFn: getVehiclesAll,
+        refetchInterval: 30000,
     });
 }
 

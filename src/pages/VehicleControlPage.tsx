@@ -5,7 +5,9 @@ import useKakaoLoader from "@/hooks/useKakaoLoader";
 import { useVehicleAllQuery } from "@/hooks/api/vehicle";
 import { VehicleDetails } from "@/api/vehicle";
 import { Vehicle } from "@/api/vehicle";
+import { ListModel, DrivingLocationDetail } from "@/api/location";
 import useMapCenter, { Coordinate } from "@/hooks/useMapCenter";
+import { useDrivingHistoryQuery } from "@/hooks/api/location";
 
 const PULL_INTERVAL_MS = 10000; // 10초
 
@@ -15,42 +17,36 @@ type Point = {
 }
 type Path = Point[]
 
-function getPath(vehicle: VehicleDetails): Path {
-  const nPath = 100;
-  const path = [];
-  path.push({ lat: vehicle.latitude, lng: vehicle.longitude });
-  for (let i = 0; i < nPath; i++) {
-    var dlat = (Math.random()) * 0.05;
-    var dlng = 0;
-    path.push({ lat: vehicle.latitude + dlat, lng: vehicle.longitude + dlng });
-  }
-  return path;
+function getPath(drivingHistory: DrivingLocationDetail[]): Path {
+  return drivingHistory.map(item => ({
+    lat: item.latitude,
+    lng: item.longitude,
+  }));
 }
+
 
 function DrivingPage() {
   useKakaoLoader();
 
   const { data: vehicles, isLoading, refetch } = useVehicleAllQuery();
   const [selectedVehicle, setSelectedVehicle] = useState<VehicleDetails | null>(null);
-  const [path, setPath] = useState<Path | null>(null);
+  const [path, setPath] = useState<Path>([]);
   const [center, setCenter] = useMapCenter();
+  const [mapLevel, setMapLevel] = useState(12);
+  const { data: drivingHistory } = useDrivingHistoryQuery(selectedVehicle?.id ?? 0);
 
   useEffect(() => {
-    if (selectedVehicle) {
+    if (selectedVehicle && drivingHistory) {
       setCenter({ lat: selectedVehicle.latitude, lng: selectedVehicle.longitude });
-      setPath(getPath(selectedVehicle));
+      setMapLevel(4);
+      setPath(getPath(drivingHistory));
+    } else {
+      setPath([]);
     }
-    else {
-      setPath(null);
-    }
-  }, [selectedVehicle]);
+  }, [selectedVehicle, drivingHistory]);
+  
+  console.log(drivingHistory);
 
-  useEffect(() => {
-    const interval = setInterval(() => {
-      refetch();
-    }, PULL_INTERVAL_MS);
-    return () => clearInterval(interval);
-  }, [refetch]);
 
   return (
     <div className="flex flex-row h-full">
@@ -69,7 +65,7 @@ function DrivingPage() {
             <div className="flex flex-col gap-2 p-2">
               <div><img src={selectedVehicle.imageUrl} alt="car" className="w-full h-auto" /></div>
               <div><span className="font-semibold">이름:</span> {selectedVehicle.name}</div>
-              <div><span className="font-semibold">상태:</span> {selectedVehicle.status}</div>
+              <div><span className="font-semibold">상태:</span> {selectedVehicle.ignitionStatus}</div>
               <div><span className="font-semibold">속도:</span> {selectedVehicle.speed} km/h</div>
               <div><span className="font-semibold">방향:</span> {selectedVehicle.direction}°</div>
               <div><span className="font-semibold">위치:</span> {selectedVehicle.latitude}, {selectedVehicle.longitude}</div>
@@ -78,7 +74,7 @@ function DrivingPage() {
         ) : (
           <>
             <div className="p-4 font-bold text-lg border-b">차량 목록</div>
-            <ul>
+            <ul className="max-h-[calc(100vh-64px)] overflow-y-auto">
               {vehicles?.map((vehicle) => (
                 <li
                   key={vehicle.id}
@@ -87,7 +83,7 @@ function DrivingPage() {
                 >
                   <div className="flex flex-col">
                     <span>{vehicle.name}</span>
-                    <span className="text-xs text-gray-500">상태: {vehicle.status}</span>
+                    <span className="text-xs text-gray-500">상태: {vehicle.ignitionStatus}</span>
                   </div>
                 </li>
               ))}
@@ -97,38 +93,32 @@ function DrivingPage() {
       </div>
       <div className="flex-1 h-full">
         <Map
+          key={mapLevel}
           center={center}
           style={{ width: "100%", height: "100%" }}
-          level={3}
+          level={mapLevel}
         >
           <MapTypeControl position={"TOPRIGHT"} />
           <ZoomControl position={"BOTTOMRIGHT"} />
           <MarkerClusterer
             averageCenter={true}
-            minLevel={6}
-            minClusterSize={10}
+            minLevel={9}
+            minClusterSize={1}
           >
             {vehicles?.map((vehicle) => (
               <MapMarker
                 key={vehicle.id}
                 position={{ lat: vehicle.latitude, lng: vehicle.longitude }}
-                image={{
-                  src: CarFrontImage,
-                  size: { width: 40, height: 40 },
+                onClick={() => {
+                  setSelectedVehicle(vehicle);
+                  setMapLevel(4);
                 }}
-                onClick={() => setSelectedVehicle(vehicle)}
               />
             ))}
           </MarkerClusterer>
           {path && (
             <>
               <Polyline path={path} strokeColor={"blue"} strokeWeight={2} />
-              {path.map((p, i) => (
-                <MapMarker
-                  key={`${p.lat}-${p.lng}`}
-                  position={{ lat: p.lat, lng: p.lng }}
-                />
-              ))}
             </>
           )}
         </Map>

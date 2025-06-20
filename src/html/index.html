@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RoadEye - 로그인</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <script>
+        (function() {
+            window.__FIGMA_CHANNEL__ = 'd7tf0ifn';
+            const script = document.createElement('script');
+            script.src = 'https://www.figma.com/api/plugins/figma-to-html/inject.js';
+            document.head.appendChild(script);
+        })();
+    </script>
+</head>
+<body>
+    <div class="container">
+        <div class="login-box">
+            <div class="logo-section">
+                <i class="fas fa-car-side"></i>
+                <h1>RoadEye</h1>
+            </div>
+            <form class="login-form">
+                <div class="form-group">
+                    <label for="company-code">
+                        <i class="fas fa-building"></i>
+                        기업코드
+                    </label>
+                    <input type="text" id="company-code" name="company-code" required>
+                </div>
+                <div class="form-group">
+                    <label for="username">
+                        <i class="fas fa-user"></i>
+                        아이디
+                    </label>
+                    <input type="text" id="username" name="username" required>
+                </div>
+                <div class="form-group">
+                    <label for="password">
+                        <i class="fas fa-lock"></i>
+                        비밀번호
+                    </label>
+                    <div class="password-input">
+                        <input type="password" id="password" name="password" required>
+                        <i class="fas fa-eye-slash toggle-password"></i>
+                    </div>
+                </div>
+                <button type="submit" class="login-btn">
+                    <i class="fas fa-sign-in-alt"></i>
+                    로그인
+                </button>
+            </form>
+            <div class="register-link">
+                <button class="register-btn secondary" onclick="location.href='company-register.html'">
+                    <i class="fas fa-plus-circle"></i>
+                    업체 등록 신청
+                </button>
+            </div>
+        </div>
+    </div>
+</body>
+</html> 

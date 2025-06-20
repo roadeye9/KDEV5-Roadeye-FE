@@ -39,6 +39,8 @@ export type VehicleDetails = Vehicle & {
     batteryVoltage: number;
     ignitionStatus: CarIgnitionStatus;
     activeTransactionId: string | null;
+    speed: number;
+    direction: number;
 };
 
 type SystemType = {
