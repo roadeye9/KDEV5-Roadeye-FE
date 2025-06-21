@@ -1,7 +1,7 @@
 import { Employee } from './auth';
 import { axiosInstance } from './axiosInstance';
 
-interface CreateEmployeeRequest {
+export interface CreateEmployeeRequest {
   loginId: string;
   password: string;
   name: string;

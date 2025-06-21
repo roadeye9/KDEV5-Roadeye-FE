@@ -4,21 +4,30 @@ import { useEmployee, useUpdateEmployee } from "@/hooks/pages/useEmployee";
 import { useState, useEffect, useMemo } from "react";
 import '@fortawesome/fontawesome-free/css/all.min.css';
 import { useMutation } from "@tanstack/react-query";
-import { updateEmployee, UpdateEmployeeRequest } from "@/api/employee";
+import { createEmployee, CreateEmployeeRequest, updateEmployee, UpdateEmployeeRequest } from "@/api/employee";
 import { toast } from "sonner";
 import { Employee } from "@/api/auth";
+import { useEmployeeMutation } from "@/hooks/api/employee";
 
 export const EmployeePage = () => {
     const { employees, pagination, status, setStatus } = useEmployee();
     const [selectedEmployee, setSelectedEmployee] = useState<Employee | null>(null);
     const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+    const [isRegisterModalOpen, setIsRegisterModalOpen] = useState(false);
 
     // 수정 모달을 위한 상태
     const [editName, setEditName] = useState("");
     const [editPosition, setEditPosition] = useState("");
     const [editStatus, setEditStatus] = useState(false); // true: ENABLE, false: DISABLE
 
+    // 등록 모달을 위한 상태
+    const [registerLoginId, setRegisterLoginId] = useState("");
+    const [registerPassword, setRegisterPassword] = useState("");
+    const [registerName, setRegisterName] = useState("");
+    const [registerPosition, setRegisterPosition] = useState("");
+
     const { updateEmployee } = useUpdateEmployee();
+    const { mutate: createEmployee } = useEmployeeMutation();
 
     const handleEditClick = (employee: Employee) => {
         setSelectedEmployee(employee);
@@ -28,6 +37,14 @@ export const EmployeePage = () => {
         setIsEditModalOpen(true);
 
         console.log(employee);
+    };
+
+    const handleRegisterClick = () => {
+        setRegisterLoginId("");
+        setRegisterPassword("");
+        setRegisterName("");
+        setRegisterPosition("");
+        setIsRegisterModalOpen(true);
     };
 
     const handleSaveChanges = () => {
@@ -52,6 +69,26 @@ export const EmployeePage = () => {
                 }
             }
         );
+    };
+
+    const handleRegisterSave = () => {
+        const payload: CreateEmployeeRequest = {
+            loginId: registerLoginId,
+            password: registerPassword,
+            name: registerName,
+            position: registerPosition,
+        };
+
+        createEmployee(payload, {
+            onSuccess: () => {
+                toast.success("사용자가 성공적으로 등록되었습니다.");
+                setIsRegisterModalOpen(false);
+            },
+            onError: (error) => {
+                toast.error("사용자 등록에 실패했습니다.");
+                console.error("Creation failed:", error);
+            },
+        });
     };
 
     useEffect(() => {
@@ -86,7 +123,7 @@ export const EmployeePage = () => {
                     </Select>
 
                     <div className="flex-1" />
-                    <Button color="primary" startContent={<User className="w-4 h-4" />}>사용자 등록</Button>
+                    <Button color="primary" startContent={<User className="w-4 h-4" />} onClick={handleRegisterClick}>사용자 등록</Button>
                 </section>
 
                 {/* Table */}
@@ -218,6 +255,62 @@ export const EmployeePage = () => {
                                 <Button
                                     color="primary"
                                     onClick={handleSaveChanges}
+                                >
+                                    저장
+                                </Button>
+                            </ModalFooter>
+                        </>
+                    )}
+                </ModalContent>
+            </Modal>
+
+            {/* 사용자 등록 모달 */}
+            <Modal isOpen={isRegisterModalOpen} onOpenChange={setIsRegisterModalOpen}>
+                <ModalContent>
+                    {(onClose) => (
+                        <>
+                            <ModalHeader className="flex flex-col gap-1">사용자 등록</ModalHeader>
+                            <ModalBody>
+                                <Input
+                                    label="아이디"
+                                    value={registerLoginId}
+                                    onChange={(e) => setRegisterLoginId(e.target.value)}
+                                    fullWidth
+                                />
+                                <Input
+                                    label="비밀번호"
+                                    type="password"
+                                    value={registerPassword}
+                                    onChange={(e) => setRegisterPassword(e.target.value)}
+                                    fullWidth
+                                />
+                                <Input
+                                    label="이름"
+                                    value={registerName}
+                                    onChange={(e) => setRegisterName(e.target.value)}
+                                    fullWidth
+                                />
+                                <Select
+                                    label="직책"
+                                    placeholder="직책을 선택하세요"
+                                    selectedKeys={registerPosition ? [registerPosition] : []}
+                                    onChange={(e) => setRegisterPosition(e.target.value)}
+                                >
+                                    <SelectItem key="normal" value="normal">
+                                        일반
+                                    </SelectItem>
+                                    <SelectItem key="Administrator" value="Administrator">
+                                        관리자
+                                    </SelectItem>
+                                </Select>
+                            </ModalBody>
+                            <ModalFooter>
+                                <Button color="danger" variant="light" onClick={onClose}>
+                                    취소
+                                </Button>
+                                <Button
+                                    color="primary"
+                                    onClick={handleRegisterSave}
                                 >
                                     저장
                                 </Button>
