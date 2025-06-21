@@ -1,5 +1,7 @@
 import { useEffect, useState } from "react";
 import { Map, MapMarker, MapTypeControl, MarkerClusterer, Polyline, ZoomControl } from "react-kakao-maps-sdk";
+import { Button, Checkbox } from "@nextui-org/react";
+import { MapPin, RefreshCw, ArrowLeft, User, Clock } from "lucide-react";
 import CarFrontImage from "@/assets/images/car-front.svg";
 import useKakaoLoader from "@/hooks/useKakaoLoader";
 import { useVehicleAllQuery } from "@/hooks/api/vehicle";
@@ -8,6 +10,7 @@ import { Vehicle } from "@/api/vehicle";
 import { ListModel, DrivingLocationDetail } from "@/api/location";
 import useMapCenter, { Coordinate } from "@/hooks/useMapCenter";
 import { useDrivingHistoryQuery } from "@/hooks/api/location";
+import '@fortawesome/fontawesome-free/css/all.min.css';
 
 const PULL_INTERVAL_MS = 10000; // 10초
 
@@ -24,8 +27,7 @@ function getPath(drivingHistory: DrivingLocationDetail[]): Path {
   }));
 }
 
-
-function DrivingPage() {
+function VehicleControlPage() {
   useKakaoLoader();
 
   const { data: vehicles, isLoading, refetch } = useVehicleAllQuery();
@@ -33,7 +35,11 @@ function DrivingPage() {
   const [path, setPath] = useState<Path>([]);
   const [center, setCenter] = useMapCenter();
   const [mapLevel, setMapLevel] = useState(12);
+  const [showDetailPanel, setShowDetailPanel] = useState(false);
+  const [visibleVehicles, setVisibleVehicles] = useState<Set<number>>(new Set());
   const { data: drivingHistory } = useDrivingHistoryQuery(selectedVehicle?.id ?? 0);
+  const [currentTime, setCurrentTime] = useState(new Date());
+  const [originalCenter, setOriginalCenter] = useState<Coordinate>({ lat: 37.5665, lng: 126.9780 }); // 서울 시청 좌표
 
   useEffect(() => {
     if (selectedVehicle && drivingHistory) {
@@ -44,87 +50,264 @@ function DrivingPage() {
       setPath([]);
     }
   }, [selectedVehicle, drivingHistory]);
-  
-  console.log(drivingHistory);
 
+  useEffect(() => {
+    // 모든 차량을 기본적으로 지도에 표시
+    if (vehicles) {
+      setVisibleVehicles(new Set(vehicles.map(v => v.id)));
+    }
+  }, [vehicles]);
+
+  // 실시간 시간 업데이트
+  useEffect(() => {
+    const timer = setInterval(() => {
+      setCurrentTime(new Date());
+    }, 1000); // 1초마다 업데이트
+
+    return () => clearInterval(timer);
+  }, []);
+
+  const handleVehicleSelect = (vehicle: VehicleDetails) => {
+    setSelectedVehicle(vehicle);
+    setShowDetailPanel(true);
+    setCenter({ lat: vehicle.latitude, lng: vehicle.longitude });
+    setMapLevel(4);
+  };
+
+  const handleBackToList = () => {
+    setSelectedVehicle(null);
+    setShowDetailPanel(false);
+    setCenter(originalCenter);
+    setMapLevel(12);
+  };
+
+  const toggleVehicleVisibility = (vehicleId: number) => {
+    const newVisible = new Set(visibleVehicles);
+    if (newVisible.has(vehicleId)) {
+      newVisible.delete(vehicleId);
+    } else {
+      newVisible.add(vehicleId);
+    }
+    setVisibleVehicles(newVisible);
+  };
+
+  const getCurrentTime = () => {
+    return currentTime.toLocaleTimeString('ko-KR', {
+      hour: '2-digit',
+      minute: '2-digit',
+      second: '2-digit'
+    });
+  };
 
   return (
-    <div className="flex flex-row h-full">
-      <div className="w-64 bg-gray-50 border-r h-full overflow-y-auto">
-        {selectedVehicle ? (
-          <div className="flex flex-col h-full">
-            <div className="flex items-center p-4 border-b gap-2">
-              <button
-                className="text-sm px-2 py-1 rounded bg-gray-200 hover:bg-gray-300"
-                onClick={() => setSelectedVehicle(null)}
-              >
-                ← 뒤로가기
-              </button>
-              <span className="font-bold text-lg">차량 상세 정보</span>
-            </div>
-            <div className="flex flex-col gap-2 p-2">
-              <div><img src={selectedVehicle.imageUrl} alt="car" className="w-full h-auto" /></div>
-              <div><span className="font-semibold">이름:</span> {selectedVehicle.name}</div>
-              <div><span className="font-semibold">상태:</span> {selectedVehicle.ignitionStatus}</div>
-              <div><span className="font-semibold">속도:</span> {selectedVehicle.speed} km/h</div>
-              <div><span className="font-semibold">방향:</span> {selectedVehicle.direction}°</div>
-              <div><span className="font-semibold">위치:</span> {selectedVehicle.latitude}, {selectedVehicle.longitude}</div>
+    <div className="flex flex-col h-screen">
+      {/* Header */}
+      <header className="p-6 bg-white border-b">
+        <div className="flex items-center justify-between">
+          <h1 className="text-2xl font-bold text-gray-800 flex items-center gap-3">
+            <MapPin className="text-blue-500" />
+            실시간 차량관제
+          </h1>
+          <div className="flex items-center gap-4">
+            <div className="flex items-center gap-2 text-gray-600">
+              <Clock className="w-4 h-4" />
+              <span>{getCurrentTime()}</span>
             </div>
           </div>
-        ) : (
-          <>
-            <div className="p-4 font-bold text-lg border-b">차량 목록</div>
-            <ul className="max-h-[calc(100vh-64px)] overflow-y-auto">
-              {vehicles?.map((vehicle) => (
-                <li
-                  key={vehicle.id}
-                  className={`p-4 cursor-pointer border-b hover:bg-gray-100`}
-                  onClick={() => setSelectedVehicle(vehicle)}
-                >
-                  <div className="flex flex-col">
-                    <span>{vehicle.name}</span>
-                    <span className="text-xs text-gray-500">상태: {vehicle.ignitionStatus}</span>
+        </div>
+      </header>
+
+      {/* Main Content */}
+      <div className="flex flex-1 overflow-hidden">
+        {/* Vehicle List Panel */}
+        <div className="w-80 bg-white border-r flex flex-col">
+          <div className="p-5 border-b">
+            <div className="flex items-center justify-between">
+              <h2 className="text-lg font-semibold text-gray-800">운행중인 차량</h2>
+              <Button
+                isIconOnly
+                variant="light"
+                color="primary"
+                onClick={() => refetch()}
+                className="hover:rotate-180 transition-transform duration-300"
+              >
+                <RefreshCw className="w-4 h-4" />
+              </Button>
+            </div>
+          </div>
+
+          <div className="flex-1 relative overflow-hidden">
+            {/* Vehicle List */}
+            <div className={`h-full transition-transform duration-300 ${showDetailPanel ? '-translate-x-full' : 'translate-x-0'}`}>
+              <div className="p-5 space-y-4 overflow-y-auto h-full">
+                {vehicles?.map((vehicle) => (
+                  <div
+                    key={vehicle.id}
+                    className={`bg-gray-50 rounded-lg p-4 cursor-pointer transition-all duration-300 hover:bg-gray-100 hover:-translate-y-1 ${
+                      selectedVehicle?.id === vehicle.id ? 'border-2 border-blue-500 bg-blue-50' : ''
+                    }`}
+                    onClick={() => handleVehicleSelect(vehicle)}
+                  >
+                    <div className="flex items-center gap-3 mb-3">
+                      <Checkbox
+                        isSelected={visibleVehicles.has(vehicle.id)}
+                        onValueChange={() => toggleVehicleVisibility(vehicle.id)}
+                        onClick={(e) => e.stopPropagation()}
+                      />
+                      <div className="flex-1">
+                        <h3 className="font-semibold text-gray-800">{vehicle.name}</h3>
+                        <span className="text-sm text-gray-600">{vehicle.vehicleNumber}</span>
+                      </div>
+                    </div>
+                    
+                    <div className="flex items-center justify-between mb-2">
+                      <span className={`flex items-center gap-1 text-sm ${
+                        vehicle.ignitionStatus === 'ON' ? 'text-green-600' : 'text-gray-500'
+                      }`}>
+                        <i className="fas fa-circle text-xs"></i>
+                        {vehicle.ignitionStatus === 'ON' ? '운행중' : '정지'}
+                      </span>
+                      <span className="flex items-center gap-1 text-sm text-gray-600">
+                        <User className="w-3 h-3" />
+                        {vehicle.driverName || '미배정'}
+                      </span>
+                    </div>
+                    
+                    <div className="flex items-center gap-2 text-sm text-gray-600">
+                      <MapPin className="w-3 h-3" />
+                      <span className="truncate">
+                        {vehicle.address || `${vehicle.latitude.toFixed(4)}, ${vehicle.longitude.toFixed(4)}`}
+                      </span>
+                    </div>
                   </div>
-                </li>
-              ))}
-            </ul>
-          </>
-        )}
-      </div>
-      <div className="flex-1 h-full">
-        <Map
-          key={mapLevel}
-          center={center}
-          style={{ width: "100%", height: "100%" }}
-          level={mapLevel}
-        >
-          <MapTypeControl position={"TOPRIGHT"} />
-          <ZoomControl position={"BOTTOMRIGHT"} />
-          <MarkerClusterer
-            averageCenter={true}
-            minLevel={9}
-            minClusterSize={1}
+                ))}
+              </div>
+            </div>
+
+            {/* Vehicle Detail Panel */}
+            <div className={`absolute top-0 left-full w-full h-full bg-white transition-transform duration-300 ${
+              showDetailPanel ? '-translate-x-full' : 'translate-x-0'
+            }`}>
+              {selectedVehicle && (
+                <div className="p-5 h-full overflow-y-auto">
+                  <div className="flex items-center justify-between mb-5">
+                    <h3 className="text-lg font-semibold text-gray-800">차량 상세 정보</h3>
+                    <Button
+                      variant="light"
+                      color="primary"
+                      startContent={<ArrowLeft className="w-4 h-4" />}
+                      onClick={handleBackToList}
+                    >
+                      목록으로
+                    </Button>
+                  </div>
+
+                  <div className="space-y-6">
+                    {/* Basic Info */}
+                    <div>
+                      <h4 className="font-semibold text-gray-800 mb-3">기본 정보</h4>
+                      <div className="grid grid-cols-2 gap-4">
+                        <div>
+                          <label className="text-xs text-gray-500">차량명</label>
+                          <p className="text-sm text-gray-800">{selectedVehicle.name}</p>
+                        </div>
+                        <div>
+                          <label className="text-xs text-gray-500">차량번호</label>
+                          <p className="text-sm text-gray-800">{selectedVehicle.vehicleNumber}</p>
+                        </div>
+                        <div>
+                          <label className="text-xs text-gray-500">운전자</label>
+                          <p className="text-sm text-gray-800">{selectedVehicle.driverName || '미배정'}</p>
+                        </div>
+                        <div>
+                          <label className="text-xs text-gray-500">상태</label>
+                          <p className={`text-sm ${
+                            selectedVehicle.ignitionStatus === 'ON' ? 'text-green-600' : 'text-gray-600'
+                          }`}>
+                            {selectedVehicle.ignitionStatus === 'ON' ? '운행중' : '정지'}
+                          </p>
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Operation Info */}
+                    <div>
+                      <h4 className="font-semibold text-gray-800 mb-3">운행 정보</h4>
+                      <div className="grid grid-cols-2 gap-4">
+                        <div>
+                          <label className="text-xs text-gray-500">현재 위치</label>
+                          <p className="text-sm text-gray-800">
+                            {selectedVehicle.address || `${selectedVehicle.latitude.toFixed(4)}, ${selectedVehicle.longitude.toFixed(4)}`}
+                          </p>
+                        </div>
+                        <div>
+                          <label className="text-xs text-gray-500">속도</label>
+                          <p className="text-sm text-gray-800">{selectedVehicle.speed} km/h</p>
+                        </div>
+                        <div>
+                          <label className="text-xs text-gray-500">방향</label>
+                          <p className="text-sm text-gray-800">{selectedVehicle.direction}°</p>
+                        </div>
+                        <div>
+                          <label className="text-xs text-gray-500">연료</label>
+                          <p className="text-sm text-gray-800">{selectedVehicle.fuelLevel || 'N/A'}%</p>
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Vehicle Image */}
+                    {selectedVehicle.imageUrl && (
+                      <div>
+                        <h4 className="font-semibold text-gray-800 mb-3">차량 이미지</h4>
+                        <img 
+                          src={selectedVehicle.imageUrl} 
+                          alt={selectedVehicle.name}
+                          className="w-full h-auto rounded-lg"
+                        />
+                      </div>
+                    )}
+                  </div>
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
+
+        {/* Map Container */}
+        <div className="flex-1 relative">
+          <Map
+            key={mapLevel}
+            center={center}
+            style={{ width: "100%", height: "100%" }}
+            level={mapLevel}
           >
-            {vehicles?.map((vehicle) => (
-              <MapMarker
-                key={vehicle.id}
-                position={{ lat: vehicle.latitude, lng: vehicle.longitude }}
-                onClick={() => {
-                  setSelectedVehicle(vehicle);
-                  setMapLevel(4);
-                }}
-              />
-            ))}
-          </MarkerClusterer>
-          {path && (
-            <>
+            <MapTypeControl position={"TOPRIGHT"} />
+            <ZoomControl position={"BOTTOMRIGHT"} />
+            <MarkerClusterer
+              averageCenter={true}
+              minLevel={9}
+              minClusterSize={1}
+            >
+              {vehicles?.filter(vehicle => visibleVehicles.has(vehicle.id)).map((vehicle) => (
+                <MapMarker
+                  key={vehicle.id}
+                  position={{ lat: vehicle.latitude, lng: vehicle.longitude }}
+                  onClick={() => {
+                    setSelectedVehicle(vehicle);
+                    setShowDetailPanel(true);
+                    setMapLevel(4);
+                  }}
+                />
+              ))}
+            </MarkerClusterer>
+            {path.length > 0 && (
               <Polyline path={path} strokeColor={"blue"} strokeWeight={2} />
-            </>
-          )}
-        </Map>
+            )}
+          </Map>
+        </div>
       </div>
     </div>
   );
 }
 
-export default DrivingPage;
+export default VehicleControlPage;
