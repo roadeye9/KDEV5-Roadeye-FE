@@ -9,9 +9,11 @@ import NotFoundPage from '@/pages/error/NotFound';
 import LandingPage from '@/pages/LandingPage';
 import PlatformLayout from '@/layouts/PlatformLayout';
 import EmployeePage from '@/pages/EmployeePage';
+import DrivingLogPage from '@/pages/DrivingLogPage';
+import Dashboard from '@/pages/Dashboard';
+import DrivingLogDetailPage from '@/pages/DrivingLogDetailPage';
 
 const LoginPage = React.lazy(() => import('@/pages/LoginPage'));
-const Dashboard = React.lazy(() => import('@/pages/Dashboard'));
 
 const VehiclePage = React.lazy(() => import('@/pages/VehiclePage'));
 const VehicleControlPage = React.lazy(() => import('@/pages/VehicleControlPage'));
@@ -87,6 +89,14 @@ const router = createBrowserRouter([
       {
         path: 'vehicle-control',
         element: <VehicleControlPage />
+      },
+      {
+        path: 'driving-log',
+        element: <DrivingLogPage />
+      },
+      {
+        path: 'driving-log-detail/:logId',
+        element: <DrivingLogDetailPage />
       },
     ]
   }

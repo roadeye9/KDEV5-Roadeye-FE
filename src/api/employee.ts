@@ -8,10 +8,10 @@ interface CreateEmployeeRequest {
   position: string;
 }
 
-
-interface UpdateEmployeeRequest {
+export interface UpdateEmployeeRequest {
   name: string;
   position: string;
+  status: 'ENABLE' | 'DISABLE';
 }
 
 interface PageRequest {
@@ -27,7 +27,7 @@ interface PageInfo {
     totalPages: number;
 }
 
-interface PageResponse<T> {
+export interface PageResponse<T> {
     content: T[];
     page: PageInfo;
 }
@@ -48,10 +48,12 @@ export const createEmployee = async (employeeData: CreateEmployeeRequest) => {
     });
 };
 
-export const updateEmployee = async (employeeId: number, employeeData: UpdateEmployeeRequest) => {
-    await axiosInstance.put<Employee>(`/employees/${employeeId}`, employeeData, {
+
+export const updateEmployee = async (employeeId: number, payload: UpdateEmployeeRequest): Promise<Employee> => {
+    const response = await axiosInstance.put<Employee>(`/employees/${employeeId}`, payload, {
         useTenant: true,
     });
+    return response.data;
 };
 
 export const deleteEmployee = async (employeeId: number) => {
@@ -60,9 +62,9 @@ export const deleteEmployee = async (employeeId: number) => {
     });
 };
 
-export const getEmployees = async (pageRequest: PageRequest): Promise<PageResponse<Employee>> => {
+export const getEmployees = async (pageRequest: PageRequest, payload: { status?: string }): Promise<PageResponse<Employee>> => {
     const response = await axiosInstance.get<PageResponse<Employee>>('/employees', {
-        params: pageRequest,
+        params: { ...pageRequest, ...payload },
         useTenant: true,
     });
     return response.data;

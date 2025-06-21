@@ -1,36 +1,224 @@
-import { Button, Input, Select, SelectItem, Avatar, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter } from "@nextui-org/react";
+import { Button, Input, Select, SelectItem, Avatar, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, Switch } from "@nextui-org/react";
 import { User } from "lucide-react";
-import { useEmployee } from "@/hooks/pages/useEmployee";
-import { useState } from "react";
+import { useEmployee, useUpdateEmployee } from "@/hooks/pages/useEmployee";
+import { useState, useEffect, useMemo } from "react";
 import '@fortawesome/fontawesome-free/css/all.min.css';
+import { useMutation } from "@tanstack/react-query";
+import { updateEmployee, UpdateEmployeeRequest } from "@/api/employee";
+import { toast } from "sonner";
+import { Employee } from "@/api/auth";
 
 export const EmployeePage = () => {
-    const { employees, pagination } = useEmployee();
-    const [selectedEmployee, setSelectedEmployee] = useState<any>(null);
+    const { employees, pagination, status, setStatus } = useEmployee();
+    const [selectedEmployee, setSelectedEmployee] = useState<Employee | null>(null);
     const [isEditModalOpen, setIsEditModalOpen] = useState(false);
 
-    const handleEditClick = (employee: any) => {
+    // 수정 모달을 위한 상태
+    const [editName, setEditName] = useState("");
+    const [editPosition, setEditPosition] = useState("");
+    const [editStatus, setEditStatus] = useState(false); // true: ENABLE, false: DISABLE
+
+    const { updateEmployee } = useUpdateEmployee();
+
+    const handleEditClick = (employee: Employee) => {
         setSelectedEmployee(employee);
+        setEditName(employee.name);
+        setEditPosition(employee.position);
+        setEditStatus(employee.status === 'ACTIVE');
         setIsEditModalOpen(true);
+
+        console.log(employee);
     };
+
+    const handleSaveChanges = () => {
+        if (!selectedEmployee) return;
+
+        const payload: UpdateEmployeeRequest = {
+            name: editName,
+            position: editPosition,
+            status: editStatus ? 'ENABLE' : 'DISABLE',
+        };
+
+        updateEmployee(
+            { employeeId: selectedEmployee.employeeId, payload },
+            {
+                onSuccess: () => {
+                    toast.success("사용자 정보가 성공적으로 업데이트되었습니다.");
+                    setIsEditModalOpen(false);
+                },
+                onError: (error) => {
+                    toast.error("사용자 정보 업데이트에 실패했습니다.");
+                    console.error("Update failed:", error);
+                }
+            }
+        );
+    };
+
+    useEffect(() => {
+        pagination.onPageChange(1);
+    }, [status]);
 
     return (
         <>
-            {/* 모달 */}
-            <Modal isOpen={isEditModalOpen} onOpenChange={setIsEditModalOpen} placement="center">
+            <div className="flex flex-col h-screen bg-gray-50">
+                <header className="p-4 font-bold text-lg border-b bg-white">사용자 관리</header>
+
+                {/* Controls */}
+                <section className="flex flex-wrap items-center gap-4 px-8 py-4 bg-white border-b">
+                    {/* <Input
+                        className="w-64"
+                        placeholder="사용자 검색..."
+                        startContent={<User className="w-4 h-4 text-gray-400" />}
+                    /> */}
+                    <Select
+                        className="w-40"
+                        selectedKeys={status ? [status] : ["all"]}
+                        onChange={(e) => {
+                        const value = e.target.value;
+                        setStatus(value === "all" ? undefined : value); // 'all'이면 undefined로 설정
+                        pagination.onPageChange(1); // 필터 변경 시 페이지를 1로 초기화
+                        }}
+                        aria-label="상태 필터"
+                    >
+                        <SelectItem key="all" value="all">전체 상태</SelectItem>
+                        <SelectItem key="ACTIVE" value="ACTIVE">활성</SelectItem>
+                        <SelectItem key="DISABLED" value="DISABLED">비활성</SelectItem>
+                    </Select>
+
+                    <div className="flex-1" />
+                    <Button color="primary" startContent={<User className="w-4 h-4" />}>사용자 등록</Button>
+                </section>
+
+                {/* Table */}
+                <div className="flex-1 overflow-y-auto px-8 py-6 bg-white">
+                    <table className="min-w-full bg-white rounded shadow border">
+                        <thead className="sticky top-0 bg-gray-100 z-10">
+                            <tr className="text-gray-700 text-sm">
+                                <th className="px-4 py-3 text-left font-semibold w-16">번호</th>
+                                <th className="px-4 py-3 text-left font-semibold">이름</th>
+                                <th className="px-4 py-3 text-left font-semibold">아이디</th>
+                                <th className="px-4 py-3 text-left font-semibold">직책</th>
+                                <th className="px-4 py-3 text-left font-semibold">상태</th>
+                                <th className="px-4 py-3 text-left font-semibold">생성일</th>
+                                <th className="px-4 py-3 text-left font-semibold">관리</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {(employees.data?.content ?? []).map((emp, index) => (
+                                <tr
+                                    key={emp.employeeId}
+                                    className="border-b last:border-b-0 hover:bg-gray-50 cursor-pointer"
+                                    onClick={() => setSelectedEmployee(emp)}
+                                >
+                                    <td className="px-4 py-3 text-center text-gray-500">
+                                        {((pagination.currentPage - 1) * pagination.pageSize) + index + 1}
+                                    </td>
+                                    <td className="px-4 py-3 flex items-center gap-2">
+                                        <i className="fas fa-user-circle text-lg text-gray-500" />
+                                        <span>{emp.name}</span>
+                                    </td>
+                                    <td className="px-4 py-3">{emp.loginId}</td>
+                                    <td className="px-4 py-3">
+                                        {emp.position === "Administrator" ? (
+                                            <span className="inline-block bg-blue-100 text-blue-800 text-xs font-semibold px-2 py-1 rounded-full">관리자</span>
+                                        ) : (
+                                            <span className="inline-block bg-gray-100 text-gray-800 text-xs font-semibold px-2 py-1 rounded-full">일반</span>
+                                        )}
+                                    </td>
+                                    <td className="px-4 py-3">
+                                        {emp.status === "ACTIVE" ? (
+                                            <span className="inline-flex items-center gap-1.5 py-1.5 px-3 rounded-full text-xs font-medium text-green-700 bg-green-100">
+                                                <span className="w-1.5 h-1.5 inline-block bg-green-500 rounded-full"></span>
+                                                활성화
+                                            </span>
+                                        ) : (
+                                            <span className="inline-flex items-center gap-1.5 py-1.5 px-3 rounded-full text-xs font-medium text-red-700 bg-red-100">
+                                                <span className="w-1.5 h-1.5 inline-block bg-red-500 rounded-full"></span>
+                                                비활성화
+                                            </span>
+                                        )}
+                                    </td>
+                                    <td className="px-4 py-3">{emp.createdAt?.slice(0, 10)}</td>
+                                    <td className="px-4 py-3">
+                                        <i className="fas fa-edit cursor-pointer" onClick={(e) => { e.stopPropagation(); handleEditClick(emp); }} />
+                                    </td>
+                                </tr>
+                            ))}
+                            {(employees.data?.content?.length ?? 0) === 0 && (
+                                <tr>
+                                    <td colSpan={7} className="text-center text-gray-400 py-8">사용자가 없습니다.</td>
+                                </tr>
+                            )}
+                        </tbody>
+                    </table>
+                </div>
+
+                {/* Pagination */}
+                <footer className="py-4 flex justify-center bg-white border-t">
+                    <div className="flex gap-1">
+                        <Button size="sm" variant="light" isDisabled={pagination.currentPage === 1} onClick={() => pagination.onPageChange(pagination.currentPage - 1)}>
+                            &lt;
+                        </Button>
+                        {Array.from({ length: Math.ceil((pagination.totalElements ?? 0) / pagination.pageSize) }, (_, i) => (
+                            <Button
+                                key={i}
+                                size="sm"
+                                variant={pagination.currentPage === i + 1 ? "solid" : "light"}
+                                color={pagination.currentPage === i + 1 ? "primary" : "default"}
+                                onClick={() => pagination.onPageChange(i + 1)}
+                            >
+                                {i + 1}
+                            </Button>
+                        ))}
+                        <Button size="sm" variant="light" isDisabled={pagination.currentPage === Math.ceil((pagination.totalElements ?? 0) / pagination.pageSize)} onClick={() => pagination.onPageChange(pagination.currentPage + 1)}>
+                            &gt;
+                        </Button>
+                    </div>
+                </footer>
+            </div>
+
+            {/* 사용자 정보 수정 모달 */}
+            <Modal isOpen={isEditModalOpen} onOpenChange={setIsEditModalOpen}>
                 <ModalContent>
                     {(onClose) => (
                         <>
                             <ModalHeader className="flex flex-col gap-1">사용자 정보 수정</ModalHeader>
                             <ModalBody>
-                                <Input label="이름" defaultValue={selectedEmployee?.name} />
-                                <Input label="아이디" defaultValue={selectedEmployee?.loginId} />
+                                <Input
+                                    label="이름"
+                                    value={editName}
+                                    onChange={(e) => setEditName(e.target.value)}
+                                    fullWidth
+                                />
+                                <Select
+                                    label="직책"
+                                    placeholder="직책을 선택하세요"
+                                    selectedKeys={editPosition ? [editPosition] : []}
+                                    onChange={(e) => setEditPosition(e.target.value)}
+                                >
+                                    <SelectItem key="normal" value="normal">
+                                        일반
+                                    </SelectItem>
+                                    <SelectItem key="Administrator" value="Administrator">
+                                        관리자
+                                    </SelectItem>
+                                </Select>
+                                <Switch
+                                    isSelected={editStatus}
+                                    onValueChange={setEditStatus}
+                                    color="success"
+                                >
+                                    {editStatus ? "활성" : "비활성"}
+                                </Switch>
                             </ModalBody>
                             <ModalFooter>
-                                <Button variant="light" onPress={onClose}>
+                                <Button color="danger" variant="light" onClick={onClose}>
                                     취소
                                 </Button>
-                                <Button color="primary" onPress={onClose}>
+                                <Button
+                                    color="primary"
+                                    onClick={handleSaveChanges}
+                                >
                                     저장
                                 </Button>
                             </ModalFooter>
@@ -38,99 +226,6 @@ export const EmployeePage = () => {
                     )}
                 </ModalContent>
             </Modal>
-
-            <div className="flex flex-row h-screen">
-                {/* Main Content */}
-                <main className="flex-1 flex flex-col h-screen overflow-hidden">
-                    {/* Header */}
-                    <div className="p-4 font-bold text-lg border-b">사용자 관리</div>
-
-                    {/* Controls */}
-                    <section className="flex flex-wrap items-center gap-4 px-8 py-4 bg-white border-b">
-                        <Input
-                            className="w-64"
-                            placeholder="사용자 검색..."
-                            startContent={<User className="w-4 h-4 text-gray-400" />}
-                        />
-                        <Select className="w-40" defaultSelectedKeys={["all"]} aria-label="상태 필터">
-                            <SelectItem key="all" value="all">전체 상태</SelectItem>
-                            <SelectItem key="active" value="active">활성</SelectItem>
-                            <SelectItem key="inactive" value="inactive">비활성</SelectItem>
-                        </Select>
-                        <div className="flex-1" />
-                        <Button color="primary" startContent={<User className="w-4 h-4" />}>사용자 등록</Button>
-                    </section>
-
-                    {/* Table + Pagination */}
-                    <div className="flex-1 flex flex-col px-8 py-6 bg-white overflow-hidden">
-                        <table className="min-w-full bg-white overflow-auto rounded shadow border">
-                            <thead>
-                                <tr className="bg-gray-100 text-gray-700 text-sm">
-                                    <th className="px-4 py-3 text-left font-semibold">이름</th>
-                                    <th className="px-4 py-3 text-left font-semibold">아이디</th>
-                                    <th className="px-4 py-3 text-left font-semibold">직책</th>
-                                    <th className="px-4 py-3 text-left font-semibold">생성일</th>
-                                    <th className="px-4 py-3 text-left font-semibold">관리</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                {(employees.data?.content ?? []).map((emp) => (
-                                    <tr
-                                        key={emp.employeeId}
-                                        className="border-b last:border-b-0 hover:bg-gray-50 cursor-pointer"
-                                        onClick={() => setSelectedEmployee(emp)}
-                                    >
-                                        <td className="px-4 py-3 flex items-center gap-2">
-                                            <i className="fas fa-user-circle text-lg text-gray-500" />
-                                            <span>{emp.name}</span>
-                                        </td>
-                                        <td className="px-4 py-3">{emp.loginId}</td>
-                                        <td className="px-4 py-3">
-                                            {emp.position === "Administrator" ? (
-                                                <span className="inline-block bg-green-100 text-green-800 text-xs font-semibold px-2 py-1 rounded-full">관리자</span>
-                                            ) : (
-                                                <span className="inline-block bg-blue-100 text-blue-800 text-xs font-semibold px-2 py-1 rounded-full">일반</span>
-                                            )}
-                                        </td>
-                                        <td className="px-4 py-3">{emp.createdAt?.slice(0, 10)}</td>
-                                        <td className="px-4 py-3">
-                                            <i className="fas fa-edit cursor-pointer" onClick={(e) => { e.stopPropagation(); handleEditClick(emp); }} />
-                                        </td>
-                                    </tr>
-                                ))}
-                                {(employees.data?.content?.length ?? 0) === 0 && (
-                                    <tr>
-                                        <td colSpan={5} className="text-center text-gray-400 py-8">사용자가 없습니다.</td>
-                                    </tr>
-                                )}
-                            </tbody>
-                        </table>
-
-                        {/* Pagination */}
-                        <footer className="py-4 flex justify-center bg-white">
-                            <div className="flex gap-1">
-                                <Button size="sm" variant="light" isDisabled={pagination.currentPage === 1} onClick={() => pagination.onPageChange(pagination.currentPage - 1)}>
-                                    &lt;
-                                </Button>
-                                {Array.from({ length: Math.ceil((pagination.totalElements ?? 0) / pagination.pageSize) }, (_, i) => (
-                                    <Button
-                                        key={i}
-                                        size="sm"
-                                        variant={pagination.currentPage === i + 1 ? "solid" : "light"}
-                                        color={pagination.currentPage === i + 1 ? "primary" : "default"}
-                                        onClick={() => pagination.onPageChange(i + 1)}
-                                    >
-                                        {i + 1}
-                                    </Button>
-                                ))}
-                                <Button size="sm" variant="light" isDisabled={pagination.currentPage === Math.ceil((pagination.totalElements ?? 0) / pagination.pageSize)} onClick={() => pagination.onPageChange(pagination.currentPage + 1)}>
-                                    &gt;
-                                </Button>
-                            </div>
-                        </footer>
-                    </div>
-                </main>
-            </div>
         </>
     );
 };

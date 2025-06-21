@@ -9,6 +9,7 @@ export interface Employee {
     name: string;
     position: string;
     createdAt: string;
+    status: string;
 }
 
 export const signIn = async (form: SignInForm) => {
