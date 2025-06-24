@@ -1,4 +1,4 @@
-import { Employee } from '@/api/auth';
+import { Employee, getMy } from '@/api/auth';
 import { createEmployee, getEmployees, updateEmployee, UpdateEmployeeRequest } from '@/api/employee';
 import { queryClient } from '@/app';
 import { useMutation, useQuery} from '@tanstack/react-query';
@@ -14,6 +14,7 @@ export const EMPLOYEE_QUERY_KEY = {
     all: ['employees'] as const,
     add: ['employee-add'] as const,
     update: ['employee-update'] as const,
+    my: ['employee-my'] as const,
     list: (params: EmployeeQueryParams) => [...EMPLOYEE_QUERY_KEY.all, 'list', params] as const,
 };
 
@@ -21,6 +22,13 @@ export const useEmployeeQuery = (params: EmployeeQueryParams) => {
     return useQuery({
         queryKey: EMPLOYEE_QUERY_KEY.list(params),
         queryFn: () => getEmployees(params, { status: params.status }),
+    });
+};
+
+export const useEmployeeMyQuery = () => {
+    return useQuery({
+        queryKey: EMPLOYEE_QUERY_KEY.my,
+        queryFn: getMy,
     });
 };
 

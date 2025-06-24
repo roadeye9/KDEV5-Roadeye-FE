@@ -1,6 +1,8 @@
 import { Outlet, useNavigate, useLocation } from "react-router-dom";
 import { Bell, Settings, User, LayoutDashboard, Truck, Inbox, ShoppingBag, Users, HelpCircle, Settings as SettingsIcon, UserCog, Calendar, ClipboardList, MapPin, FileText, Car, LogOut } from "lucide-react";
 import { Button, Card, CardBody, Avatar } from "@nextui-org/react";
+import { useMyMutation } from "@/hooks/api/auth";
+import { useEmployeeMyQuery, useEmployeeQuery } from "@/hooks/api/employee";
 
 const MENU_ITEMS = [
     // { icon: LayoutDashboard, label: "Dashboard", url: "/manage" },
@@ -17,13 +19,7 @@ const MENU_ITEMS = [
 const Sidebar = () => {
     const navigate = useNavigate();
     const location = useLocation(); // 현재 위치 정보를 가져옴
-    
-    // 임시 사용자 정보 (실제로는 context나 props에서 가져와야 함)
-    const userInfo = {
-        name: "김커널",
-        email: "kernel@roadeye.com",
-        role: "관리자"
-    };
+    const { data: userInfo } = useEmployeeMyQuery();
 
     const handleLogout = () => {
         // 로그아웃 로직
@@ -82,13 +78,13 @@ const Sidebar = () => {
                 <div className="border-t border-gray-200 p-4">
                     <div className="flex items-center gap-3 mb-3">
                         <Avatar 
-                            name={userInfo.name} 
+                            // name={userInfo?.name} 
                             className="w-10 h-10 bg-blue-100 text-blue-600 font-semibold"
                         />
                         <div className="flex-1 min-w-0">
-                            <p className="font-semibold text-gray-800 truncate">{userInfo.name}</p>
-                            <p className="text-xs text-gray-500 truncate">{userInfo.email}</p>
-                            <p className="text-xs text-blue-600 font-medium">{userInfo.role}</p>
+                            <p className="font-semibold text-gray-800 truncate">{userInfo?.name}</p>
+                            <p className="text-xs text-gray-500 truncate">{userInfo?.loginId}</p>
+                            <p className="text-xs text-blue-600 font-medium">{userInfo?.position === 'Administrator' ? '관리자' : '일반'}</p>
                         </div>
                     </div>
                     

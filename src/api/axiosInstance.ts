@@ -24,13 +24,9 @@ axiosInstance.interceptors.response.use(
     },
     (error: AxiosError) => {
         if (error.response?.status === 403) {
-            toast.error('인증 실패', {
-                description: '세션이 만료되었거나 접근 권한이 없습니다. 다시 로그인해주세요.',
-            });
-
             setTimeout(() => {
                 window.location.href = '/login';
-            }, 1500);
+            }, 1000);
         }
         
         return Promise.reject(error);

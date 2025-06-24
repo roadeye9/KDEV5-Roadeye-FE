@@ -1,17 +1,9 @@
 import { axiosInstance } from "./axiosInstance";
 
-export type PageInfo = {
+interface PageInfo  {
     page: number;
     size: number;
     total: number;
-}
-
-export interface PagedModel<T> {
-    data: T[];
-    totalElements: number;
-    totalPages: number;
-    size: number;
-    page: number;
 }
 
 export interface ListModel<T> {
@@ -22,14 +14,21 @@ export type Response<T> = {
     data: T;
 }
 
+export interface PageResponse<T> {
+    data: T[];
+    pageInfo: PageInfo;
+}
+
 export type Vehicle = {
     id: number;
     name: string;
     licenseNumber: string;
     imageUrl: string;
+    createAt: string;
 }
 
 export type CarIgnitionStatus = "ON" | "OFF"
+export type EntityLifecycleStatus = "ACTIVE" | "DISABLED"
 
 export type VehicleDetails = Vehicle & {
     latitude: number;
@@ -41,6 +40,9 @@ export type VehicleDetails = Vehicle & {
     activeTransactionId: string | null;
     speed: number;
     direction: number;
+    name: string;
+    licenseNumber: string;
+    ignitionOnTime: string;
 };
 
 type SystemType = {
@@ -48,7 +50,6 @@ type SystemType = {
     updatedAt: string;
 }
 
-export type VehilceSearchResponse = PagedModel<Vehicle & SystemType>;
 export type VehicleDetailsListResponse = ListModel<VehicleDetails & SystemType>;
 
 
@@ -63,9 +64,8 @@ const combine = (path: string, request: PageRequest) => path + '?' + Object.entr
 
 
 export const getVehicles = async (pageRequest: PageRequest) => {
-    const { data } = await axiosInstance.get<VehilceSearchResponse>(combine('/cars', pageRequest));
-
-    return data;
+    const response = await axiosInstance.get<PageResponse<Vehicle>>(combine('/cars', pageRequest));
+    return response.data;
 }
 
 export const getVehiclesAll = async () => {
@@ -73,6 +73,14 @@ export const getVehiclesAll = async () => {
 
     return data.data;
 }
+
+export const getVehiclesByStatus = async (status: "ON" | "OFF") => {
+  const { data } = await axiosInstance.get<VehicleDetailsListResponse>("/cars/ignition", {
+    params: { status },
+  });
+
+  return data.data;
+};
 
 export const postVehicle = async (vehicle: Omit<Vehicle, 'id'> & { mileageInitial: number }) => {
     await axiosInstance.post('/cars', vehicle);
