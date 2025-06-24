@@ -16,14 +16,11 @@ const VehiclePage = () => {
         setIsModalOpen(true);
     };
 
-    console.log(vehicles.data?.data);
-
-    const filteredVehicles = (vehicles.data?.data ?? []).filter((vehicle: any) => {
-        const matchesSearch = vehicle.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                             vehicle.vehicleNumber?.toLowerCase().includes(searchTerm.toLowerCase());
-        const matchesStatus = statusFilter === "all" || vehicle.status === statusFilter;
-        return matchesSearch && matchesStatus;
-    });
+    const totalPages = Math.ceil((pagination.totalElements ?? 0) / pagination.pageSize);
+    const maxPageButtons = 10;
+    const startPage = Math.floor((pagination.currentPage - 1) / maxPageButtons) * maxPageButtons + 1;
+    const endPage = Math.min(startPage + maxPageButtons - 1, totalPages);
+    const pageNumbers = Array.from({ length: (endPage - startPage + 1) }, (_, i) => startPage + i);
 
     return (
         <>
@@ -131,15 +128,15 @@ const VehiclePage = () => {
                 {/* Vehicle Cards */}
                 <div className="flex-1 p-6 bg-gray-50 overflow-auto">
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-                        {filteredVehicles.map((vehicle: any, index: number) => (
+                        {(vehicles.data?.data ?? []).map((vehicle: any, index: number) => (
                             <div 
-                                key={vehicle.vehicleId || index}
+                                key={vehicle.id || index}
                                 className="bg-white rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300 border border-gray-100 overflow-hidden group"
                             >
                                 {/* Vehicle Image */}
                                 <div className="relative h-48 bg-gray-100 overflow-hidden">
                                     <img 
-                                        src={vehicle.image || "/car.jpg"} 
+                                        src={vehicle.imageUrl || "/car.jpg"} 
                                         alt={vehicle.name}
                                         className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
                                     />
@@ -153,17 +150,17 @@ const VehiclePage = () => {
                                                 {vehicle.name}
                                             </h3>
                                             <span className={`px-3 py-1 rounded-full text-xs font-medium flex items-center gap-1 ${
-                                                vehicle.status === 'available' 
+                                                vehicle.ignitionStatus === 'ON' 
                                                     ? 'bg-green-100 text-green-700' 
-                                                    : 'bg-green-100 text-green-700'
+                                                    : 'bg-gray-100 text-gray-700'
                                             }`}>
-                                                <i className="fas fa-circle text-xs"></i>
-                                                {vehicle.status === 'ACTIVE' ? '사용가능' : '사용가능'}
+                                                <i className={`fas fa-circle text-xs ${vehicle.ignitionStatus === 'ON' ? 'text-green-500' : 'text-gray-500'}`}></i>
+                                                {vehicle.ignitionStatus === 'ON' ? '운행중' : '대기중'}
                                             </span>
                                         </div>
                                         <p className="text-gray-600 flex items-center gap-2">
                                             <Hash className="text-blue-500 w-4 h-4" />
-                                            {vehicle.vehicleNumber}
+                                            {vehicle.licenseNumber}
                                         </p>
                                     </div>
 
@@ -172,7 +169,7 @@ const VehiclePage = () => {
                                             <MapPin className="text-blue-500 w-4 h-4" />
                                             <span className="text-sm text-gray-600">
                                                 주행거리: <span className="font-medium text-gray-800">
-                                                    {vehicle.mileage?.toLocaleString()} km
+                                                    {vehicle.mileageInitial?.toLocaleString()} km
                                                 </span>
                                             </span>
                                         </div>
@@ -191,13 +188,51 @@ const VehiclePage = () => {
                         ))}
                     </div>
 
-                    {filteredVehicles.length === 0 && (
+                    {(vehicles.data?.data?.length ?? 0) === 0 && (
                         <div className="text-center py-12">
                             <Car className="mx-auto w-12 h-12 text-gray-400 mb-4" />
                             <p className="text-gray-500">등록된 차량이 없습니다.</p>
                         </div>
                     )}
                 </div>
+                {/* Pagination */}
+                <footer className="py-4 flex justify-center bg-white border-t">
+                    <div className="flex gap-1">
+                        <Button
+                            size="sm"
+                            variant="light"
+                            isDisabled={startPage === 1}
+                            onClick={() => pagination.onPageChange(startPage - maxPageButtons > 0 ? startPage - maxPageButtons : 1)}
+                        >
+                            &lt;&lt;
+                        </Button>
+                        <Button size="sm" variant="light" isDisabled={pagination.currentPage === 1} onClick={() => pagination.onPageChange(pagination.currentPage - 1)}>
+                            &lt;
+                        </Button>
+                        {pageNumbers.map((pageNumber) => (
+                            <Button
+                                key={pageNumber}
+                                size="sm"
+                                variant={pagination.currentPage === pageNumber ? "solid" : "light"}
+                                color={pagination.currentPage === pageNumber ? "primary" : "default"}
+                                onClick={() => pagination.onPageChange(pageNumber)}
+                            >
+                                {pageNumber}
+                            </Button>
+                        ))}
+                        <Button size="sm" variant="light" isDisabled={pagination.currentPage === totalPages} onClick={() => pagination.onPageChange(pagination.currentPage + 1)}>
+                            &gt;
+                        </Button>
+                        <Button
+                            size="sm"
+                            variant="light"
+                            isDisabled={endPage >= totalPages}
+                            onClick={() => pagination.onPageChange(startPage + maxPageButtons)}
+                        >
+                            &gt;&gt;
+                        </Button>
+                    </div>
+                </footer>
             </div>
         </>
     );

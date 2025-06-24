@@ -4,7 +4,7 @@ import { Button, Checkbox } from "@nextui-org/react";
 import { MapPin, RefreshCw, ArrowLeft, User, Clock } from "lucide-react";
 import CarFrontImage from "@/assets/images/car-front.svg";
 import useKakaoLoader from "@/hooks/useKakaoLoader";
-import { useVehicleAllQuery } from "@/hooks/api/vehicle";
+import { useVehicleAllQuery, useVehicleByStatusQuery } from "@/hooks/api/vehicle";
 import { VehicleDetails } from "@/api/vehicle";
 import { Vehicle } from "@/api/vehicle";
 import { ListModel, DrivingLocationDetail } from "@/api/location";
@@ -30,7 +30,7 @@ function getPath(drivingHistory: DrivingLocationDetail[]): Path {
 function VehicleControlPage() {
   useKakaoLoader();
 
-  const { data: vehicles, isLoading, refetch } = useVehicleAllQuery();
+  const { data: vehicles, isLoading, refetch } = useVehicleByStatusQuery("ON");
   const [selectedVehicle, setSelectedVehicle] = useState<VehicleDetails | null>(null);
   const [path, setPath] = useState<Path>([]);
   const [center, setCenter] = useMapCenter();
@@ -156,7 +156,7 @@ function VehicleControlPage() {
                       />
                       <div className="flex-1">
                         <h3 className="font-semibold text-gray-800">{vehicle.name}</h3>
-                        <span className="text-sm text-gray-600">{vehicle.vehicleNumber}</span>
+                        <span className="text-sm text-gray-600">{vehicle.licenseNumber}</span>
                       </div>
                     </div>
                     
@@ -169,14 +169,14 @@ function VehicleControlPage() {
                       </span>
                       <span className="flex items-center gap-1 text-sm text-gray-600">
                         <User className="w-3 h-3" />
-                        {vehicle.driverName || '미배정'}
+                        {'미배정'}
                       </span>
                     </div>
                     
                     <div className="flex items-center gap-2 text-sm text-gray-600">
                       <MapPin className="w-3 h-3" />
                       <span className="truncate">
-                        {vehicle.address || `${vehicle.latitude.toFixed(4)}, ${vehicle.longitude.toFixed(4)}`}
+                        {`${vehicle.latitude.toFixed(4)}, ${vehicle.longitude.toFixed(4)}`}
                       </span>
                     </div>
                   </div>
@@ -213,11 +213,11 @@ function VehicleControlPage() {
                         </div>
                         <div>
                           <label className="text-xs text-gray-500">차량번호</label>
-                          <p className="text-sm text-gray-800">{selectedVehicle.vehicleNumber}</p>
+                          <p className="text-sm text-gray-800">{selectedVehicle.licenseNumber}</p>
                         </div>
                         <div>
                           <label className="text-xs text-gray-500">운전자</label>
-                          <p className="text-sm text-gray-800">{selectedVehicle.driverName || '미배정'}</p>
+                          <p className="text-sm text-gray-800">{'미배정'}</p>
                         </div>
                         <div>
                           <label className="text-xs text-gray-500">상태</label>
@@ -237,20 +237,26 @@ function VehicleControlPage() {
                         <div>
                           <label className="text-xs text-gray-500">현재 위치</label>
                           <p className="text-sm text-gray-800">
-                            {selectedVehicle.address || `${selectedVehicle.latitude.toFixed(4)}, ${selectedVehicle.longitude.toFixed(4)}`}
+                            {`${selectedVehicle.latitude.toFixed(4)}, ${selectedVehicle.longitude.toFixed(4)}`}
                           </p>
                         </div>
                         <div>
                           <label className="text-xs text-gray-500">속도</label>
-                          <p className="text-sm text-gray-800">{selectedVehicle.speed} km/h</p>
+                          <p className="text-sm text-gray-800">{selectedVehicle.speed || 60} km/h</p>
                         </div>
                         <div>
-                          <label className="text-xs text-gray-500">방향</label>
-                          <p className="text-sm text-gray-800">{selectedVehicle.direction}°</p>
-                        </div>
-                        <div>
-                          <label className="text-xs text-gray-500">연료</label>
-                          <p className="text-sm text-gray-800">{selectedVehicle.fuelLevel || 'N/A'}%</p>
+                        <label className="text-xs text-gray-500">운행 시작 시간</label>
+                          <p className="text-sm text-gray-800">
+                            {selectedVehicle.ignitionOnTime
+                              ? new Date(selectedVehicle.ignitionOnTime).toLocaleString("ko-KR", {
+                                  year: "numeric",
+                                  month: "2-digit",
+                                  day: "2-digit",
+                                  hour: "2-digit",
+                                  minute: "2-digit",
+                                })
+                              : "정보 없음"}
+                          </p>
                         </div>
                       </div>
                     </div>

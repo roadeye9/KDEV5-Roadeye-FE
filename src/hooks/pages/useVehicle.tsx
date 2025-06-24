@@ -3,7 +3,7 @@ import { useState } from "react"
 
 export const useVehicle = () => {
     const [page, setPage] = useState(0);
-    const [pageSize, setPageSize] = useState(20);
+    const [pageSize, setPageSize] = useState(10);
 
     const {data, isLoading, error} = useVehicleQuery({
         page,

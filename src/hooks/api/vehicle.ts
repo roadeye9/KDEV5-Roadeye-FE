@@ -1,5 +1,7 @@
-import { deleteVehicle, getVehicles, getVehiclesAll, PageRequest, patchVehicle, postVehicle } from "@/api/vehicle";
+import { CarIgnitionStatus, deleteVehicle, EntityLifecycleStatus, getVehicles, getVehiclesAll, getVehiclesByStatus, PageRequest, patchVehicle, postVehicle } from "@/api/vehicle";
 import { useMutation, useQuery } from "@tanstack/react-query";
+
+const REFETCH_INTERVAL = Number(import.meta.env.VITE_REFETCH_INTERVAL_MS);
 
 export const VEHICLE_QUERY_KEY = {
     all: ['vehicles'] as const,
@@ -8,9 +10,15 @@ export const VEHICLE_QUERY_KEY = {
     delete: ['vehicle-delete'] as const,
     patch: ['vehicle-patch'] as const,
     list: (params: PageRequest) => [...VEHICLE_QUERY_KEY.all, 'list', params] as const,
+    byStatus: (status: "ON" | "OFF") => ['vehicle', 'byStatus', status] as const,
 }
 
-export const useVehicleQuery = (params: PageRequest) => {
+export interface VehicleQueryParams extends PageRequest {
+    status?: EntityLifecycleStatus;
+    ignitionStatus?: CarIgnitionStatus;
+}
+
+export const useVehicleQuery = (params: VehicleQueryParams) => {
     return useQuery({
         queryKey: VEHICLE_QUERY_KEY.list(params),
         queryFn: () => getVehicles(params),
@@ -21,7 +29,14 @@ export const useVehicleAllQuery = () => {
     return useQuery({
         queryKey: VEHICLE_QUERY_KEY.allDetails,
         queryFn: getVehiclesAll,
-        refetchInterval: 30000,
+        refetchInterval: REFETCH_INTERVAL,
+    });
+}
+
+export const useVehicleByStatusQuery = (status: "ON" | "OFF") => {
+    return useQuery({
+        queryKey: VEHICLE_QUERY_KEY.byStatus(status),
+        queryFn: () => getVehiclesByStatus(status),
     });
 }
 
