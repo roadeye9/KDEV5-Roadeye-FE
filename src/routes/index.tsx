@@ -10,7 +10,7 @@ import LandingPage from '@/pages/LandingPage';
 import PlatformLayout from '@/layouts/PlatformLayout';
 import EmployeePage from '@/pages/EmployeePage';
 import DrivingLogPage from '@/pages/DrivingLogPage';
-import Dashboard from '@/pages/Dashboard';
+import Dashboard from '@/pages/DashboardPage';
 import DrivingLogDetailPage from '@/pages/DrivingLogDetailPage';
 
 const LoginPage = React.lazy(() => import('@/pages/LoginPage'));
