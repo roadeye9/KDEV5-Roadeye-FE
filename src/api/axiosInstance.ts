@@ -4,11 +4,12 @@ import { checkAndTenantId, delayFulfilled, waitingFulfilled } from "./intercepto
 // import {NETWORK} from "@/constants/api";
 // import {checkAndSetToken, delayFulfilled, handleTokenError, waitingFulfilled} from "@/api/Interceptors";
 
-const BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000';
+const BASE_URL = import.meta.env.VITE_API_URL || window.location.origin;
+
 
 export const axiosInstance = axios.create({
     baseURL: `${BASE_URL}/api`,
-    timeout: 5000,
+    timeout: 100000,
     withCredentials: true,
     useAuth: true,
     useTenant: true,
