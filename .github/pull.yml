@@ -2,5 +2,5 @@ version: "1"
 
 rules:
   - base: main
-    upstream: wei:main # change `wei` to the owner of upstream repo
+    upstream: Kernel360:main # change `wei` to the owner of upstream repo
     mergeMethod: hardreset
