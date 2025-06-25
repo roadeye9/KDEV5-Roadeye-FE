@@ -8,6 +8,7 @@ import { createEmployee, CreateEmployeeRequest, updateEmployee, UpdateEmployeeRe
 import { toast } from "sonner";
 import { Employee } from "@/api/auth";
 import { useEmployeeMutation } from "@/hooks/api/employee";
+import Pagination from "@/components/common/Pagination";
 
 export const EmployeePage = () => {
     const { employees, pagination, status, setStatus } = useEmployee();
@@ -191,27 +192,12 @@ export const EmployeePage = () => {
                 </div>
 
                 {/* Pagination */}
-                <footer className="py-4 flex justify-center bg-white border-t">
-                    <div className="flex gap-1">
-                        <Button size="sm" variant="light" isDisabled={pagination.currentPage === 1} onClick={() => pagination.onPageChange(pagination.currentPage - 1)}>
-                            &lt;
-                        </Button>
-                        {Array.from({ length: Math.ceil((pagination.totalElements ?? 0) / pagination.pageSize) }, (_, i) => (
-                            <Button
-                                key={i}
-                                size="sm"
-                                variant={pagination.currentPage === i + 1 ? "solid" : "light"}
-                                color={pagination.currentPage === i + 1 ? "primary" : "default"}
-                                onClick={() => pagination.onPageChange(i + 1)}
-                            >
-                                {i + 1}
-                            </Button>
-                        ))}
-                        <Button size="sm" variant="light" isDisabled={pagination.currentPage === Math.ceil((pagination.totalElements ?? 0) / pagination.pageSize)} onClick={() => pagination.onPageChange(pagination.currentPage + 1)}>
-                            &gt;
-                        </Button>
-                    </div>
-                </footer>
+                <Pagination
+                  currentPage={pagination.currentPage}
+                  pageSize={pagination.pageSize}
+                  totalElements={pagination.totalElements}
+                  onPageChange={pagination.onPageChange}
+                />
             </div>
 
             {/* 사용자 정보 수정 모달 */}
