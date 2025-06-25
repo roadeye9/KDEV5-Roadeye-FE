@@ -1,13 +1,15 @@
-import { useVehicleQuery } from "../api/vehicle"
+import { useVehicleByStatusQuery, useVehicleQuery } from "../api/vehicle"
 import { useState } from "react"
 
 export const useVehicle = () => {
     const [page, setPage] = useState(0);
     const [pageSize, setPageSize] = useState(10);
+    const [status, setStatus] = useState<"ON" | "OFF" | undefined>(undefined);
 
     const {data, isLoading, error} = useVehicleQuery({
         page,
         size: pageSize,
+        status: status,
     })
 
     const handlePageChange = (newPage: number) => {
@@ -31,6 +33,8 @@ export const useVehicle = () => {
             totalElements: data?.pageInfo.total ?? 0,
             onPageChange: handlePageChange,
             onPageSizeChange: handlePageSizeChange,
-        }
+        },
+        status,
+        setStatus,
     }
 } 

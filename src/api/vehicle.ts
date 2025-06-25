@@ -63,8 +63,10 @@ const combine = (path: string, request: PageRequest) => path + '?' + Object.entr
 
 
 
-export const getVehicles = async (pageRequest: PageRequest) => {
-    const response = await axiosInstance.get<PageResponse<Vehicle>>(combine('/cars', pageRequest));
+export const getVehicles = async (pageRequest: PageRequest, params: { status?: "ON" | "OFF" | null }) => {
+    const response = await axiosInstance.get<PageResponse<Vehicle>>('/cars/search/ignition', {
+        params: { ...pageRequest, ...params },
+    });
     return response.data;
 }
 
@@ -74,7 +76,7 @@ export const getVehiclesAll = async () => {
     return data.data;
 }
 
-export const getVehiclesByStatus = async (status: "ON" | "OFF") => {
+export const getVehiclesByStatus = async (status: "ON" | "OFF" | null) => {
   const { data } = await axiosInstance.get<VehicleDetailsListResponse>("/cars/ignition", {
     params: { status },
   });

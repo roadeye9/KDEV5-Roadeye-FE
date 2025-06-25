@@ -6,11 +6,10 @@ import '@fortawesome/fontawesome-free/css/all.min.css';
 import Pagination from "@/components/common/Pagination";
 
 const VehiclePage = () => {
-    const { vehicles, pagination } = useVehicle();
+    const { vehicles, pagination, status, setStatus } = useVehicle();
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [selectedVehicle, setSelectedVehicle] = useState<any>(null);
     const [searchTerm, setSearchTerm] = useState("");
-    const [statusFilter, setStatusFilter] = useState("all");
 
     const handleEditClick = (vehicle: any) => {
         setSelectedVehicle(vehicle);
@@ -41,7 +40,7 @@ const VehiclePage = () => {
                                     <Input
                                         label="차량 번호"
                                         placeholder="차량 번호를 입력하세요"
-                                        defaultValue={selectedVehicle?.vehicleNumber}
+                                        defaultValue={selectedVehicle?.licenseNumber}
                                         startContent={<Hash className="text-blue-500" />}
                                     />
                                     <Input
@@ -54,17 +53,9 @@ const VehiclePage = () => {
                                         label="주행거리 (km)"
                                         type="number"
                                         placeholder="주행거리를 입력하세요"
-                                        defaultValue={selectedVehicle?.mileage}
+                                        defaultValue={((selectedVehicle?.mileageCurrent ?? 0)/1000).toLocaleString()}
                                         startContent={<MapPin className="text-blue-500" />}
                                     />
-                                    <Select
-                                        label="상태"
-                                        defaultSelectedKeys={[selectedVehicle?.status || "available"]}
-                                        startContent={<Car className="text-blue-500" />}
-                                    >
-                                        <SelectItem key="available" value="available">사용 가능</SelectItem>
-                                        <SelectItem key="unavailable" value="unavailable">사용 불가능</SelectItem>
-                                    </Select>
                                 </div>
                             </ModalBody>
                             <ModalFooter>
@@ -93,7 +84,7 @@ const VehiclePage = () => {
                 <section className="p-6 bg-white border-b">
                     <div className="flex flex-wrap items-center gap-4 justify-between">
                         <div className="flex flex-wrap items-center gap-4">
-                            <div className="relative">
+                            {/* <div className="relative">
                                 <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
                                 <Input
                                     className="w-64 pl-10"
@@ -101,16 +92,20 @@ const VehiclePage = () => {
                                     value={searchTerm}
                                     onChange={(e) => setSearchTerm(e.target.value)}
                                 />
-                            </div>
+                            </div> */}
                             <Select 
                                 className="w-40" 
-                                defaultSelectedKeys={["all"]} 
-                                value={statusFilter}
-                                onChange={(e) => setStatusFilter(e.target.value)}
+                                selectedKeys={status ? [status] : ["all"]}
+                                onChange={(e) => {
+                                    const value = e.target.value;
+                                    setStatus(value === "all" ? undefined : value as "ON" | "OFF"); // 'all'이면 undefined로 설정
+                                    pagination.onPageChange(1); // 필터 변경 시 페이지를 1로 초기화
+                                }}
+                                aria-label="상태 필터"
                             >
                                 <SelectItem key="all" value="all">전체 상태</SelectItem>
-                                <SelectItem key="available" value="available">사용 가능</SelectItem>
-                                <SelectItem key="unavailable" value="unavailable">사용 불가능</SelectItem>
+                                <SelectItem key="ON" value="ON">운행중</SelectItem>
+                                <SelectItem key="OFF" value="OFF">정지</SelectItem>
                             </Select>
                         </div>
                         <Button 
@@ -170,7 +165,7 @@ const VehiclePage = () => {
                                             <MapPin className="text-blue-500 w-4 h-4" />
                                             <span className="text-sm text-gray-600">
                                                 주행거리: <span className="font-medium text-gray-800">
-                                                    {vehicle.mileageInitial?.toLocaleString()} km
+                                                    {((vehicle.mileageCurrent ?? 0)/1000).toLocaleString()} km
                                                 </span>
                                             </span>
                                         </div>

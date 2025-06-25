@@ -10,18 +10,18 @@ export const VEHICLE_QUERY_KEY = {
     delete: ['vehicle-delete'] as const,
     patch: ['vehicle-patch'] as const,
     list: (params: PageRequest) => [...VEHICLE_QUERY_KEY.all, 'list', params] as const,
-    byStatus: (status: "ON" | "OFF") => ['vehicle', 'byStatus', status] as const,
+    byStatus: (status: "ON" | "OFF" | null) => ['vehicle', 'byStatus', status] as const,
 }
 
 export interface VehicleQueryParams extends PageRequest {
-    status?: EntityLifecycleStatus;
+    status?:  "ON" | "OFF" | null;
     ignitionStatus?: CarIgnitionStatus;
 }
 
 export const useVehicleQuery = (params: VehicleQueryParams) => {
     return useQuery({
         queryKey: VEHICLE_QUERY_KEY.list(params),
-        queryFn: () => getVehicles(params),
+        queryFn: () => getVehicles(params, { status: params.status }),
     });
 }
 
@@ -33,7 +33,7 @@ export const useVehicleAllQuery = () => {
     });
 }
 
-export const useVehicleByStatusQuery = (status: "ON" | "OFF") => {
+export const useVehicleByStatusQuery = (status: "ON" | "OFF" | null) => {
     return useQuery({
         queryKey: VEHICLE_QUERY_KEY.byStatus(status),
         queryFn: () => getVehiclesByStatus(status),
