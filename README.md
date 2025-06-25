@@ -155,4 +155,4 @@ Special thanks to:
 - [alrra](https://github.com/alrra) for [browser-logos](https://github.com/alrra/browser-logos);
 - [tandpfun](https://github.com/tandpfun) for [skill-icons](https://github.com/tandpfun/skill-icons);
 
-[Back to :arrow_up:](#vite-react-typescript--shadcnui--template "Back to 'Table of contents' section")
+[Back to :arrow_up:](#vite-react-typescript--shadcnui--template "Back to 'Table of contents' section")  
