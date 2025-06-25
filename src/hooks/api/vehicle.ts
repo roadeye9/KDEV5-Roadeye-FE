@@ -1,4 +1,4 @@
-import { CarIgnitionStatus, deleteVehicle, EntityLifecycleStatus, getVehicles, getVehiclesAll, getVehiclesByStatus, PageRequest, patchVehicle, postVehicle } from "@/api/vehicle";
+import { CarIgnitionStatus, deleteVehicle, EntityLifecycleStatus, getVehicles, getVehiclesAll, getVehiclesByStatus, PageRequest, patchVehicle, postVehicle, getVehicle } from "@/api/vehicle";
 import { useMutation, useQuery } from "@tanstack/react-query";
 
 const REFETCH_INTERVAL = Number(import.meta.env.VITE_REFETCH_INTERVAL_MS);
@@ -60,4 +60,13 @@ export const useVehiclePatchMutation = () => {
         mutationFn: patchVehicle,
     });
 }
+
+export const useVehicleDetailQuery = (vehicleId: number | null, options = {}) => {
+    return useQuery({
+        queryKey: ["vehicle", vehicleId],
+        queryFn: () => getVehicle(vehicleId!),
+        enabled: !!vehicleId,
+        ...options,
+    });
+};
 

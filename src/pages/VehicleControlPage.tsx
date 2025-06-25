@@ -4,7 +4,7 @@ import { Button, Checkbox } from "@nextui-org/react";
 import { MapPin, RefreshCw, ArrowLeft, User, Clock } from "lucide-react";
 import CarFrontImage from "@/assets/images/car-front.svg";
 import useKakaoLoader from "@/hooks/useKakaoLoader";
-import { useVehicleAllQuery, useVehicleByStatusQuery } from "@/hooks/api/vehicle";
+import { useVehicleAllQuery, useVehicleByStatusQuery, useVehicleDetailQuery } from "@/hooks/api/vehicle";
 import { VehicleDetails } from "@/api/vehicle";
 import { Vehicle } from "@/api/vehicle";
 import { ListModel, DrivingLocationDetail } from "@/api/location";
@@ -12,7 +12,6 @@ import useMapCenter, { Coordinate } from "@/hooks/useMapCenter";
 import { useDrivingHistoryQuery } from "@/hooks/api/location";
 import '@fortawesome/fontawesome-free/css/all.min.css';
 
-const PULL_INTERVAL_MS = 10000; // 10초
 
 type Point = {
   lat: number;
@@ -30,7 +29,7 @@ function getPath(drivingHistory: DrivingLocationDetail[]): Path {
 function VehicleControlPage() {
   useKakaoLoader();
 
-  const { data: vehicles, isLoading, refetch } = useVehicleByStatusQuery("ON");
+  const { data: vehicles, isLoading, refetch: refetchAll } = useVehicleByStatusQuery("ON");
   const [selectedVehicle, setSelectedVehicle] = useState<VehicleDetails | null>(null);
   const [path, setPath] = useState<Path>([]);
   const [center, setCenter] = useMapCenter();
@@ -40,6 +39,7 @@ function VehicleControlPage() {
   const { data: drivingHistory } = useDrivingHistoryQuery(selectedVehicle?.id ?? 0);
   const [currentTime, setCurrentTime] = useState(new Date());
   const [originalCenter, setOriginalCenter] = useState<Coordinate>({ lat: 37.5665, lng: 126.9780 }); // 서울 시청 좌표
+  const { data: vehicleDetail, refetch: refetchDetail, isFetching: isFetchingDetail } = useVehicleDetailQuery(selectedVehicle?.id ?? null, { enabled: !!selectedVehicle });
 
   useEffect(() => {
     if (selectedVehicle && drivingHistory) {
@@ -99,6 +99,17 @@ function VehicleControlPage() {
     });
   };
 
+  // 새로고침 핸들러
+  const handleRefresh = () => {
+    if (selectedVehicle) {
+      console.log("refetchDetail");
+      refetchDetail();
+    } else {
+      console.log("refetchAll");
+      refetchAll();
+    }
+  };
+
   return (
     <div className="flex flex-col h-screen">
       {/* Header */}
@@ -128,7 +139,7 @@ function VehicleControlPage() {
                 isIconOnly
                 variant="light"
                 color="primary"
-                onClick={() => refetch()}
+                onClick={handleRefresh}
                 className="hover:rotate-180 transition-transform duration-300"
               >
                 <RefreshCw className="w-4 h-4" />
@@ -192,14 +203,25 @@ function VehicleControlPage() {
                 <div className="p-5 h-full overflow-y-auto">
                   <div className="flex items-center justify-between mb-5">
                     <h3 className="text-lg font-semibold text-gray-800">차량 상세 정보</h3>
-                    <Button
-                      variant="light"
-                      color="primary"
-                      startContent={<ArrowLeft className="w-4 h-4" />}
-                      onClick={handleBackToList}
-                    >
-                      목록으로
-                    </Button>
+                    <div className="flex gap-2">
+                      {/* <Button
+                        isIconOnly
+                        variant="light"
+                        color="primary"
+                        onClick={handleRefresh}
+                        className="hover:rotate-180 transition-transform duration-300"
+                      >
+                        <RefreshCw className="w-4 h-4" />
+                      </Button> */}
+                      <Button
+                        variant="light"
+                        color="primary"
+                        startContent={<ArrowLeft className="w-4 h-4" />}
+                        onClick={handleBackToList}
+                      >
+                        목록으로
+                      </Button>
+                    </div>
                   </div>
 
                   <div className="space-y-6">
@@ -209,11 +231,11 @@ function VehicleControlPage() {
                       <div className="grid grid-cols-2 gap-4">
                         <div>
                           <label className="text-xs text-gray-500">차량명</label>
-                          <p className="text-sm text-gray-800">{selectedVehicle.name}</p>
+                          <p className="text-sm text-gray-800">{vehicleDetail?.name ?? selectedVehicle.name}</p>
                         </div>
                         <div>
                           <label className="text-xs text-gray-500">차량번호</label>
-                          <p className="text-sm text-gray-800">{selectedVehicle.licenseNumber}</p>
+                          <p className="text-sm text-gray-800">{vehicleDetail?.licenseNumber ?? selectedVehicle.licenseNumber}</p>
                         </div>
                         <div>
                           <label className="text-xs text-gray-500">운전자</label>
@@ -222,9 +244,9 @@ function VehicleControlPage() {
                         <div>
                           <label className="text-xs text-gray-500">상태</label>
                           <p className={`text-sm ${
-                            selectedVehicle.ignitionStatus === 'ON' ? 'text-green-600' : 'text-gray-600'
+                            (selectedVehicle.ignitionStatus) === 'ON' ? 'text-green-600' : 'text-gray-600'
                           }`}>
-                            {selectedVehicle.ignitionStatus === 'ON' ? '운행중' : '정지'}
+                            {(selectedVehicle.ignitionStatus) === 'ON' ? '운행중' : '정지'}
                           </p>
                         </div>
                       </div>

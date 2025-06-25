@@ -3,6 +3,7 @@ import { Car, Plus, Search, Edit, Hash, MapPin } from "lucide-react";
 import { useVehicle } from "@/hooks/pages/useVehicle";
 import { useState } from "react";
 import '@fortawesome/fontawesome-free/css/all.min.css';
+import Pagination from "@/components/common/Pagination";
 
 const VehiclePage = () => {
     const { vehicles, pagination } = useVehicle();
@@ -196,43 +197,12 @@ const VehiclePage = () => {
                     )}
                 </div>
                 {/* Pagination */}
-                <footer className="py-4 flex justify-center bg-white border-t">
-                    <div className="flex gap-1">
-                        <Button
-                            size="sm"
-                            variant="light"
-                            isDisabled={startPage === 1}
-                            onClick={() => pagination.onPageChange(startPage - maxPageButtons > 0 ? startPage - maxPageButtons : 1)}
-                        >
-                            &lt;&lt;
-                        </Button>
-                        <Button size="sm" variant="light" isDisabled={pagination.currentPage === 1} onClick={() => pagination.onPageChange(pagination.currentPage - 1)}>
-                            &lt;
-                        </Button>
-                        {pageNumbers.map((pageNumber) => (
-                            <Button
-                                key={pageNumber}
-                                size="sm"
-                                variant={pagination.currentPage === pageNumber ? "solid" : "light"}
-                                color={pagination.currentPage === pageNumber ? "primary" : "default"}
-                                onClick={() => pagination.onPageChange(pageNumber)}
-                            >
-                                {pageNumber}
-                            </Button>
-                        ))}
-                        <Button size="sm" variant="light" isDisabled={pagination.currentPage === totalPages} onClick={() => pagination.onPageChange(pagination.currentPage + 1)}>
-                            &gt;
-                        </Button>
-                        <Button
-                            size="sm"
-                            variant="light"
-                            isDisabled={endPage >= totalPages}
-                            onClick={() => pagination.onPageChange(startPage + maxPageButtons)}
-                        >
-                            &gt;&gt;
-                        </Button>
-                    </div>
-                </footer>
+                <Pagination
+                  currentPage={pagination.currentPage}
+                  pageSize={pagination.pageSize}
+                  totalElements={pagination.totalElements}
+                  onPageChange={pagination.onPageChange}
+                />
             </div>
         </>
     );
