@@ -6,14 +6,6 @@ export type PageInfo = {
     total: number;
 }
 
-export interface PagedModel<T> {
-    data: T[];
-    totalElements: number;
-    totalPages: number;
-    size: number;
-    page: number;
-}
-
 export interface ListModel<T> {
     data: T[];
 }
@@ -29,12 +21,19 @@ export interface PageResponse<T> {
 
 export type DrivingHistory = {
     id: number;
-    vehicleId: number;
-    driverId: number;
-    startAt: string;
-    endAt: string;
-    distance: number;
-    fuelConsumption: number;
+    status: string;
+    txUid: string[];
+    previousMileageSum: number;
+    driveStartedAt: string;
+    previoustLatitude: number;
+    previoustLongitude: number;
+    nextMileageSum: number;
+    driveEndedAt: string;
+    nextLatitude: number;
+    nextLongitude: number;
+    carName: string;
+    licenseNumber: string;
+    driverName: string;
 }
 
 export type PageRequest = {
@@ -42,14 +41,26 @@ export type PageRequest = {
     size: number;
 }
 
+export type DrivingHistoryPath = {
+    latitude: number;
+    longitude: number;
+}
 export type DrivingHistoryListResponse = ListModel<DrivingHistory>;
 
 export const getDrivingHistory = async (pageRequest: PageRequest) => {
-    const { data } = await axiosInstance.get<PageResponse<DrivingHistory>>(`/driving-history?page=${pageRequest.page}&size=${pageRequest.size}`);
-    return data;
+    const response = await axiosInstance.get<PageResponse<DrivingHistory>>('/driving', {
+        params: pageRequest,
+        useTenant: true,
+    });
+    return response.data;
 }
 
 export const getDrivingHistoryAll = async () => {
     const { data } = await axiosInstance.get<DrivingHistoryListResponse>('/driving-history/all');
+    return data;
+}
+
+export const getDrivingHistoryPath = async (id: number) => {
+    const { data } = await axiosInstance.get<ListModel<DrivingHistoryPath>>(`/driving/${id}`);
     return data;
 }
