@@ -3,30 +3,8 @@ import { ArrowLeft, Clock, Car, User, Route, Gauge, TrendingUp, Pencil, MapPin, 
 import { useLocation, useNavigate, useParams } from "react-router-dom";
 import { CustomOverlayMap, Map, MapMarker, Polyline } from "react-kakao-maps-sdk";
 import useKakaoLoader from "@/hooks/useKakaoLoader";
-import { useState } from "react";
 import { formatDate, formatDuration } from "@/utils/format";
 import { useDrivingHistoryPathQuery } from "@/hooks/api/drivingHistory";
-import useMapCenter from "@/hooks/useMapCenter";
-
-// 임시 단일 운행 상세 데이터
-const mockTripDetailData = {
-    id: 1,
-    startTime: "2024-03-21 09:05",
-    endTime: "2024-03-21 10:15",
-    vehicleNumber: "12가 3456",
-    vehicleModel: "소나타",
-    driver: "홍길동",
-    distance: 25,
-    duration: "1시간 10분",
-    avgSpeed: "21 km/h",
-    fuelConsumed: "2.1 L",
-    note: "강남 지역 교통 정체로 예상보다 시간이 지연됨. 다음 운행 시 참고 필요.",
-    path: [
-        { lat: 37.4979, lng: 127.0276 },
-        { lat: 37.48, lng: 127.08 },
-        { lat: 37.4563, lng: 127.1287 }
-    ],
-};
 
 type Point = {
     lat: number;
@@ -38,17 +16,8 @@ const DrivingLogDetailPage = () => {
     const navigate = useNavigate();
     const { state } = useLocation();
     const log = state?.log;
-    const tripData = mockTripDetailData;
     const { data: path } = useDrivingHistoryPathQuery(log.id);
 
-    const [note, setNote] = useState(tripData.note);
-    const [isEditingNote, setIsEditingNote] = useState(false);
-
-    const handleSaveNote = () => {
-        // 실제 앱에서는 API를 통해 노트를 저장하는 로직이 필요합니다.
-        console.log("저장된 비고:", note);
-        setIsEditingNote(false);
-    };
 
     const polylinePath = (path?.data ?? []).map(p => ({
         lat: p.latitude,
