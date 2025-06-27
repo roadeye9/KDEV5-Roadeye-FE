@@ -263,7 +263,7 @@ function VehicleControlPage() {
                         </div>
                         <div>
                           <label className="text-xs text-gray-500">속도</label>
-                          <p className="text-sm text-gray-800">{path[path.length - 1].speed || 60} km/h</p>
+                          <p className="text-sm text-gray-800">{path[path.length - 1]?.speed || 60} km/h</p>
                         </div>
                         <div>
                         <label className="text-xs text-gray-500">운행 시작 시간</label>
