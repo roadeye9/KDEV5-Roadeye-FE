@@ -5,11 +5,7 @@ import { useMyMutation } from "@/hooks/api/auth";
 import { useEmployeeMyQuery, useEmployeeQuery } from "@/hooks/api/employee";
 
 const MENU_ITEMS = [
-    // { icon: LayoutDashboard, label: "Dashboard", url: "/manage" },
-    // { icon: Truck, label: "Tracking", url: "/manage/tracking" },
-    // { icon: Inbox, label: "Inbox", badge: 3, url: "/manage/inbox" },
-    // { icon: ShoppingBag, label: "Orders", url: "/manage/orders" },
-    // { icon: Users, label: "Customers", url: "/manage/customers" },
+    { icon: LayoutDashboard, label: "대시보드", url: "/manage/dashboard", activeURLs: ["/manage/dashboard"] },
     { icon: UserCog, label: "직원 관리", url: "/manage/employee" },
     { icon: Truck, label: "차량 관리", url: "/manage/vehicle" },
     { icon: MapPin, label: "차량 관제", url: "/manage/vehicle-control" },
