@@ -1,6 +1,8 @@
 import { getLocationHistory } from "@/api/location";
 import { useQuery } from "@tanstack/react-query";
 
+const REFETCH_INTERVAL = Number(import.meta.env.VITE_REFETCH_INTERVAL_MS);
+
 export const DRIVING_HISTORY_QUERY_KEY = {
     all: ['driving-history'] as const,
     list: (carId: number) => [...DRIVING_HISTORY_QUERY_KEY.all, 'car', carId] as const,
@@ -12,5 +14,6 @@ export const DRIVING_HISTORY_QUERY_KEY = {
       queryKey: DRIVING_HISTORY_QUERY_KEY.list(carId),
       queryFn: () => getLocationHistory(carId),
       enabled: carId > 0,  // carId가 0보다 클 때만 쿼리 실행하게 하는 옵션 (선택사항)
+      refetchInterval: REFETCH_INTERVAL,
     });
   };

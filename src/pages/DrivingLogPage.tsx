@@ -6,6 +6,7 @@ import { useNavigate } from "react-router-dom";
 import { useDrivingHistory } from "@/hooks/pages/useDrivingHistory";
 import { formatDate } from "@/utils/format";
 import { DrivingHistory } from "@/api/drivingHistory";
+import Pagination from "@/components/common/Pagination";
 
 const DrivingLogPage = () => {
     const { drivingHistory, pagination } = useDrivingHistory();
@@ -59,7 +60,7 @@ const DrivingLogPage = () => {
             </header>
 
             {/* Filters Section */}
-            <section className="p-6 bg-white border-b">
+            {/* <section className="p-6 bg-white border-b">
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-6">
                     <div className="space-y-2">
                         <label className="text-sm font-medium text-gray-700 flex items-center gap-2">
@@ -132,7 +133,7 @@ const DrivingLogPage = () => {
                         초기화
                     </Button>
                 </div>
-            </section>
+            </section> */}
 
             {/* Driving Logs Table */}
             <div className="flex-1 p-6 bg-gray-50 overflow-auto">
@@ -183,6 +184,12 @@ const DrivingLogPage = () => {
                         </div>
                     )}
                 </div>
+                <Pagination
+                    currentPage={pagination.currentPage}
+                    pageSize={pagination.pageSize}
+                    totalElements={pagination.totalElements}
+                    onPageChange={pagination.onPageChange}
+                />
             </div>
         </div>
     );

@@ -17,20 +17,28 @@ type Point = {
   lat: number;
   lng: number;
 }
-type Path = Point[]
+type Path = (Point & { speed: number })[]
 
 function getPath(drivingHistory: DrivingLocationDetail[]): Path {
   return drivingHistory.map(item => ({
     lat: item.latitude,
     lng: item.longitude,
+    speed: item.speed,
   }));
+}
+
+function hasLatLng(vehicle: Vehicle | VehicleDetails): vehicle is VehicleDetails {
+  return (
+    typeof (vehicle as VehicleDetails).latitude === 'number' &&
+    typeof (vehicle as VehicleDetails).longitude === 'number'
+  );
 }
 
 function VehicleControlPage() {
   useKakaoLoader();
 
-  const { data: vehicles, isLoading, refetch: refetchAll } = useVehicleByStatusQuery("ON");
   const [selectedVehicle, setSelectedVehicle] = useState<VehicleDetails | null>(null);
+  const { data: vehicles, isLoading, refetch: refetchAll } = useVehicleByStatusQuery("ON", !selectedVehicle);
   const [path, setPath] = useState<Path>([]);
   const [center, setCenter] = useMapCenter();
   const [mapLevel, setMapLevel] = useState(12);
@@ -42,8 +50,8 @@ function VehicleControlPage() {
   const { data: vehicleDetail, refetch: refetchDetail, isFetching: isFetchingDetail } = useVehicleDetailQuery(selectedVehicle?.id ?? null, { enabled: !!selectedVehicle });
 
   useEffect(() => {
-    if (selectedVehicle && drivingHistory) {
-      setCenter({ lat: selectedVehicle.latitude, lng: selectedVehicle.longitude });
+    if (selectedVehicle && drivingHistory && vehicleDetail) {
+      setCenter({ lat: vehicleDetail.latitude, lng: vehicleDetail.longitude });
       setMapLevel(4);
       setPath(getPath(drivingHistory));
     } else {
@@ -204,15 +212,6 @@ function VehicleControlPage() {
                   <div className="flex items-center justify-between mb-5">
                     <h3 className="text-lg font-semibold text-gray-800">차량 상세 정보</h3>
                     <div className="flex gap-2">
-                      {/* <Button
-                        isIconOnly
-                        variant="light"
-                        color="primary"
-                        onClick={handleRefresh}
-                        className="hover:rotate-180 transition-transform duration-300"
-                      >
-                        <RefreshCw className="w-4 h-4" />
-                      </Button> */}
                       <Button
                         variant="light"
                         color="primary"
@@ -231,11 +230,11 @@ function VehicleControlPage() {
                       <div className="grid grid-cols-2 gap-4">
                         <div>
                           <label className="text-xs text-gray-500">차량명</label>
-                          <p className="text-sm text-gray-800">{vehicleDetail?.name ?? selectedVehicle.name}</p>
+                          <p className="text-sm text-gray-800">{vehicleDetail?.name}</p>
                         </div>
                         <div>
                           <label className="text-xs text-gray-500">차량번호</label>
-                          <p className="text-sm text-gray-800">{vehicleDetail?.licenseNumber ?? selectedVehicle.licenseNumber}</p>
+                          <p className="text-sm text-gray-800">{vehicleDetail?.licenseNumber}</p>
                         </div>
                         <div>
                           <label className="text-xs text-gray-500">운전자</label>
@@ -259,12 +258,12 @@ function VehicleControlPage() {
                         <div>
                           <label className="text-xs text-gray-500">현재 위치</label>
                           <p className="text-sm text-gray-800">
-                            {`${selectedVehicle.latitude.toFixed(4)}, ${selectedVehicle.longitude.toFixed(4)}`}
+                            {`${vehicleDetail?.latitude.toFixed(4)}, ${vehicleDetail?.longitude.toFixed(4)}`}
                           </p>
                         </div>
                         <div>
                           <label className="text-xs text-gray-500">속도</label>
-                          <p className="text-sm text-gray-800">{selectedVehicle.speed || 60} km/h</p>
+                          <p className="text-sm text-gray-800">{path[path.length - 1].speed || 60} km/h</p>
                         </div>
                         <div>
                         <label className="text-xs text-gray-500">운행 시작 시간</label>
@@ -316,17 +315,29 @@ function VehicleControlPage() {
               minLevel={9}
               minClusterSize={1}
             >
-              {vehicles?.filter(vehicle => visibleVehicles.has(vehicle.id)).map((vehicle) => (
+              {selectedVehicle && path.length > 0 ? (
                 <MapMarker
-                  key={vehicle.id}
-                  position={{ lat: vehicle.latitude, lng: vehicle.longitude }}
-                  onClick={() => {
-                    setSelectedVehicle(vehicle);
-                    setShowDetailPanel(true);
-                    setMapLevel(4);
-                  }}
+                  key={selectedVehicle.id}
+                  position={path[path.length - 1]}
                 />
-              ))}
+              ) : (
+                vehicles
+                  ?.filter(vehicle => visibleVehicles.has(vehicle.id) && hasLatLng(vehicle))
+                  .map(vehicle => {
+                    const v = vehicle as VehicleDetails;
+                    return (
+                      <MapMarker
+                        key={v.id}
+                        position={{ lat: v.latitude, lng: v.longitude }}
+                        onClick={() => {
+                          setSelectedVehicle(v);
+                          setShowDetailPanel(true);
+                          setMapLevel(4);
+                        }}
+                      />
+                    );
+                  })
+              )}
             </MarkerClusterer>
             {path.length > 0 && (
               <Polyline path={path} strokeColor={"blue"} strokeWeight={2} />

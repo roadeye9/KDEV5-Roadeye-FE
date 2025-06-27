@@ -25,6 +25,8 @@ export type Vehicle = {
     licenseNumber: string;
     imageUrl: string;
     createAt: string;
+    latitude: number;
+    longitude: number;
 }
 
 export type CarIgnitionStatus = "ON" | "OFF"
@@ -89,7 +91,7 @@ export const postVehicle = async (vehicle: Omit<Vehicle, 'id'> & { mileageInitia
 }
 
 export const getVehicle = async (id: number) => {
-    const { data: { data } } = await axiosInstance.get<Response<Vehicle>>(`/cars/${id}`);
+    const { data: { data } } = await axiosInstance.get<Response<VehicleDetails>>(`/cars/${id}`);
 
     return data;
 }

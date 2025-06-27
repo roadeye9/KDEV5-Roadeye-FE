@@ -33,10 +33,11 @@ export const useVehicleAllQuery = () => {
     });
 }
 
-export const useVehicleByStatusQuery = (status: "ON" | "OFF" | null) => {
+export const useVehicleByStatusQuery = (status: "ON" | "OFF" | null, isActive: boolean = false) => {
     return useQuery({
         queryKey: VEHICLE_QUERY_KEY.byStatus(status),
         queryFn: () => getVehiclesByStatus(status),
+        refetchInterval: isActive ? REFETCH_INTERVAL : false,
     });
 }
 
@@ -67,6 +68,7 @@ export const useVehicleDetailQuery = (vehicleId: number | null, options = {}) =>
         queryFn: () => getVehicle(vehicleId!),
         enabled: !!vehicleId,
         ...options,
+        refetchInterval: REFETCH_INTERVAL,
     });
 };
 
