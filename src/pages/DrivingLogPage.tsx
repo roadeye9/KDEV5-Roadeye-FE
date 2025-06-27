@@ -147,9 +147,6 @@ const DrivingLogPage = () => {
                                 <div className="flex items-center gap-2"><Car className="w-4 h-4 text-blue-500" />차량정보</div>
                             </TableColumn>
                             <TableColumn>
-                                <div className="flex items-center gap-2"><User className="w-4 h-4 text-blue-500" />운전자</div>
-                            </TableColumn>
-                            <TableColumn>
                                 <div className="flex items-center gap-2"><Route className="w-4 h-4 text-blue-500" />주행 거리</div>
                             </TableColumn>
                             <TableColumn>관리</TableColumn>
@@ -165,8 +162,7 @@ const DrivingLogPage = () => {
                                         <div className="font-medium text-gray-800">{log.carName}</div>
                                         <div className="text-sm text-gray-600">{log.licenseNumber}</div>
                                     </TableCell>
-                                    <TableCell>{log.driverName || "미등록"}</TableCell>
-                                    <TableCell>{log.nextMileageSum - log.previousMileageSum} km</TableCell>
+                                    <TableCell>{(log.nextMileageSum - log.previousMileageSum)/1000} km</TableCell>
                                     <TableCell>
                                         <Button size="sm" color="primary" variant="light" startContent={<Eye className="w-4 h-4" />} onClick={() => viewDetail(log)}>
                                             상세보기

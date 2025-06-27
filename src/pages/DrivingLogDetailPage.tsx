@@ -112,27 +112,29 @@ const DrivingLogDetailPage = () => {
                     <Card className="shadow-lg h-full">
                         <CardHeader><h2 className="text-xl font-semibold text-gray-800">운행 경로</h2></CardHeader>
                         <CardBody className="p-0">
-                            <Map center={getCenter(polylinePath)} style={{ width: '100%', height: '100%', minHeight: '500px' }} level={8}>
-                                <Polyline path={polylinePath} strokeColor="#3b82f6" strokeWeight={4} />
-                                <CustomOverlayMap position={polylinePath[0]}>
-                                    <div
-                                        className="flex flex-col items-center"
-                                        style={{ transform: "translateY(-32px)" }}
-                                    >
-                                        <span className="text-sm font-semibold text-gray-600">출발지</span>
-                                        <MapPin className="w-12 h-12 text-blue-600 drop-shadow" />
-                                    </div>
-                                </CustomOverlayMap>
-                                <CustomOverlayMap position={polylinePath[polylinePath.length - 1]}>
-                                    <div
-                                        className="flex flex-col items-center"
-                                        style={{ transform: "translateY(-32px)" }}
-                                    >
-                                        <span className="text-sm font-semibold text-gray-600">도착지</span>
-                                        <MapPin className="w-12 h-12 text-red-600 drop-shadow" />
-                                    </div>
-                                </CustomOverlayMap>
-                            </Map>
+                            {polylinePath.length > 0 && (
+                                <Map center={getCenter(polylinePath)} style={{ width: '100%', height: '100%', minHeight: '500px' }} level={8}>
+                                    <Polyline path={polylinePath} strokeColor="#3b82f6" strokeWeight={4} />
+                                    <CustomOverlayMap position={polylinePath[0]}>
+                                        <div
+                                            className="flex flex-col items-center"
+                                            style={{ transform: "translateY(-32px)" }}
+                                        >
+                                            <span className="text-sm font-semibold text-gray-600">출발지</span>
+                                            <MapPin className="w-12 h-12 text-blue-600 drop-shadow" />
+                                        </div>
+                                    </CustomOverlayMap>
+                                    <CustomOverlayMap position={polylinePath[polylinePath.length - 1]}>
+                                        <div
+                                            className="flex flex-col items-center"
+                                            style={{ transform: "translateY(-32px)" }}
+                                        >
+                                            <span className="text-sm font-semibold text-gray-600">도착지</span>
+                                            <MapPin className="w-12 h-12 text-red-600 drop-shadow" />
+                                        </div>
+                                    </CustomOverlayMap>
+                                </Map>
+                            )}
                         </CardBody>
                     </Card>
                 </div>
