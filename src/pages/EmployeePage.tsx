@@ -102,29 +102,27 @@ export const EmployeePage = () => {
                 <header className="p-4 font-bold text-lg border-b bg-white">사용자 관리</header>
 
                 {/* Controls */}
-                <section className="flex flex-wrap items-center gap-4 px-8 py-4 bg-white border-b">
-                    {/* <Input
-                        className="w-64"
-                        placeholder="사용자 검색..."
-                        startContent={<User className="w-4 h-4 text-gray-400" />}
-                    /> */}
-                    <Select
-                        className="w-40"
-                        selectedKeys={status ? [status] : ["all"]}
-                        onChange={(e) => {
-                        const value = e.target.value;
-                        setStatus(value === "all" ? undefined : value); // 'all'이면 undefined로 설정
-                        pagination.onPageChange(1); // 필터 변경 시 페이지를 1로 초기화
-                        }}
-                        aria-label="상태 필터"
-                    >
-                        <SelectItem key="all" value="all">전체 상태</SelectItem>
-                        <SelectItem key="ACTIVE" value="ACTIVE">활성</SelectItem>
-                        <SelectItem key="DISABLED" value="DISABLED">비활성</SelectItem>
-                    </Select>
-
-                    <div className="flex-1" />
-                    <Button color="primary" startContent={<User className="w-4 h-4" />} onClick={handleRegisterClick}>사용자 등록</Button>
+                <section className="px-8 py-4 bg-white border-b">
+                    <div className="flex flex-wrap items-center justify-between gap-4">
+                        <span className="text-lg font-semibold text-gray-800">총 {employees.data?.page?.totalElements ?? 0}명</span>
+                        <div className="flex items-center gap-3 ml-auto">
+                            <Select
+                                className="w-40"
+                                selectedKeys={status ? [status] : ["all"]}
+                                onChange={(e) => {
+                                    const value = e.target.value;
+                                    setStatus(value === "all" ? undefined : value); // 'all'이면 undefined로 설정
+                                    pagination.onPageChange(1); // 필터 변경 시 페이지를 1로 초기화
+                                }}
+                                aria-label="상태 필터"
+                            >
+                                <SelectItem key="all" value="all">전체 상태</SelectItem>
+                                <SelectItem key="ACTIVE" value="ACTIVE">활성</SelectItem>
+                                <SelectItem key="DISABLED" value="DISABLED">비활성</SelectItem>
+                            </Select>
+                            <Button color="primary" startContent={<User className="w-4 h-4" />} onClick={handleRegisterClick}>사용자 등록</Button>
+                        </div>
+                    </div>
                 </section>
 
                 {/* Table */}
