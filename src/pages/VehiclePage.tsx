@@ -4,12 +4,16 @@ import { useVehicle } from "@/hooks/pages/useVehicle";
 import { useState } from "react";
 import '@fortawesome/fontawesome-free/css/all.min.css';
 import Pagination from "@/components/common/Pagination";
+import { useVehicleDetailQuery } from "@/hooks/api/vehicle";
+import { Map, MapMarker } from "react-kakao-maps-sdk";
 
 const VehiclePage = () => {
     const { vehicles, pagination, status, setStatus } = useVehicle();
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [selectedVehicle, setSelectedVehicle] = useState<any>(null);
     const [searchTerm, setSearchTerm] = useState("");
+    const [showDetailPanel, setShowDetailPanel] = useState(false);
+    const { data: vehicleDetail, isLoading: isDetailLoading } = useVehicleDetailQuery(selectedVehicle?.id ?? null, { enabled: !!selectedVehicle });
 
     const handleEditClick = (vehicle: any) => {
         setSelectedVehicle(vehicle);
@@ -121,65 +125,55 @@ const VehiclePage = () => {
                     </div>
                 </section>
 
-                {/* Vehicle Cards */}
-                <div className="flex-1 p-6 bg-gray-50 overflow-auto">
-                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+                {/* Vehicle Cards (리스트형) */}
+                <div className="flex-1 p-6 bg-gray-50 overflow-auto relative">
+                    <div className="flex flex-col gap-4">
                         {(vehicles.data?.data ?? []).map((vehicle: any, index: number) => (
                             <div 
                                 key={vehicle.id || index}
-                                className="bg-white rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300 border border-gray-100 overflow-hidden group"
+                                className="flex items-center bg-white rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300 border border-gray-100 overflow-hidden group px-4 py-3 cursor-pointer"
+                                onClick={() => {
+                                    setSelectedVehicle(vehicle);
+                                    setShowDetailPanel(true);
+                                }}
                             >
                                 {/* Vehicle Image */}
-                                <div className="relative h-48 bg-gray-100 overflow-hidden">
+                                <div className="w-24 h-24 flex-shrink-0 bg-gray-100 rounded-xl overflow-hidden mr-6">
                                     <img 
                                         src={vehicle.imageUrl || "/car.jpg"} 
                                         alt={vehicle.name}
-                                        className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                                        className="w-full h-full object-cover"
                                     />
                                 </div>
-
                                 {/* Vehicle Info */}
-                                <div className="p-5">
-                                    <div className="mb-4">
-                                        <div className="flex items-center justify-between mb-2">
-                                            <h3 className="text-xl font-semibold text-gray-800">
-                                                {vehicle.name}
-                                            </h3>
-                                            <span className={`px-3 py-1 rounded-full text-xs font-medium flex items-center gap-1 ${
-                                                vehicle.ignitionStatus === 'ON' 
-                                                    ? 'bg-green-100 text-green-700' 
-                                                    : 'bg-gray-100 text-gray-700'
-                                            }`}>
-                                                <i className={`fas fa-circle text-xs ${vehicle.ignitionStatus === 'ON' ? 'text-green-500' : 'text-gray-500'}`}></i>
-                                                {vehicle.ignitionStatus === 'ON' ? '운행중' : '대기중'}
-                                            </span>
-                                        </div>
-                                        <p className="text-gray-600 flex items-center gap-2">
-                                            <Hash className="text-blue-500 w-4 h-4" />
-                                            {vehicle.licenseNumber}
-                                        </p>
+                                <div className="flex-1 min-w-0">
+                                    <div className="flex items-center justify-between mb-1">
+                                        <h3 className="text-lg font-semibold text-gray-800 truncate">
+                                            {vehicle.name}
+                                        </h3>
+                                        <span className={`px-3 py-1 rounded-full text-xs font-medium flex items-center gap-1 ${
+                                            vehicle.ignitionStatus === 'ON' 
+                                                ? 'bg-green-100 text-green-700' 
+                                                : 'bg-gray-100 text-gray-700'
+                                        }`}>
+                                            <i className={`fas fa-circle text-xs ${vehicle.ignitionStatus === 'ON' ? 'text-green-500' : 'text-gray-500'}`}></i>
+                                            {vehicle.ignitionStatus === 'ON' ? '운행중' : '대기중'}
+                                        </span>
                                     </div>
-
-                                    <div className="flex items-center justify-between pt-4 border-t border-gray-100">
-                                        <div className="flex items-center gap-2 bg-gray-50 px-3 py-2 rounded-lg">
-                                            <MapPin className="text-blue-500 w-4 h-4" />
-                                            <span className="text-sm text-gray-600">
-                                                주행거리: <span className="font-medium text-gray-800">
-                                                    {((vehicle.mileageCurrent ?? 0)/1000).toLocaleString()} km
-                                                </span>
-                                            </span>
-                                        </div>
-                                        <Button
-                                            size="sm"
-                                            variant="light"
-                                            color="primary"
-                                            startContent={<Edit className="w-4 h-4" />}
-                                            onClick={() => handleEditClick(vehicle)}
-                                        >
-                                            수정
-                                        </Button>
+                                    <div className="flex items-center gap-4 text-gray-600 text-sm mb-1">
+                                        <span className="flex items-center gap-1"><Hash className="text-blue-500 w-4 h-4" />{vehicle.licenseNumber}</span>
+                                        <span className="flex items-center gap-1"><MapPin className="text-blue-500 w-4 h-4" />주행거리: <span className="font-medium text-gray-800">{((vehicle.mileageCurrent ?? 0)/1000).toLocaleString()} km</span></span>
                                     </div>
                                 </div>
+                                {/* <Button
+                                    size="sm"
+                                    variant="light"
+                                    color="primary"
+                                    startContent={<Edit className="w-4 h-4" />}
+                                    onClick={e => { e.stopPropagation(); handleEditClick(vehicle); }}
+                                >
+                                    수정
+                                </Button> */}
                             </div>
                         ))}
                     </div>
@@ -188,6 +182,72 @@ const VehiclePage = () => {
                         <div className="text-center py-12">
                             <Car className="mx-auto w-12 h-12 text-gray-400 mb-4" />
                             <p className="text-gray-500">등록된 차량이 없습니다.</p>
+                        </div>
+                    )}
+
+                    {/* 차량 상세 정보 패널 */}
+                    {showDetailPanel && selectedVehicle && (
+                        <div className="fixed top-0 right-0 w-full max-w-md h-full bg-white shadow-2xl z-50 p-8 overflow-y-auto border-l border-gray-200 animate-slide-in">
+                            <button
+                                className="absolute top-4 right-4 text-gray-400 hover:text-gray-700"
+                                onClick={() => setShowDetailPanel(false)}
+                            >
+                                <span className="text-xl">&times;</span>
+                            </button>
+                            {isDetailLoading ? (
+                                <div className="flex items-center justify-center h-full">로딩 중...</div>
+                            ) : vehicleDetail ? (
+                                <>
+                                    <div className="flex flex-col items-center mb-6">
+                                        <img
+                                            src={vehicleDetail.imageUrl || "/car.jpg"}
+                                            alt={vehicleDetail.name}
+                                            className="w-32 h-32 object-cover rounded-xl mb-3"
+                                        />
+                                        <h2 className="text-2xl font-bold text-gray-800 mb-1">{vehicleDetail.name}</h2>
+                                        <span className="text-gray-500 text-sm mb-2">{vehicleDetail.licenseNumber}</span>
+                                        <span className={`px-3 py-1 rounded-full text-xs font-medium flex items-center gap-1 ${
+                                            vehicleDetail.ignitionStatus === 'ON'
+                                                ? 'bg-green-100 text-green-700'
+                                                : 'bg-gray-100 text-gray-700'
+                                        }`}>
+                                            <i className={`fas fa-circle text-xs ${vehicleDetail.ignitionStatus === 'ON' ? 'text-green-500' : 'text-gray-500'}`}></i>
+                                            {vehicleDetail.ignitionStatus === 'ON' ? '운행중' : '대기중'}
+                                        </span>
+                                    </div>
+                                    <div className="space-y-4">
+                                        <div>
+                                            <label className="text-xs text-gray-500">주행거리</label>
+                                            <p className="text-base text-gray-800 font-medium">{((vehicleDetail.mileageCurrent ?? 0)/1000).toLocaleString()} km</p>
+                                        </div>
+                                        <div>
+                                            <label className="text-xs text-gray-500">배터리 전압</label>
+                                            <p className="text-base text-gray-800 font-medium">{vehicleDetail.batteryVoltage ?? '-'} V</p>
+                                        </div>
+                                        <div>
+                                            <label className="text-xs text-gray-500">상태</label>
+                                            <p className="text-base text-gray-800 font-medium">{vehicleDetail.ignitionStatus === 'ON' ? '운행중' : '정지'}</p>
+                                        </div>
+                                    
+                                        {typeof vehicleDetail.latitude === 'number' && typeof vehicleDetail.longitude === 'number' && (
+                                            <div>
+                                                <label className="text-xs text-gray-500 mb-1 block">현재 위치</label>
+                                                <div className="w-full h-56 rounded-lg overflow-hidden border">
+                                                    <Map
+                                                        center={{ lat: vehicleDetail.latitude, lng: vehicleDetail.longitude }}
+                                                        style={{ width: '100%', height: '100%' }}
+                                                        level={5}
+                                                    >
+                                                        <MapMarker position={{ lat: vehicleDetail.latitude, lng: vehicleDetail.longitude }} />
+                                                    </Map>
+                                                </div>
+                                            </div>
+                                        )}
+                                    </div>
+                                </>
+                            ) : (
+                                <div className="text-center text-gray-500">차량 정보를 불러올 수 없습니다.</div>
+                            )}
                         </div>
                     )}
                 </div>
