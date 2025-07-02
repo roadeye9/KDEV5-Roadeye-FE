@@ -14,6 +14,7 @@ const VehiclePage = () => {
     const [searchTerm, setSearchTerm] = useState("");
     const [showDetailPanel, setShowDetailPanel] = useState(false);
     const { data: vehicleDetail, isLoading: isDetailLoading } = useVehicleDetailQuery(selectedVehicle?.id ?? null, { enabled: !!selectedVehicle });
+    const [modalError, setModalError] = useState("");
 
     const handleEditClick = (vehicle: any) => {
         setSelectedVehicle(vehicle);
@@ -29,7 +30,7 @@ const VehiclePage = () => {
     return (
         <>
             {/* 차량 등록/수정 모달 */}
-            <Modal isOpen={isModalOpen} onOpenChange={setIsModalOpen} size="2xl">
+            <Modal isOpen={isModalOpen} onOpenChange={(open) => { setIsModalOpen(open); setModalError(""); }} size="2xl">
                 <ModalContent>
                     {(onClose) => (
                         <>
@@ -61,12 +62,15 @@ const VehiclePage = () => {
                                         startContent={<MapPin className="text-blue-500" />}
                                     />
                                 </div>
+                                {modalError && (
+                                    <div className="text-red-500 text-sm mt-2 text-center">{modalError}</div>
+                                )}
                             </ModalBody>
                             <ModalFooter>
                                 <Button variant="light" onPress={onClose}>
                                     취소
                                 </Button>
-                                <Button color="primary" onPress={onClose}>
+                                <Button color="primary" onPress={() => setModalError('서버에 일시적인 오류가 발생했습니다. 잠시 후 다시 이용해주세요.') }>
                                     {selectedVehicle ? '수정' : '등록'}
                                 </Button>
                             </ModalFooter>
@@ -86,17 +90,9 @@ const VehiclePage = () => {
 
                 {/* Controls */}
                 <section className="p-6 bg-white border-b">
-                    <div className="flex flex-wrap items-center gap-4 justify-between">
-                        <div className="flex flex-wrap items-center gap-4">
-                            {/* <div className="relative">
-                                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
-                                <Input
-                                    className="w-64 pl-10"
-                                    placeholder="차량 검색..."
-                                    value={searchTerm}
-                                    onChange={(e) => setSearchTerm(e.target.value)}
-                                />
-                            </div> */}
+                    <div className="flex flex-wrap items-center justify-between gap-4">
+                        <span className="text-lg font-semibold text-gray-800">총 {vehicles.data?.pageInfo?.total ?? 0}대</span>
+                        <div className="flex items-center gap-3 ml-auto">
                             <Select 
                                 className="w-40" 
                                 selectedKeys={status ? [status] : ["all"]}
@@ -111,17 +107,17 @@ const VehiclePage = () => {
                                 <SelectItem key="ON" value="ON">운행중</SelectItem>
                                 <SelectItem key="OFF" value="OFF">정지</SelectItem>
                             </Select>
+                            <Button 
+                                color="primary" 
+                                startContent={<Plus className="w-4 h-4" />}
+                                onClick={() => {
+                                    setSelectedVehicle(null);
+                                    setIsModalOpen(true);
+                                }}
+                            >
+                                차량 등록
+                            </Button>
                         </div>
-                        <Button 
-                            color="primary" 
-                            startContent={<Plus className="w-4 h-4" />}
-                            onClick={() => {
-                                setSelectedVehicle(null);
-                                setIsModalOpen(true);
-                            }}
-                        >
-                            차량 등록
-                        </Button>
                     </div>
                 </section>
 
