@@ -27,3 +27,23 @@ export const getMy = async (): Promise<Employee> => {
   });
   return response.data;
 };
+
+export const getSessionInfo = async () => {
+  const { data: { data } } = await axiosInstance.get<{
+    data: {
+      createdAt: string;
+      lastAccessedAt: string;
+      expireAt: string;
+    }
+  }>('/session/my');
+  const ret = {
+    createdAt: Date.parse(data.createdAt),
+    lastAccessedAt: Date.parse(data.lastAccessedAt),
+    expireAt: Date.parse(data.expireAt),
+  } as const;
+
+  return {
+    ...ret,
+    isExpired: () => ret.expireAt < Date.now()
+  };
+};

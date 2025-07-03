@@ -1,6 +1,6 @@
-import { useMutation } from '@tanstack/react-query';
+import { useMutation, useQuery } from '@tanstack/react-query';
 
-import { getMy, signIn } from '@/api/auth';
+import { getMy, getSessionInfo, signIn } from '@/api/auth';
 
 export const useSignInMutation = () => {
   return useMutation({
@@ -14,5 +14,11 @@ export const useMyMutation = () => {
     onSuccess: (data) => {
       console.log(data);
     }
+  });
+};
+export const useSessionInfoQuery = () => {
+  return useQuery({
+    queryKey: ['sessionInfo'],
+    queryFn: getSessionInfo
   });
 };

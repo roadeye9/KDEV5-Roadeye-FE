@@ -9,13 +9,13 @@ import NotFoundPage from '@/routes/error/NotFound';
 import LandingPage from '@/routes/index';
 import Dashboard from '@/routes/manage/dashboard';
 import DrivingLogPage from '@/routes/manage/driving-log';
-import DrivingLogDetailPage from '@/routes/manage/driving-log.$id';
 import EmployeePage from '@/routes/manage/employees';
 
 const LoginPage = React.lazy(() => import('@/routes/login'));
 
 const VehiclePage = React.lazy(() => import('@/routes/manage/vehicle'));
 const VehicleControlPage = React.lazy(() => import('@/routes/manage/vehicle-control'));
+const DrivingLogDetailPage = React.lazy(() => import('@/routes/manage/driving-log.$id'));
 
 const BrandingLayout = () => {
   return (

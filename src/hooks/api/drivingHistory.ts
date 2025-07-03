@@ -1,4 +1,4 @@
-import { useQuery } from '@tanstack/react-query';
+import { useQuery, useSuspenseQuery } from '@tanstack/react-query';
 
 import { getDrivingHistory, getDrivingHistoryPath, PageRequest } from '@/api/drivingHistory';
 
@@ -21,7 +21,7 @@ export const useDrivingHistoryQuery = (params: DrivingHistoryQueryParams) => {
 };
 
 export const useDrivingHistoryPathQuery = (id: number) => {
-  return useQuery({
+  return useSuspenseQuery({
     queryKey: DRIVING_HISTORY_QUERY_KEY.path(id),
     queryFn: () => getDrivingHistoryPath(id)
   });

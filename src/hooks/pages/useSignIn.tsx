@@ -33,7 +33,6 @@ export const useSignIn = () => {
   const handleSubmit = useCallback(
     (e: React.FormEvent) => {
       e.preventDefault();
-      console.log(signInForm);
       mutation.mutate(signInForm, {
         onSuccess: () => {
           localStorage.setItem('tenantId', signInForm.tenantId);

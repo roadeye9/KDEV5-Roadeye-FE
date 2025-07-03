@@ -1,7 +1,7 @@
 import { Button, Card, CardBody, CardHeader } from '@nextui-org/react';
 import { ArrowLeft, Car, Clock, Gauge, MapPin, Route, User } from 'lucide-react';
 import { CustomOverlayMap, Map, Polyline } from 'react-kakao-maps-sdk';
-import { useLocation, useNavigate } from 'react-router-dom';
+import { useLocation, useNavigate, useParams } from 'react-router-dom';
 
 import { useDrivingHistoryPathQuery } from '@/hooks/api/drivingHistory';
 import useKakaoLoader from '@/hooks/useKakaoLoader';
@@ -16,9 +16,11 @@ const DrivingLogDetailPage = () => {
   useKakaoLoader();
 
   const navigate = useNavigate();
-  const { state } = useLocation();
-  const log = state?.log;
-  const { data: path } = useDrivingHistoryPathQuery(log.id);
+
+  const { logId } = useParams();
+  const { data: path } = useDrivingHistoryPathQuery(Number(logId));
+
+  console.log(JSON.stringify(path, null, 2));
 
   const polylinePath = (path?.data ?? []).map((p) => ({
     lat: p.latitude,
@@ -48,15 +50,12 @@ const DrivingLogDetailPage = () => {
           <div className='flex flex-wrap items-center gap-x-6 gap-y-2 text-gray-600'>
             <span className='flex items-center gap-2'>
               <Clock className='h-4 w-4 text-blue-500' />
-              {formatDate(log.driveStartedAt)} ~ {formatDate(log.driveEndedAt)}
             </span>
             <span className='flex items-center gap-2'>
               <Car className='h-4 w-4 text-blue-500' />
-              {log.carName} ({log.licenseNumber})
             </span>
             <span className='flex items-center gap-2'>
               <User className='h-4 w-4 text-blue-500' />
-              {log.driverName || '미등록'}
             </span>
           </div>
         </div>
@@ -73,20 +72,17 @@ const DrivingLogDetailPage = () => {
                 <Route className='mx-auto mb-1 h-8 w-8 text-gray-500' />
                 <p className='text-sm font-medium text-gray-600'>주행거리</p>
                 <p className='text-xl font-bold text-gray-800'>
-                  {(log.nextMileageSum - log.previousMileageSum) / 1000} km
                 </p>
               </div>
               <div className='rounded-lg bg-gray-50 p-3'>
                 <Clock className='mx-auto mb-1 h-8 w-8 text-gray-500' />
                 <p className='text-sm font-medium text-gray-600'>운행시간</p>
                 <p className='text-xl font-bold text-gray-800'>
-                  {formatDuration(log.driveStartedAt, log.driveEndedAt)}
                 </p>
               </div>
               <div className='rounded-lg bg-gray-50 p-3'>
                 <Gauge className='mx-auto mb-1 h-8 w-8 text-gray-500' />
                 <p className='text-sm font-medium text-gray-600'>평균 속도</p>
-                <p className='text-xl font-bold text-gray-800'>{log.speed} km/h</p>
               </div>
             </div>
           </CardBody>
