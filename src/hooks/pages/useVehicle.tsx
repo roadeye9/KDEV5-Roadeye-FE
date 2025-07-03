@@ -1,4 +1,4 @@
-import { useVehicleByStatusQuery, useVehicleQuery } from "../api/vehicle"
+import { useVehicleQuery } from "../api/vehicle"
 import { useState } from "react"
 
 export const useVehicle = () => {
@@ -6,7 +6,7 @@ export const useVehicle = () => {
     const [pageSize, setPageSize] = useState(10);
     const [status, setStatus] = useState<"ON" | "OFF" | undefined>(undefined);
 
-    const {data, isLoading, error} = useVehicleQuery({
+    const { data, isLoading, error } = useVehicleQuery({
         page,
         size: pageSize,
         status: status,

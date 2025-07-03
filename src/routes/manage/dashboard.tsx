@@ -15,7 +15,7 @@ const Dashboard = () => {
     const { data: idleCount } = useCarIgnitionCount("OFF", "ACTIVE");
     const { data: repairCount } = useCarIgnitionCount("OFF", "DISABLED");
     const { data: monthlyStats } = useDrivingLogMonthlyCount();
-    const { data: vehicles, isLoading, refetch } = useVehicleAllQuery();
+    const { data: vehicles, isLoading } = useVehicleAllQuery();
 
     return (
         <div className="p-6 bg-gray-50 min-h-screen">

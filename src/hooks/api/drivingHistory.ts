@@ -1,4 +1,3 @@
-import { axiosInstance } from '@/api/axiosInstance';
 import { getDrivingHistory, getDrivingHistoryPath } from '@/api/drivingHistory';
 import { PageRequest } from '@/api/drivingHistory';
 import { useQuery } from '@tanstack/react-query';

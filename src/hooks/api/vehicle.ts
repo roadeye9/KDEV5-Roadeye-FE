@@ -1,4 +1,4 @@
-import { CarIgnitionStatus, deleteVehicle, EntityLifecycleStatus, getVehicles, getVehiclesAll, getVehiclesByStatus, PageRequest, patchVehicle, postVehicle, getVehicle } from "@/api/vehicle";
+import { CarIgnitionStatus, deleteVehicle, getVehicle, getVehicles, getVehiclesAll, getVehiclesByStatus, PageRequest, patchVehicle, postVehicle } from "@/api/vehicle";
 import { useMutation, useQuery } from "@tanstack/react-query";
 
 const REFETCH_INTERVAL = Number(import.meta.env.VITE_REFETCH_INTERVAL_MS);
@@ -14,7 +14,7 @@ export const VEHICLE_QUERY_KEY = {
 }
 
 export interface VehicleQueryParams extends PageRequest {
-    status?:  "ON" | "OFF" | null;
+    status?: "ON" | "OFF" | null;
     ignitionStatus?: CarIgnitionStatus;
 }
 

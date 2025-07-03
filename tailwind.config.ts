@@ -1,7 +1,6 @@
 import { type Config } from 'tailwindcss';
-const {nextui} = require("@nextui-org/react");
-
-
+import { nextui } from '@nextui-org/react';
+import tailwindcssAnimate from 'tailwindcss-animate';
 
 export default {
   prefix: '',
@@ -78,5 +77,8 @@ export default {
       }
     }
   },
-  plugins: [require('tailwindcss-animate'), nextui()]
+  plugins: [
+    tailwindcssAnimate,
+    nextui()
+  ]
 } satisfies Config;

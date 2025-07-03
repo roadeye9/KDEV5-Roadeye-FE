@@ -1,3 +1,4 @@
+import type { Vehicle } from "@/api/vehicle";
 import Pagination from "@/components/common/Pagination";
 import { useVehicleDetailQuery } from "@/hooks/api/vehicle";
 import { useVehicle } from "@/hooks/pages/useVehicle";
@@ -10,22 +11,10 @@ import { Map, MapMarker } from "react-kakao-maps-sdk";
 const VehiclePage = () => {
     const { vehicles, pagination, status, setStatus } = useVehicle();
     const [isModalOpen, setIsModalOpen] = useState(false);
-    const [selectedVehicle, setSelectedVehicle] = useState<any>(null);
-    const [searchTerm, setSearchTerm] = useState("");
+    const [selectedVehicle, setSelectedVehicle] = useState<Vehicle | null>(null);
     const [showDetailPanel, setShowDetailPanel] = useState(false);
     const { data: vehicleDetail, isLoading: isDetailLoading } = useVehicleDetailQuery(selectedVehicle?.id ?? null, { enabled: !!selectedVehicle });
     const [modalError, setModalError] = useState("");
-
-    const handleEditClick = (vehicle: any) => {
-        setSelectedVehicle(vehicle);
-        setIsModalOpen(true);
-    };
-
-    const totalPages = Math.ceil((pagination.totalElements ?? 0) / pagination.pageSize);
-    const maxPageButtons = 10;
-    const startPage = Math.floor((pagination.currentPage - 1) / maxPageButtons) * maxPageButtons + 1;
-    const endPage = Math.min(startPage + maxPageButtons - 1, totalPages);
-    const pageNumbers = Array.from({ length: (endPage - startPage + 1) }, (_, i) => startPage + i);
 
     return (
         <>
@@ -124,7 +113,7 @@ const VehiclePage = () => {
                 {/* Vehicle Cards (리스트형) */}
                 <div className="flex-1 p-6 bg-gray-50 overflow-auto relative">
                     <div className="flex flex-col gap-4">
-                        {(vehicles.data?.data ?? []).map((vehicle: any, index: number) => (
+                        {(vehicles.data?.data ?? []).map((vehicle: Vehicle, index: number) => (
                             <div
                                 key={vehicle.id || index}
                                 className="flex items-center bg-white rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300 border border-gray-100 overflow-hidden group px-4 py-3 cursor-pointer"

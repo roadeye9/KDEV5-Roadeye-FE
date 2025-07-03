@@ -1,8 +1,8 @@
-import { useNavigate, NavLink } from "react-router-dom";
-import { LayoutDashboard, Truck, UserCog, MapPin, FileText, Car, LogOut, type LucideIcon } from "lucide-react";
-import { Button, Avatar } from "@nextui-org/react";
 import { useEmployeeMyQuery } from "@/hooks/api/employee";
+import { Avatar, Button } from "@nextui-org/react";
+import { Car, FileText, LayoutDashboard, LogOut, MapPin, Truck, UserCog } from "lucide-react";
 import { Suspense } from "react";
+import { NavLink, useNavigate } from "react-router-dom";
 
 const MENU_ITEMS = [
     {

@@ -1,6 +1,5 @@
 import { useCallback, useState } from "react";
 import { useSignInMutation } from "../api/auth";
-import { getMy } from "@/api/auth";
 import { useNavigate } from "react-router-dom";
 
 export interface SignInForm {
@@ -29,9 +28,9 @@ export const useSignIn = () => {
 
     const handleSubmit = useCallback((e: React.FormEvent) => {
         e.preventDefault();
-        console.log(signInForm); 
+        console.log(signInForm);
         mutation.mutate(signInForm, {
-            onSuccess: (data) => {
+            onSuccess: () => {
                 localStorage.setItem("tenantId", signInForm.tenantId);
                 navigate(`/manage/dashboard`);
             }

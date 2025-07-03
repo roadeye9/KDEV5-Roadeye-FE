@@ -1,5 +1,4 @@
-import {AxiosError, AxiosResponse, InternalAxiosRequestConfig} from "axios";
-import {axiosInstance} from "@/api/axiosInstance";
+import { AxiosResponse, InternalAxiosRequestConfig } from "axios";
 
 export interface ErrorResponseData {
   statusCode: number;
@@ -12,23 +11,22 @@ export class HTTPError {
   }
 }
 
-
 export const checkAndTenantId = (config: InternalAxiosRequestConfig) => {
-    if(!config.useTenant || !config.headers) return config;
+  if (!config.useTenant || !config.headers) return config;
 
-    const tenantId = localStorage.getItem("tenantId");
+  const tenantId = localStorage.getItem("tenantId");
 
-    if(!tenantId){
-      window.location.href = "/auth"
-      throw new Error("테넌트 아이디가 없습니다.");
-    }
-  
-    config.headers["X-Company-Id"]= tenantId;
-    return config;
+  if (!tenantId) {
+    window.location.href = "/auth"
+    throw new Error("테넌트 아이디가 없습니다.");
+  }
+
+  config.headers["X-Company-Id"] = tenantId;
+  return config;
 
 }
 
-export const delayFulfilled = (config: InternalAxiosRequestConfig )=> ({
+export const delayFulfilled = (config: InternalAxiosRequestConfig) => ({
   ...config,
   p0: performance.now(),
 });

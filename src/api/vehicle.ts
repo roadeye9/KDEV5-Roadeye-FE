@@ -1,6 +1,6 @@
 import { axiosInstance } from "./axiosInstance";
 
-interface PageInfo  {
+interface PageInfo {
     page: number;
     size: number;
     total: number;
@@ -60,11 +60,6 @@ export type PageRequest = {
     size: number;
 }
 
-
-const combine = (path: string, request: PageRequest) => path + '?' + Object.entries(request).map(([key, value]) => `${key}=${value}`).join('&');
-
-
-
 export const getVehicles = async (pageRequest: PageRequest, params: { status?: "ON" | "OFF" | null }) => {
     const response = await axiosInstance.get<PageResponse<Vehicle>>('/cars/search/ignition', {
         params: { ...pageRequest, ...params },
@@ -79,11 +74,11 @@ export const getVehiclesAll = async () => {
 }
 
 export const getVehiclesByStatus = async (status: "ON" | "OFF" | null) => {
-  const { data } = await axiosInstance.get<VehicleDetailsListResponse>("/cars/ignition", {
-    params: { status },
-  });
+    const { data } = await axiosInstance.get<VehicleDetailsListResponse>("/cars/ignition", {
+        params: { status },
+    });
 
-  return data.data;
+    return data.data;
 };
 
 export const postVehicle = async (vehicle: Omit<Vehicle, 'id'> & { mileageInitial: number }) => {

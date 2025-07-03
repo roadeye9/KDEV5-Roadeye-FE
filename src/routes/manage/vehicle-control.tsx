@@ -1,17 +1,14 @@
+import { DrivingLocationDetail } from "@/api/location";
+import { Vehicle, VehicleDetails } from "@/api/vehicle";
+import { useDrivingHistoryQuery } from "@/hooks/api/location";
+import { useVehicleByStatusQuery, useVehicleDetailQuery } from "@/hooks/api/vehicle";
+import useKakaoLoader from "@/hooks/useKakaoLoader";
+import useMapCenter, { Coordinate } from "@/hooks/useMapCenter";
+import '@fortawesome/fontawesome-free/css/all.min.css';
+import { Button, Checkbox } from "@nextui-org/react";
+import { ArrowLeft, Clock, MapPin, RefreshCw, User } from "lucide-react";
 import { useEffect, useState } from "react";
 import { Map, MapMarker, MapTypeControl, MarkerClusterer, Polyline, ZoomControl } from "react-kakao-maps-sdk";
-import { Button, Checkbox } from "@nextui-org/react";
-import { MapPin, RefreshCw, ArrowLeft, User, Clock } from "lucide-react";
-import CarFrontImage from "@/assets/images/car-front.svg";
-import useKakaoLoader from "@/hooks/useKakaoLoader";
-import { useVehicleAllQuery, useVehicleByStatusQuery, useVehicleDetailQuery } from "@/hooks/api/vehicle";
-import { VehicleDetails } from "@/api/vehicle";
-import { Vehicle } from "@/api/vehicle";
-import { ListModel, DrivingLocationDetail } from "@/api/location";
-import useMapCenter, { Coordinate } from "@/hooks/useMapCenter";
-import { useDrivingHistoryQuery } from "@/hooks/api/location";
-import '@fortawesome/fontawesome-free/css/all.min.css';
-
 
 type Point = {
   lat: number;
@@ -38,7 +35,7 @@ function VehicleControlPage() {
   useKakaoLoader();
 
   const [selectedVehicle, setSelectedVehicle] = useState<VehicleDetails | null>(null);
-  const { data: vehicles, isLoading, refetch: refetchAll } = useVehicleByStatusQuery("ON", !selectedVehicle);
+  const { data: vehicles, refetch: refetchAll } = useVehicleByStatusQuery("ON", !selectedVehicle);
   const [path, setPath] = useState<Path>([]);
   const [center, setCenter] = useMapCenter();
   const [mapLevel, setMapLevel] = useState(12);
@@ -46,8 +43,8 @@ function VehicleControlPage() {
   const [visibleVehicles, setVisibleVehicles] = useState<Set<number>>(new Set());
   const { data: drivingHistory } = useDrivingHistoryQuery(selectedVehicle?.id ?? 0);
   const [currentTime, setCurrentTime] = useState(new Date());
-  const [originalCenter, setOriginalCenter] = useState<Coordinate>({ lat: 37.5665, lng: 126.9780 }); // 서울 시청 좌표
-  const { data: vehicleDetail, refetch: refetchDetail, isFetching: isFetchingDetail } = useVehicleDetailQuery(selectedVehicle?.id ?? null, { enabled: !!selectedVehicle });
+  const [originalCenter] = useState<Coordinate>({ lat: 37.5665, lng: 126.9780 }); // 서울 시청 좌표
+  const { data: vehicleDetail, refetch: refetchDetail } = useVehicleDetailQuery(selectedVehicle?.id ?? null, { enabled: !!selectedVehicle });
 
   useEffect(() => {
     if (selectedVehicle && drivingHistory && vehicleDetail) {
@@ -162,9 +159,8 @@ function VehicleControlPage() {
                 {vehicles?.map((vehicle) => (
                   <div
                     key={vehicle.id}
-                    className={`bg-gray-50 rounded-lg p-4 cursor-pointer transition-all duration-300 hover:bg-gray-100 hover:-translate-y-1 ${
-                      selectedVehicle?.id === vehicle.id ? 'border-2 border-blue-500 bg-blue-50' : ''
-                    }`}
+                    className={`bg-gray-50 rounded-lg p-4 cursor-pointer transition-all duration-300 hover:bg-gray-100 hover:-translate-y-1 ${selectedVehicle?.id === vehicle.id ? 'border-2 border-blue-500 bg-blue-50' : ''
+                      }`}
                     onClick={() => handleVehicleSelect(vehicle)}
                   >
                     <div className="flex items-center gap-3 mb-3">
@@ -178,11 +174,10 @@ function VehicleControlPage() {
                         <span className="text-sm text-gray-600">{vehicle.licenseNumber}</span>
                       </div>
                     </div>
-                    
+
                     <div className="flex items-center justify-between mb-2">
-                      <span className={`flex items-center gap-1 text-sm ${
-                        vehicle.ignitionStatus === 'ON' ? 'text-green-600' : 'text-gray-500'
-                      }`}>
+                      <span className={`flex items-center gap-1 text-sm ${vehicle.ignitionStatus === 'ON' ? 'text-green-600' : 'text-gray-500'
+                        }`}>
                         <i className="fas fa-circle text-xs"></i>
                         {vehicle.ignitionStatus === 'ON' ? '운행중' : '정지'}
                       </span>
@@ -191,7 +186,7 @@ function VehicleControlPage() {
                         {'미배정'}
                       </span>
                     </div>
-                    
+
                     <div className="flex items-center gap-2 text-sm text-gray-600">
                       <MapPin className="w-3 h-3" />
                       <span className="truncate">
@@ -204,9 +199,8 @@ function VehicleControlPage() {
             </div>
 
             {/* Vehicle Detail Panel */}
-            <div className={`absolute top-0 left-full w-full h-full bg-white transition-transform duration-300 ${
-              showDetailPanel ? '-translate-x-full' : 'translate-x-0'
-            }`}>
+            <div className={`absolute top-0 left-full w-full h-full bg-white transition-transform duration-300 ${showDetailPanel ? '-translate-x-full' : 'translate-x-0'
+              }`}>
               {selectedVehicle && (
                 <div className="p-5 h-full overflow-y-auto">
                   <div className="flex items-center justify-between mb-5">
@@ -242,9 +236,8 @@ function VehicleControlPage() {
                         </div>
                         <div>
                           <label className="text-xs text-gray-500">상태</label>
-                          <p className={`text-sm ${
-                            (selectedVehicle.ignitionStatus) === 'ON' ? 'text-green-600' : 'text-gray-600'
-                          }`}>
+                          <p className={`text-sm ${(selectedVehicle.ignitionStatus) === 'ON' ? 'text-green-600' : 'text-gray-600'
+                            }`}>
                             {(selectedVehicle.ignitionStatus) === 'ON' ? '운행중' : '정지'}
                           </p>
                         </div>
@@ -266,16 +259,16 @@ function VehicleControlPage() {
                           <p className="text-sm text-gray-800">{path[path.length - 1]?.speed || 60} km/h</p>
                         </div>
                         <div>
-                        <label className="text-xs text-gray-500">운행 시작 시간</label>
+                          <label className="text-xs text-gray-500">운행 시작 시간</label>
                           <p className="text-sm text-gray-800">
                             {selectedVehicle.ignitionOnTime
                               ? new Date(selectedVehicle.ignitionOnTime).toLocaleString("ko-KR", {
-                                  year: "numeric",
-                                  month: "2-digit",
-                                  day: "2-digit",
-                                  hour: "2-digit",
-                                  minute: "2-digit",
-                                })
+                                year: "numeric",
+                                month: "2-digit",
+                                day: "2-digit",
+                                hour: "2-digit",
+                                minute: "2-digit",
+                              })
                               : "정보 없음"}
                           </p>
                         </div>
@@ -286,8 +279,8 @@ function VehicleControlPage() {
                     {selectedVehicle.imageUrl && (
                       <div>
                         <h4 className="font-semibold text-gray-800 mb-3">차량 이미지</h4>
-                        <img 
-                          src={selectedVehicle.imageUrl} 
+                        <img
+                          src={selectedVehicle.imageUrl}
                           alt={selectedVehicle.name}
                           className="w-full h-auto rounded-lg"
                         />

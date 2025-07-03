@@ -1,11 +1,7 @@
-import axios, { AxiosError, AxiosResponse } from "axios";
-import { toast } from "sonner";
+import axios, { AxiosError } from "axios";
 import { checkAndTenantId, delayFulfilled, waitingFulfilled } from "./interceptor";
-// import {NETWORK} from "@/constants/api";
-// import {checkAndSetToken, delayFulfilled, handleTokenError, waitingFulfilled} from "@/api/Interceptors";
 
 const BASE_URL = import.meta.env.VITE_API_URL || window.location.origin;
-
 
 export const axiosInstance = axios.create({
     baseURL: `${BASE_URL}/api`,
@@ -29,7 +25,7 @@ axiosInstance.interceptors.response.use(
                 window.location.href = '/login';
             }, 1000);
         }
-        
+
         return Promise.reject(error);
     }
 );

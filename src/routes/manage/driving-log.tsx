@@ -5,43 +5,12 @@ import { formatDate } from "@/utils/format";
 import '@fortawesome/fontawesome-free/css/all.min.css';
 import { Button, Table, TableBody, TableCell, TableColumn, TableHeader, TableRow } from "@nextui-org/react";
 import { Car, Clock, Eye, Route } from "lucide-react";
-import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 
 const DrivingLogPage = () => {
     const { drivingHistory, pagination } = useDrivingHistory();
-    const [filters, setFilters] = useState({
-        vehicle: "",
-        startDate: "",
-        endDate: "",
-        driver: ""
-    });
+
     const navigate = useNavigate();
-
-    const handleFilterChange = (key: string, value: string) => {
-        setFilters(prev => ({ ...prev, [key]: value }));
-    };
-
-    const applyFilters = () => {
-        let filtered = drivingHistory.data?.data ?? [];
-
-        setFilters({
-            vehicle: filters.vehicle,
-            startDate: filters.startDate,
-            endDate: filters.endDate,
-            driver: filters.driver
-        });
-    };
-
-    const resetFilters = () => {
-        setFilters({
-            vehicle: "",
-            startDate: "",
-            endDate: "",
-            driver: ""
-        });
-    };
-
 
     const viewDetail = (log: DrivingHistory) => {
         navigate(`/manage/driving-log/${log.id}`, { state: { log } });

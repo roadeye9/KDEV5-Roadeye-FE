@@ -1,4 +1,4 @@
-import { Employee, getMy } from '@/api/auth';
+import { getMy } from '@/api/auth';
 import { createEmployee, getEmployees, updateEmployee, UpdateEmployeeRequest } from '@/api/employee';
 import { queryClient } from '@/app';
 import { useMutation, useQuery, useSuspenseQuery } from '@tanstack/react-query';
