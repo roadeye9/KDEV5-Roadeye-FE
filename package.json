@@ -12,7 +12,7 @@
   "scripts": {
     "dev": "vite",
     "build": "tsc && vite build",
-    "build:cloud": "rm -rf package.lock.json node_modules && npm install && vite build",
+    "build:cloud": "rm -rf package-lock.json node_modules && npm install && vite build",
     "preview": "vite preview",
     "lint": "eslint .",
     "lint:fix": "eslint . --fix",
