@@ -1,7 +1,7 @@
 import { Employee, getMy } from '@/api/auth';
 import { createEmployee, getEmployees, updateEmployee, UpdateEmployeeRequest } from '@/api/employee';
 import { queryClient } from '@/app';
-import { useMutation, useQuery} from '@tanstack/react-query';
+import { useMutation, useQuery, useSuspenseQuery } from '@tanstack/react-query';
 
 export interface EmployeeQueryParams {
     page: number;
@@ -26,7 +26,7 @@ export const useEmployeeQuery = (params: EmployeeQueryParams) => {
 };
 
 export const useEmployeeMyQuery = () => {
-    return useQuery({
+    return useSuspenseQuery({
         queryKey: EMPLOYEE_QUERY_KEY.my,
         queryFn: getMy,
     });
@@ -34,7 +34,7 @@ export const useEmployeeMyQuery = () => {
 
 export const useEmployeeMutation = () => {
     return useMutation({
-        mutationKey: EMPLOYEE_QUERY_KEY.add,    
+        mutationKey: EMPLOYEE_QUERY_KEY.add,
         mutationFn: createEmployee,
         onSuccess: () => {
             queryClient.refetchQueries({ queryKey: EMPLOYEE_QUERY_KEY.list({ page: 0, size: 20 }) });
@@ -45,7 +45,7 @@ export const useEmployeeMutation = () => {
 export const useUpdateEmployeeMutation = () => {
     return useMutation({
         mutationKey: EMPLOYEE_QUERY_KEY.update,
-        mutationFn: ({ employeeId, payload }: { employeeId: number, payload: UpdateEmployeeRequest }) => 
+        mutationFn: ({ employeeId, payload }: { employeeId: number, payload: UpdateEmployeeRequest }) =>
             updateEmployee(employeeId, payload),
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: EMPLOYEE_QUERY_KEY.all });
