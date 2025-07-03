@@ -19,6 +19,7 @@ import {
   Polyline,
   ZoomControl
 } from 'react-kakao-maps-sdk';
+import { useCurrentTime } from '@/hooks/useCurrentTime';
 
 type Point = {
   lat: number;
@@ -52,7 +53,6 @@ function VehicleControlPage() {
   const [showDetailPanel, setShowDetailPanel] = useState(false);
   const [visibleVehicles, setVisibleVehicles] = useState<Set<number>>(new Set());
   const { data: drivingHistory } = useDrivingHistoryQuery(selectedVehicle?.id ?? 0);
-  const [currentTime, setCurrentTime] = useState(new Date());
   const [originalCenter] = useState<Coordinate>({ lat: 37.5665, lng: 126.978 }); // 서울 시청 좌표
   const { data: vehicleDetail, refetch: refetchDetail } = useVehicleDetailQuery(
     selectedVehicle?.id ?? null,
@@ -75,15 +75,6 @@ function VehicleControlPage() {
       setVisibleVehicles(new Set(vehicles.map((v) => v.id)));
     }
   }, [vehicles]);
-
-  // 실시간 시간 업데이트
-  useEffect(() => {
-    const timer = setInterval(() => {
-      setCurrentTime(new Date());
-    }, 1000); // 1초마다 업데이트
-
-    return () => clearInterval(timer);
-  }, []);
 
   const handleVehicleSelect = (vehicle: VehicleDetails) => {
     setSelectedVehicle(vehicle);
@@ -109,15 +100,6 @@ function VehicleControlPage() {
     setVisibleVehicles(newVisible);
   };
 
-  const getCurrentTime = () => {
-    return currentTime.toLocaleTimeString('ko-KR', {
-      hour: '2-digit',
-      minute: '2-digit',
-      second: '2-digit'
-    });
-  };
-
-  // 새로고침 핸들러
   const handleRefresh = () => {
     if (selectedVehicle) {
       console.log('refetchDetail');
@@ -130,25 +112,9 @@ function VehicleControlPage() {
 
   return (
     <div className='flex h-screen flex-col'>
-      {/* Header */}
-      <header className='border-b bg-white p-6'>
-        <div className='flex items-center justify-between'>
-          <h1 className='flex items-center gap-3 text-2xl font-bold text-gray-800'>
-            <MapPin className='text-blue-500' />
-            실시간 차량관제
-          </h1>
-          <div className='flex items-center gap-4'>
-            <div className='flex items-center gap-2 text-gray-600'>
-              <Clock className='h-4 w-4' />
-              <span>{getCurrentTime()}</span>
-            </div>
-          </div>
-        </div>
-      </header>
+      <Header />
 
-      {/* Main Content */}
       <div className='flex flex-1 overflow-hidden'>
-        {/* Vehicle List Panel */}
         <div className='flex w-80 flex-col border-r bg-white'>
           <div className='border-b p-5'>
             <div className='flex items-center justify-between'>
@@ -166,7 +132,6 @@ function VehicleControlPage() {
           </div>
 
           <div className='relative flex-1 overflow-hidden'>
-            {/* Vehicle List */}
             <div
               className={`h-full transition-transform duration-300 ${showDetailPanel ? '-translate-x-full' : 'translate-x-0'}`}
             >
@@ -174,11 +139,10 @@ function VehicleControlPage() {
                 {vehicles?.map((vehicle) => (
                   <div
                     key={vehicle.id}
-                    className={`cursor-pointer rounded-lg bg-gray-50 p-4 transition-all duration-300 hover:-translate-y-1 hover:bg-gray-100 ${
-                      selectedVehicle?.id === vehicle.id
-                        ? 'border-2 border-blue-500 bg-blue-50'
-                        : ''
-                    }`}
+                    className={`cursor-pointer rounded-lg bg-gray-50 p-4 transition-all duration-300 hover:-translate-y-1 hover:bg-gray-100 ${selectedVehicle?.id === vehicle.id
+                      ? 'border-2 border-blue-500 bg-blue-50'
+                      : ''
+                      }`}
                     onClick={() => handleVehicleSelect(vehicle)}
                   >
                     <div className='mb-3 flex items-center gap-3'>
@@ -195,9 +159,8 @@ function VehicleControlPage() {
 
                     <div className='mb-2 flex items-center justify-between'>
                       <span
-                        className={`flex items-center gap-1 text-sm ${
-                          vehicle.ignitionStatus === 'ON' ? 'text-green-600' : 'text-gray-500'
-                        }`}
+                        className={`flex items-center gap-1 text-sm ${vehicle.ignitionStatus === 'ON' ? 'text-green-600' : 'text-gray-500'
+                          }`}
                       >
                         <i className='fas fa-circle text-xs'></i>
                         {vehicle.ignitionStatus === 'ON' ? '운행중' : '정지'}
@@ -219,11 +182,9 @@ function VehicleControlPage() {
               </div>
             </div>
 
-            {/* Vehicle Detail Panel */}
             <div
-              className={`absolute left-full top-0 h-full w-full bg-white transition-transform duration-300 ${
-                showDetailPanel ? '-translate-x-full' : 'translate-x-0'
-              }`}
+              className={`absolute left-full top-0 h-full w-full bg-white transition-transform duration-300 ${showDetailPanel ? '-translate-x-full' : 'translate-x-0'
+                }`}
             >
               {selectedVehicle && (
                 <div className='h-full overflow-y-auto p-5'>
@@ -242,7 +203,6 @@ function VehicleControlPage() {
                   </div>
 
                   <div className='space-y-6'>
-                    {/* Basic Info */}
                     <div>
                       <h4 className='mb-3 font-semibold text-gray-800'>기본 정보</h4>
                       <div className='grid grid-cols-2 gap-4'>
@@ -261,11 +221,10 @@ function VehicleControlPage() {
                         <div>
                           <label className='text-xs text-gray-500'>상태</label>
                           <p
-                            className={`text-sm ${
-                              selectedVehicle.ignitionStatus === 'ON'
-                                ? 'text-green-600'
-                                : 'text-gray-600'
-                            }`}
+                            className={`text-sm ${selectedVehicle.ignitionStatus === 'ON'
+                              ? 'text-green-600'
+                              : 'text-gray-600'
+                              }`}
                           >
                             {selectedVehicle.ignitionStatus === 'ON' ? '운행중' : '정지'}
                           </p>
@@ -294,12 +253,12 @@ function VehicleControlPage() {
                           <p className='text-sm text-gray-800'>
                             {selectedVehicle.ignitionOnTime
                               ? new Date(selectedVehicle.ignitionOnTime).toLocaleString('ko-KR', {
-                                  year: 'numeric',
-                                  month: '2-digit',
-                                  day: '2-digit',
-                                  hour: '2-digit',
-                                  minute: '2-digit'
-                                })
+                                year: 'numeric',
+                                month: '2-digit',
+                                day: '2-digit',
+                                hour: '2-digit',
+                                minute: '2-digit'
+                              })
                               : '정보 없음'}
                           </p>
                         </div>
@@ -324,44 +283,62 @@ function VehicleControlPage() {
           </div>
         </div>
 
-        {/* Map Container */}
-        <div className='relative flex-1'>
-          <Map
-            key={mapLevel}
-            center={center}
-            style={{ width: '100%', height: '100%' }}
-            level={mapLevel}
-          >
-            <MapTypeControl position={'TOPRIGHT'} />
-            <ZoomControl position={'BOTTOMRIGHT'} />
-            <MarkerClusterer averageCenter={true} minLevel={9} minClusterSize={1}>
-              {selectedVehicle && path.length > 0 ? (
-                <MapMarker key={selectedVehicle.id} position={path[path.length - 1]} />
-              ) : (
-                vehicles
-                  ?.filter((vehicle) => visibleVehicles.has(vehicle.id) && hasLatLng(vehicle))
-                  .map((vehicle) => {
-                    const v = vehicle as VehicleDetails;
-                    return (
-                      <MapMarker
-                        key={v.id}
-                        position={{ lat: v.latitude, lng: v.longitude }}
-                        onClick={() => {
-                          setSelectedVehicle(v);
-                          setShowDetailPanel(true);
-                          setMapLevel(4);
-                        }}
-                      />
-                    );
-                  })
-              )}
-            </MarkerClusterer>
-            {path.length > 0 && <Polyline path={path} strokeColor={'blue'} strokeWeight={2} />}
-          </Map>
-        </div>
+        <Map
+          className='flex-1'
+          key={mapLevel}
+          center={center}
+          level={mapLevel}
+        >
+          <MapTypeControl position={'TOPRIGHT'} />
+          <ZoomControl position={'BOTTOMRIGHT'} />
+          <MarkerClusterer averageCenter={true} minLevel={9} minClusterSize={1}>
+            {selectedVehicle && path.length > 0 ? (
+              <MapMarker key={selectedVehicle.id} position={path[path.length - 1]} />
+            ) : (
+              vehicles
+                ?.filter((vehicle) => visibleVehicles.has(vehicle.id) && hasLatLng(vehicle))
+                .map((vehicle) => {
+                  const v = vehicle as VehicleDetails;
+                  return (
+                    <MapMarker
+                      key={v.id}
+                      position={{ lat: v.latitude, lng: v.longitude }}
+                      onClick={() => {
+                        setSelectedVehicle(v);
+                        setShowDetailPanel(true);
+                        setMapLevel(4);
+                      }}
+                    />
+                  );
+                })
+            )}
+          </MarkerClusterer>
+          {path.length > 0 && <Polyline path={path} strokeColor={'blue'} strokeWeight={2} />}
+        </Map>
       </div>
     </div>
   );
+}
+
+function Header() {
+  const currentTime = useCurrentTime();
+
+  return (
+    <header className='border-b bg-white p-6'>
+      <div className='flex items-center justify-between'>
+        <h1 className='flex items-center gap-3 text-2xl font-bold text-gray-800'>
+          <MapPin className='text-blue-500' />
+          실시간 차량관제
+        </h1>
+        <div className='flex items-center gap-4'>
+          <div className='flex items-center gap-2 text-gray-600'>
+            <Clock className='h-4 w-4' />
+            <span>{currentTime}</span>
+          </div>
+        </div>
+      </div>
+    </header>
+  )
 }
 
 export default VehicleControlPage;
