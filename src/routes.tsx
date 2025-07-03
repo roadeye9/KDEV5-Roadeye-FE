@@ -1,17 +1,14 @@
 import React from 'react';
-
 import { createBrowserRouter, Outlet, RouterProvider } from 'react-router-dom';
-
 import { Toaster } from '@/components/ui/toaster';
-import { AuthProvider } from '@/contexts/auth';
 import AuthLayout from '@/layouts/AuthLayout';
 import PlatformLayout from '@/layouts/PlatformLayout';
-import Dashboard from '@/routes/manage/dashboard';
-import DrivingLogDetailPage from '@/routes/manage/driving-log.$id';
-import EmployeePage from '@/routes/manage/employees';
 import NotFoundPage from '@/routes/error/NotFound';
 import LandingPage from '@/routes/index';
+import Dashboard from '@/routes/manage/dashboard';
 import DrivingLogPage from '@/routes/manage/driving-log';
+import DrivingLogDetailPage from '@/routes/manage/driving-log.$id';
+import EmployeePage from '@/routes/manage/employees';
 
 const LoginPage = React.lazy(() => import('@/routes/login'));
 
