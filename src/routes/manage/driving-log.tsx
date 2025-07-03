@@ -1,7 +1,7 @@
 import { DrivingHistory } from '@/api/drivingHistory';
 import Pagination from '@/components/common/Pagination';
 import { useDrivingHistory } from '@/hooks/pages/useDrivingHistory';
-import { formatDate } from '@/utils/format';
+import { formatDate } from '@/utils/dateUtils';
 
 import '@fortawesome/fontawesome-free/css/all.min.css';
 

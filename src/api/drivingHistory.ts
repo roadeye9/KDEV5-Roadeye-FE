@@ -47,20 +47,33 @@ export type DrivingHistoryPath = {
 };
 export type DrivingHistoryListResponse = ListModel<DrivingHistory>;
 
-export const getDrivingHistory = async (pageRequest: PageRequest) => {
+export const getDrivingHistoryPage = async (pageRequest: PageRequest) => {
   const response = await axiosInstance.get<PageResponse<DrivingHistory>>('/driving', {
     params: pageRequest,
     useTenant: true
   });
-  return response.data;
+  const ret = response.data;
+  return {
+    ...ret,
+    data: ret.data.map((d) => ({
+      ...d,
+      driveStartedAt: new Date(d.driveStartedAt),
+      driveEndedAt: new Date(d.driveEndedAt)
+    }))
+  } as const
 };
 
-export const getDrivingHistoryAll = async () => {
-  const { data } = await axiosInstance.get<DrivingHistoryListResponse>('/driving-history/all');
-  return data;
+export const getDrivingHistory = async (id: number) => {
+  const { data } = await axiosInstance.get<Response<DrivingHistory>>(`/driving/${id}`);
+  const ret = data.data;
+  return {
+    ...ret,
+    driveStartedAt: new Date(ret.driveStartedAt),
+    driveEndedAt: new Date(ret.driveEndedAt)
+  } as const
 };
 
 export const getDrivingHistoryPath = async (id: number) => {
-  const { data } = await axiosInstance.get<ListModel<DrivingHistoryPath>>(`/driving/${id}`);
-  return data;
+  const { data } = await axiosInstance.get<ListModel<DrivingHistoryPath>>(`/driving/${id}/path`);
+  return data.data;
 };

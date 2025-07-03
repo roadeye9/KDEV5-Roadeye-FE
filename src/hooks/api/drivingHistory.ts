@@ -1,6 +1,6 @@
 import { useQuery, useSuspenseQuery } from '@tanstack/react-query';
 
-import { getDrivingHistory, getDrivingHistoryPath, PageRequest } from '@/api/drivingHistory';
+import { getDrivingHistory, getDrivingHistoryPage, getDrivingHistoryPath, PageRequest } from '@/api/drivingHistory';
 
 export interface DrivingHistoryQueryParams {
   page: number;
@@ -9,14 +9,22 @@ export interface DrivingHistoryQueryParams {
 
 export const DRIVING_HISTORY_QUERY_KEY = {
   all: ['driving-history'] as const,
+  detail: (id: number) => [...DRIVING_HISTORY_QUERY_KEY.all, 'detail', id] as const,
   list: (params: PageRequest) => [...DRIVING_HISTORY_QUERY_KEY.all, 'list', params] as const,
   path: (id: number) => [...DRIVING_HISTORY_QUERY_KEY.all, 'path', id] as const
 };
 
-export const useDrivingHistoryQuery = (params: DrivingHistoryQueryParams) => {
+export const useDrivingHistoryPageQuery = (params: DrivingHistoryQueryParams) => {
   return useQuery({
     queryKey: DRIVING_HISTORY_QUERY_KEY.list(params),
-    queryFn: () => getDrivingHistory(params)
+    queryFn: () => getDrivingHistoryPage(params)
+  });
+};
+
+export const useDrivingHistoryQuery = (id: number) => {
+  return useSuspenseQuery({
+    queryKey: DRIVING_HISTORY_QUERY_KEY.detail(id),
+    queryFn: () => getDrivingHistory(id)
   });
 };
 

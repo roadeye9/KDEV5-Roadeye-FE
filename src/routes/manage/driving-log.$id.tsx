@@ -3,9 +3,9 @@ import { ArrowLeft, Car, Clock, Gauge, MapPin, Route, User } from 'lucide-react'
 import { CustomOverlayMap, Map, Polyline } from 'react-kakao-maps-sdk';
 import { useLocation, useNavigate, useParams } from 'react-router-dom';
 
-import { useDrivingHistoryPathQuery } from '@/hooks/api/drivingHistory';
+import { useDrivingHistoryPathQuery, useDrivingHistoryQuery } from '@/hooks/api/drivingHistory';
 import useKakaoLoader from '@/hooks/useKakaoLoader';
-import { formatDate, formatDuration } from '@/utils/format';
+import { formatDate, formatDuration, getDateDiff } from '@/utils/dateUtils';
 
 type Point = {
   lat: number;
@@ -18,11 +18,15 @@ const DrivingLogDetailPage = () => {
   const navigate = useNavigate();
 
   const { logId } = useParams();
-  const { data: path } = useDrivingHistoryPathQuery(Number(logId));
 
-  console.log(JSON.stringify(path, null, 2));
+  const { data: drivingLog } = useDrivingHistoryQuery(Number(logId));
+  const { data: drivingPath } = useDrivingHistoryPathQuery(Number(logId));
 
-  const polylinePath = (path?.data ?? []).map((p) => ({
+  if (!drivingLog || !drivingPath) {
+    return <div>Loading...</div>;
+  }
+
+  const polylinePath = drivingPath.map((p) => ({
     lat: p.latitude,
     lng: p.longitude
   }));
@@ -33,6 +37,10 @@ const DrivingLogDetailPage = () => {
     const lng = points.reduce((sum, p) => sum + p.lng, 0) / points.length;
     return { lat, lng };
   };
+
+  const mileageKm = (drivingLog.nextMileageSum - drivingLog.previousMileageSum) / 1000;
+  const drivingTime = getDateDiff(drivingLog.driveStartedAt, drivingLog.driveEndedAt)!;
+  const avgSpeed = mileageKm / (drivingTime.hours + drivingTime.minutes / 60);
 
   return (
     <div className='flex flex-col h-full p-6 gap-2'>
@@ -50,12 +58,15 @@ const DrivingLogDetailPage = () => {
           <div className='flex flex-wrap items-center gap-x-6 gap-y-2 text-gray-600'>
             <span className='flex items-center gap-2'>
               <Clock className='h-4 w-4 text-blue-500' />
+              {formatDate(drivingLog.driveStartedAt)}
             </span>
             <span className='flex items-center gap-2'>
               <Car className='h-4 w-4 text-blue-500' />
+              {drivingLog.carName}
             </span>
             <span className='flex items-center gap-2'>
               <User className='h-4 w-4 text-blue-500' />
+              {drivingLog.driverName}
             </span>
           </div>
         </div>
@@ -72,17 +83,22 @@ const DrivingLogDetailPage = () => {
                 <Route className='mx-auto mb-1 h-8 w-8 text-gray-500' />
                 <p className='text-sm font-medium text-gray-600'>주행거리</p>
                 <p className='text-xl font-bold text-gray-800'>
+                  {mileageKm} km
                 </p>
               </div>
               <div className='rounded-lg bg-gray-50 p-3'>
                 <Clock className='mx-auto mb-1 h-8 w-8 text-gray-500' />
                 <p className='text-sm font-medium text-gray-600'>운행시간</p>
                 <p className='text-xl font-bold text-gray-800'>
+                  {drivingTime.hours}시간 {drivingTime.minutes}분
                 </p>
               </div>
               <div className='rounded-lg bg-gray-50 p-3'>
                 <Gauge className='mx-auto mb-1 h-8 w-8 text-gray-500' />
                 <p className='text-sm font-medium text-gray-600'>평균 속도</p>
+                <p className='text-xl font-bold text-gray-800'>
+                  {avgSpeed.toFixed(2)} km/h
+                </p>
               </div>
             </div>
           </CardBody>

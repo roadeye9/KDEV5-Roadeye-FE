@@ -1,12 +1,12 @@
 import { useState } from 'react';
 
-import { useDrivingHistoryQuery } from '../api/drivingHistory';
+import { useDrivingHistoryPageQuery } from '../api/drivingHistory';
 
 export const useDrivingHistory = () => {
   const [page, setPage] = useState(0);
   const [pageSize, setPageSize] = useState(10);
 
-  const { data, isLoading, error } = useDrivingHistoryQuery({ page, size: pageSize });
+  const { data, isLoading, error } = useDrivingHistoryPageQuery({ page, size: pageSize });
 
   const handlePageChange = (newPage: number) => {
     setPage(newPage - 1);
