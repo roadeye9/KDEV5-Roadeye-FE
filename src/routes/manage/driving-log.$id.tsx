@@ -14,6 +14,7 @@ type Point = {
 
 const DrivingLogDetailPage = () => {
   useKakaoLoader();
+
   const navigate = useNavigate();
   const { state } = useLocation();
   const log = state?.log;
@@ -32,9 +33,8 @@ const DrivingLogDetailPage = () => {
   };
 
   return (
-    <div className='p-6'>
-      {/* Header */}
-      <header className='mb-6'>
+    <div className='flex flex-col h-full p-6 gap-2'>
+      <header>
         <Button
           variant='light'
           startContent={<ArrowLeft className='h-4 w-4' />}
@@ -62,77 +62,68 @@ const DrivingLogDetailPage = () => {
         </div>
       </header>
 
-      {/* Main Content */}
-      <div className='grid grid-cols-1 gap-6 lg:grid-cols-1'>
-        {/* 왼쪽 영역 (요약, 비고) */}
-        <div className='space-y-6'>
-          <Card className='shadow-lg'>
-            <CardHeader>
-              <h2 className='text-xl font-semibold text-gray-800'>운행 요약</h2>
-            </CardHeader>
-            <CardBody>
-              <div className='grid grid-cols-2 gap-4 text-center md:grid-cols-3'>
-                <div className='rounded-lg bg-gray-50 p-3'>
-                  <Route className='mx-auto mb-1 h-8 w-8 text-gray-500' />
-                  <p className='text-sm font-medium text-gray-600'>주행거리</p>
-                  <p className='text-xl font-bold text-gray-800'>
-                    {(log.nextMileageSum - log.previousMileageSum) / 1000} km
-                  </p>
-                </div>
-                <div className='rounded-lg bg-gray-50 p-3'>
-                  <Clock className='mx-auto mb-1 h-8 w-8 text-gray-500' />
-                  <p className='text-sm font-medium text-gray-600'>운행시간</p>
-                  <p className='text-xl font-bold text-gray-800'>
-                    {formatDuration(log.driveStartedAt, log.driveEndedAt)}
-                  </p>
-                </div>
-                <div className='rounded-lg bg-gray-50 p-3'>
-                  <Gauge className='mx-auto mb-1 h-8 w-8 text-gray-500' />
-                  <p className='text-sm font-medium text-gray-600'>평균 속도</p>
-                  <p className='text-xl font-bold text-gray-800'>{log.speed} km/h</p>
-                </div>
+      <div className='flex-1 flex flex-col gap-2'>
+        <Card className='shadow-lg'>
+          <CardHeader>
+            <h2 className='text-xl font-semibold text-gray-800'>운행 요약</h2>
+          </CardHeader>
+          <CardBody>
+            <div className='grid grid-cols-2 gap-4 text-center md:grid-cols-3'>
+              <div className='rounded-lg bg-gray-50 p-3'>
+                <Route className='mx-auto mb-1 h-8 w-8 text-gray-500' />
+                <p className='text-sm font-medium text-gray-600'>주행거리</p>
+                <p className='text-xl font-bold text-gray-800'>
+                  {(log.nextMileageSum - log.previousMileageSum) / 1000} km
+                </p>
               </div>
-            </CardBody>
-          </Card>
-        </div>
+              <div className='rounded-lg bg-gray-50 p-3'>
+                <Clock className='mx-auto mb-1 h-8 w-8 text-gray-500' />
+                <p className='text-sm font-medium text-gray-600'>운행시간</p>
+                <p className='text-xl font-bold text-gray-800'>
+                  {formatDuration(log.driveStartedAt, log.driveEndedAt)}
+                </p>
+              </div>
+              <div className='rounded-lg bg-gray-50 p-3'>
+                <Gauge className='mx-auto mb-1 h-8 w-8 text-gray-500' />
+                <p className='text-sm font-medium text-gray-600'>평균 속도</p>
+                <p className='text-xl font-bold text-gray-800'>{log.speed} km/h</p>
+              </div>
+            </div>
+          </CardBody>
+        </Card>
 
-        {/* 오른쪽 영역 (지도) */}
-        <div className='space-y-6'>
-          <Card className='h-full shadow-lg'>
-            <CardHeader>
-              <h2 className='text-xl font-semibold text-gray-800'>운행 경로</h2>
-            </CardHeader>
-            <CardBody className='p-0'>
-              {polylinePath.length > 0 && (
-                <Map
-                  center={getCenter(polylinePath)}
-                  style={{ width: '100%', height: '100%', minHeight: '500px' }}
-                  level={8}
+        <Card className='flex-1 shadow-lg'>
+          <CardHeader>
+            <h2 className='text-xl font-semibold text-gray-800'>운행 경로</h2>
+          </CardHeader>
+          <CardBody className='w-full h-full p-0'>
+            <Map
+              className='w-full h-full'
+              center={getCenter(polylinePath)}
+              level={8}
+            >
+              <Polyline path={polylinePath} strokeColor='#3b82f6' strokeWeight={4} />
+              <CustomOverlayMap position={polylinePath[0]}>
+                <div
+                  className='flex flex-col items-center'
+                  style={{ transform: 'translateY(-32px)' }}
                 >
-                  <Polyline path={polylinePath} strokeColor='#3b82f6' strokeWeight={4} />
-                  <CustomOverlayMap position={polylinePath[0]}>
-                    <div
-                      className='flex flex-col items-center'
-                      style={{ transform: 'translateY(-32px)' }}
-                    >
-                      <span className='text-sm font-semibold text-gray-600'>출발지</span>
-                      <MapPin className='h-12 w-12 text-blue-600 drop-shadow' />
-                    </div>
-                  </CustomOverlayMap>
-                  <CustomOverlayMap position={polylinePath[polylinePath.length - 1]}>
-                    <div
-                      className='flex flex-col items-center'
-                      style={{ transform: 'translateY(-32px)' }}
-                    >
-                      <span className='text-sm font-semibold text-gray-600'>도착지</span>
-                      <MapPin className='h-12 w-12 text-red-600 drop-shadow' />
-                    </div>
-                  </CustomOverlayMap>
-                </Map>
-              )}
-            </CardBody>
-          </Card>
-        </div>
+                  <span className='text-sm font-semibold text-gray-600'>출발지</span>
+                  <MapPin className='h-12 w-12 text-blue-600 drop-shadow' />
+                </div>
+              </CustomOverlayMap>
+              <CustomOverlayMap position={polylinePath[polylinePath.length - 1]}>
+                <div
+                  className='flex flex-col items-center'
+                  style={{ transform: 'translateY(-32px)' }}
+                >
+                  <span className='text-sm font-semibold text-gray-600'>도착지</span>
+                  <MapPin className='h-12 w-12 text-red-600 drop-shadow' />
+                </div>
+              </CustomOverlayMap>
+            </Map>
+          </CardBody>
+        </Card>
       </div>
     </div>
   );
