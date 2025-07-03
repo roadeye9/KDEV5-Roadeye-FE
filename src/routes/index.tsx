@@ -95,7 +95,7 @@ const router = createBrowserRouter([
         element: <DrivingLogPage />
       },
       {
-        path: 'driving-log-detail/:logId',
+        path: 'driving-log/:logId',
         element: <DrivingLogDetailPage />
       },
     ]

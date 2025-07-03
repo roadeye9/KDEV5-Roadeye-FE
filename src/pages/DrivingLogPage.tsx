@@ -44,7 +44,7 @@ const DrivingLogPage = () => {
 
 
     const viewDetail = (log: DrivingHistory) => {
-        navigate(`/manage/driving-log-detail/${log.id}`, { state: { log } });
+        navigate(`/manage/driving-log/${log.id}`, { state: { log } });
     };
 
     return (
@@ -162,7 +162,7 @@ const DrivingLogPage = () => {
                                         <div className="font-medium text-gray-800">{log.carName}</div>
                                         <div className="text-sm text-gray-600">{log.licenseNumber}</div>
                                     </TableCell>
-                                    <TableCell>{(log.nextMileageSum - log.previousMileageSum)/1000} km</TableCell>
+                                    <TableCell>{(log.nextMileageSum - log.previousMileageSum) / 1000} km</TableCell>
                                     <TableCell>
                                         <Button size="sm" color="primary" variant="light" startContent={<Eye className="w-4 h-4" />} onClick={() => viewDetail(log)}>
                                             상세보기

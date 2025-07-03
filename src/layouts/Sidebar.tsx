@@ -9,7 +9,7 @@ const MENU_ITEMS = [
     { icon: UserCog, label: "직원 관리", url: "/manage/employee" },
     { icon: Truck, label: "차량 관리", url: "/manage/vehicle" },
     { icon: MapPin, label: "차량 관제", url: "/manage/vehicle-control" },
-    { icon: FileText, label: "운행 일지", url: "/manage/driving-log", activeURLs: ["/manage/driving-log", "/manage/driving-log-detail"] },
+    { icon: FileText, label: "운행 일지", url: "/manage/driving-log", activeURLs: ["/manage/driving-log"] },
 ];
 
 const Sidebar = () => {
@@ -28,7 +28,7 @@ const Sidebar = () => {
             {/* 왼쪽 사이드바 */}
             <div className="w-[240px] h-screen flex flex-col bg-white border-r border-gray-200">
                 {/* 로고 영역 */}
-                <div 
+                <div
                     className="flex items-center gap-3 px-6 py-6 cursor-pointer hover:bg-gray-50 transition-colors"
                     onClick={() => navigate("/manage/dashboard")}
                 >
@@ -46,7 +46,7 @@ const Sidebar = () => {
                     <div className="space-y-2">
                         {MENU_ITEMS.map((item, index) => {
                             // 현재 경로와 메뉴의 URL이 정확히 일치하거나, 하위 경로(/로 시작)인지 확인
-                            const isActive = (item.activeURLs || [item.url]).some(url => 
+                            const isActive = (item.activeURLs || [item.url]).some(url =>
                                 location.pathname === url || location.pathname.startsWith(url + '/')
                             );
 
@@ -55,11 +55,10 @@ const Sidebar = () => {
                                     key={index}
                                     variant={isActive ? "flat" : "light"}
                                     color={isActive ? "primary" : "default"}
-                                    className={`w-full justify-start gap-3 px-3 h-12 text-gray-700 ${
-                                        isActive 
-                                            ? "bg-blue-100 text-blue-600 font-bold" 
+                                    className={`w-full justify-start gap-3 px-3 h-12 text-gray-700 ${isActive
+                                            ? "bg-blue-100 text-blue-600 font-bold"
                                             : "hover:text-blue-600 hover:bg-blue-50"
-                                    }`}
+                                        }`}
                                     onClick={() => navigate(item.url)}
                                 >
                                     <item.icon size={20} className={isActive ? "text-blue-600" : ""} />
@@ -73,7 +72,7 @@ const Sidebar = () => {
                 {/* 사용자 정보 영역 */}
                 <div className="border-t border-gray-200 p-4">
                     <div className="flex items-center gap-3 mb-3">
-                        <Avatar 
+                        <Avatar
                             // name={userInfo?.name} 
                             className="w-10 h-10 bg-blue-100 text-blue-600 font-semibold"
                         />
@@ -83,7 +82,7 @@ const Sidebar = () => {
                             <p className="text-xs text-blue-600 font-medium">{userInfo?.position === 'Administrator' ? '관리자' : '일반'}</p>
                         </div>
                     </div>
-                    
+
                     <Button
                         variant="light"
                         color="danger"
