@@ -4,9 +4,18 @@ import { partytownVite } from '@builder.io/partytown/utils';
 import react from '@vitejs/plugin-react-swc';
 import { defineConfig } from 'vite';
 
-import config from './_config';
+const config = {
+  metadata: {
+    title: 'RoadEye',
+    description: 'RoadEye',
+    keywords: 'RoadEye'
+  },
+  server: {
+    host: '0.0.0.0',
+    port: 3000
+  }
+}
 
-// https://vitejs.dev/config/
 export default defineConfig({
   resolve: {
     alias: {
@@ -30,18 +39,18 @@ export default defineConfig({
   ],
   server: {
     host: config.server.host,
-    port: config.server.port ,
-      proxy: {
-        '/api': {
-          target: 'https://api-web.roadeye.my',
-          // target:'http://localhost:8081',
-          // target:'http://192.168.0.53:8080',
-          changeOrigin: true,
-          rewrite: (path) => path.replace(/^\/api/, '/api')
-        }
+    port: config.server.port,
+    proxy: {
+      '/api': {
+        target: 'https://api-web.roadeye.my',
+        // target:'http://localhost:8081',
+        // target:'http://192.168.0.53:8080',
+        changeOrigin: true,
+        rewrite: (path) => path.replace(/^\/api/, '/api')
       }
+    }
   },
-  optimizeDeps:{
+  optimizeDeps: {
     include: ['@react-spring/web'],
   }
 });
