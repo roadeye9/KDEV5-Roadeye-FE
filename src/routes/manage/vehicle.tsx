@@ -1,10 +1,10 @@
-import { Button, Input, Select, SelectItem, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter } from "@nextui-org/react";
-import { Car, Plus, Search, Edit, Hash, MapPin } from "lucide-react";
-import { useVehicle } from "@/hooks/pages/useVehicle";
-import { useState } from "react";
-import '@fortawesome/fontawesome-free/css/all.min.css';
 import Pagination from "@/components/common/Pagination";
 import { useVehicleDetailQuery } from "@/hooks/api/vehicle";
+import { useVehicle } from "@/hooks/pages/useVehicle";
+import '@fortawesome/fontawesome-free/css/all.min.css';
+import { Button, Input, Modal, ModalBody, ModalContent, ModalFooter, ModalHeader, Select, SelectItem } from "@nextui-org/react";
+import { Car, Hash, MapPin, Plus } from "lucide-react";
+import { useState } from "react";
 import { Map, MapMarker } from "react-kakao-maps-sdk";
 
 const VehiclePage = () => {
@@ -58,7 +58,7 @@ const VehiclePage = () => {
                                         label="주행거리 (km)"
                                         type="number"
                                         placeholder="주행거리를 입력하세요"
-                                        defaultValue={((selectedVehicle?.mileageCurrent ?? 0)/1000).toLocaleString()}
+                                        defaultValue={((selectedVehicle?.mileageCurrent ?? 0) / 1000).toLocaleString()}
                                         startContent={<MapPin className="text-blue-500" />}
                                     />
                                 </div>
@@ -70,7 +70,7 @@ const VehiclePage = () => {
                                 <Button variant="light" onPress={onClose}>
                                     취소
                                 </Button>
-                                <Button color="primary" onPress={() => setModalError('서버에 일시적인 오류가 발생했습니다. 잠시 후 다시 이용해주세요.') }>
+                                <Button color="primary" onPress={() => setModalError('서버에 일시적인 오류가 발생했습니다. 잠시 후 다시 이용해주세요.')}>
                                     {selectedVehicle ? '수정' : '등록'}
                                 </Button>
                             </ModalFooter>
@@ -93,8 +93,8 @@ const VehiclePage = () => {
                     <div className="flex flex-wrap items-center justify-between gap-4">
                         <span className="text-lg font-semibold text-gray-800">총 {vehicles.data?.pageInfo?.total ?? 0}대</span>
                         <div className="flex items-center gap-3 ml-auto">
-                            <Select 
-                                className="w-40" 
+                            <Select
+                                className="w-40"
                                 selectedKeys={status ? [status] : ["all"]}
                                 onChange={(e) => {
                                     const value = e.target.value;
@@ -107,8 +107,8 @@ const VehiclePage = () => {
                                 <SelectItem key="ON" value="ON">운행중</SelectItem>
                                 <SelectItem key="OFF" value="OFF">정지</SelectItem>
                             </Select>
-                            <Button 
-                                color="primary" 
+                            <Button
+                                color="primary"
                                 startContent={<Plus className="w-4 h-4" />}
                                 onClick={() => {
                                     setSelectedVehicle(null);
@@ -125,7 +125,7 @@ const VehiclePage = () => {
                 <div className="flex-1 p-6 bg-gray-50 overflow-auto relative">
                     <div className="flex flex-col gap-4">
                         {(vehicles.data?.data ?? []).map((vehicle: any, index: number) => (
-                            <div 
+                            <div
                                 key={vehicle.id || index}
                                 className="flex items-center bg-white rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300 border border-gray-100 overflow-hidden group px-4 py-3 cursor-pointer"
                                 onClick={() => {
@@ -135,8 +135,8 @@ const VehiclePage = () => {
                             >
                                 {/* Vehicle Image */}
                                 <div className="w-24 h-24 flex-shrink-0 bg-gray-100 rounded-xl overflow-hidden mr-6">
-                                    <img 
-                                        src={vehicle.imageUrl || "/car.jpg"} 
+                                    <img
+                                        src={vehicle.imageUrl || "/car.jpg"}
                                         alt={vehicle.name}
                                         className="w-full h-full object-cover"
                                     />
@@ -147,18 +147,17 @@ const VehiclePage = () => {
                                         <h3 className="text-lg font-semibold text-gray-800 truncate">
                                             {vehicle.name}
                                         </h3>
-                                        <span className={`px-3 py-1 rounded-full text-xs font-medium flex items-center gap-1 ${
-                                            vehicle.ignitionStatus === 'ON' 
-                                                ? 'bg-green-100 text-green-700' 
-                                                : 'bg-gray-100 text-gray-700'
-                                        }`}>
+                                        <span className={`px-3 py-1 rounded-full text-xs font-medium flex items-center gap-1 ${vehicle.ignitionStatus === 'ON'
+                                            ? 'bg-green-100 text-green-700'
+                                            : 'bg-gray-100 text-gray-700'
+                                            }`}>
                                             <i className={`fas fa-circle text-xs ${vehicle.ignitionStatus === 'ON' ? 'text-green-500' : 'text-gray-500'}`}></i>
                                             {vehicle.ignitionStatus === 'ON' ? '운행중' : '대기중'}
                                         </span>
                                     </div>
                                     <div className="flex items-center gap-4 text-gray-600 text-sm mb-1">
                                         <span className="flex items-center gap-1"><Hash className="text-blue-500 w-4 h-4" />{vehicle.licenseNumber}</span>
-                                        <span className="flex items-center gap-1"><MapPin className="text-blue-500 w-4 h-4" />주행거리: <span className="font-medium text-gray-800">{((vehicle.mileageCurrent ?? 0)/1000).toLocaleString()} km</span></span>
+                                        <span className="flex items-center gap-1"><MapPin className="text-blue-500 w-4 h-4" />주행거리: <span className="font-medium text-gray-800">{((vehicle.mileageCurrent ?? 0) / 1000).toLocaleString()} km</span></span>
                                     </div>
                                 </div>
                                 {/* <Button
@@ -202,11 +201,10 @@ const VehiclePage = () => {
                                         />
                                         <h2 className="text-2xl font-bold text-gray-800 mb-1">{vehicleDetail.name}</h2>
                                         <span className="text-gray-500 text-sm mb-2">{vehicleDetail.licenseNumber}</span>
-                                        <span className={`px-3 py-1 rounded-full text-xs font-medium flex items-center gap-1 ${
-                                            vehicleDetail.ignitionStatus === 'ON'
-                                                ? 'bg-green-100 text-green-700'
-                                                : 'bg-gray-100 text-gray-700'
-                                        }`}>
+                                        <span className={`px-3 py-1 rounded-full text-xs font-medium flex items-center gap-1 ${vehicleDetail.ignitionStatus === 'ON'
+                                            ? 'bg-green-100 text-green-700'
+                                            : 'bg-gray-100 text-gray-700'
+                                            }`}>
                                             <i className={`fas fa-circle text-xs ${vehicleDetail.ignitionStatus === 'ON' ? 'text-green-500' : 'text-gray-500'}`}></i>
                                             {vehicleDetail.ignitionStatus === 'ON' ? '운행중' : '대기중'}
                                         </span>
@@ -214,7 +212,7 @@ const VehiclePage = () => {
                                     <div className="space-y-4">
                                         <div>
                                             <label className="text-xs text-gray-500">주행거리</label>
-                                            <p className="text-base text-gray-800 font-medium">{((vehicleDetail.mileageCurrent ?? 0)/1000).toLocaleString()} km</p>
+                                            <p className="text-base text-gray-800 font-medium">{((vehicleDetail.mileageCurrent ?? 0) / 1000).toLocaleString()} km</p>
                                         </div>
                                         <div>
                                             <label className="text-xs text-gray-500">배터리 전압</label>
@@ -224,7 +222,7 @@ const VehiclePage = () => {
                                             <label className="text-xs text-gray-500">상태</label>
                                             <p className="text-base text-gray-800 font-medium">{vehicleDetail.ignitionStatus === 'ON' ? '운행중' : '정지'}</p>
                                         </div>
-                                    
+
                                         {typeof vehicleDetail.latitude === 'number' && typeof vehicleDetail.longitude === 'number' && (
                                             <div>
                                                 <label className="text-xs text-gray-500 mb-1 block">현재 위치</label>
@@ -249,10 +247,10 @@ const VehiclePage = () => {
                 </div>
                 {/* Pagination */}
                 <Pagination
-                  currentPage={pagination.currentPage}
-                  pageSize={pagination.pageSize}
-                  totalElements={pagination.totalElements}
-                  onPageChange={pagination.onPageChange}
+                    currentPage={pagination.currentPage}
+                    pageSize={pagination.pageSize}
+                    totalElements={pagination.totalElements}
+                    onPageChange={pagination.onPageChange}
                 />
             </div>
         </>

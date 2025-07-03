@@ -1,14 +1,13 @@
-import { Button, Input, Select, SelectItem, Avatar, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, Switch } from "@nextui-org/react";
-import { User } from "lucide-react";
-import { useEmployee, useUpdateEmployee } from "@/hooks/pages/useEmployee";
-import { useState, useEffect, useMemo } from "react";
-import '@fortawesome/fontawesome-free/css/all.min.css';
-import { useMutation } from "@tanstack/react-query";
-import { createEmployee, CreateEmployeeRequest, updateEmployee, UpdateEmployeeRequest } from "@/api/employee";
-import { toast } from "sonner";
 import { Employee } from "@/api/auth";
-import { useEmployeeMutation } from "@/hooks/api/employee";
+import { CreateEmployeeRequest, UpdateEmployeeRequest } from "@/api/employee";
 import Pagination from "@/components/common/Pagination";
+import { useEmployeeMutation } from "@/hooks/api/employee";
+import { useEmployee, useUpdateEmployee } from "@/hooks/pages/useEmployee";
+import '@fortawesome/fontawesome-free/css/all.min.css';
+import { Button, Input, Modal, ModalBody, ModalContent, ModalFooter, ModalHeader, Select, SelectItem, Switch } from "@nextui-org/react";
+import { User } from "lucide-react";
+import { useEffect, useState } from "react";
+import { toast } from "sonner";
 
 export const EmployeePage = () => {
     const { employees, pagination, status, setStatus } = useEmployee();
@@ -191,10 +190,10 @@ export const EmployeePage = () => {
 
                 {/* Pagination */}
                 <Pagination
-                  currentPage={pagination.currentPage}
-                  pageSize={pagination.pageSize}
-                  totalElements={pagination.totalElements}
-                  onPageChange={pagination.onPageChange}
+                    currentPage={pagination.currentPage}
+                    pageSize={pagination.pageSize}
+                    totalElements={pagination.totalElements}
+                    onPageChange={pagination.onPageChange}
                 />
             </div>
 

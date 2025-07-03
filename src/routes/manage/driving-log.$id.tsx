@@ -1,10 +1,10 @@
-import { Card, CardBody, CardHeader, Button, Textarea } from "@nextui-org/react";
-import { ArrowLeft, Clock, Car, User, Route, Gauge, TrendingUp, Pencil, MapPin, Flag } from "lucide-react";
-import { useLocation, useNavigate, useParams } from "react-router-dom";
-import { CustomOverlayMap, Map, MapMarker, Polyline } from "react-kakao-maps-sdk";
+import { useDrivingHistoryPathQuery } from "@/hooks/api/drivingHistory";
 import useKakaoLoader from "@/hooks/useKakaoLoader";
 import { formatDate, formatDuration } from "@/utils/format";
-import { useDrivingHistoryPathQuery } from "@/hooks/api/drivingHistory";
+import { Button, Card, CardBody, CardHeader } from "@nextui-org/react";
+import { ArrowLeft, Car, Clock, Gauge, MapPin, Route, User } from "lucide-react";
+import { CustomOverlayMap, Map, Polyline } from "react-kakao-maps-sdk";
+import { useLocation, useNavigate } from "react-router-dom";
 
 type Point = {
     lat: number;
@@ -29,7 +29,7 @@ const DrivingLogDetailPage = () => {
         const lat = points.reduce((sum, p) => sum + p.lat, 0) / points.length;
         const lng = points.reduce((sum, p) => sum + p.lng, 0) / points.length;
         return { lat, lng };
-      };
+    };
 
     return (
         <div className="p-6">
@@ -41,9 +41,9 @@ const DrivingLogDetailPage = () => {
                 <div className="bg-white p-6 rounded-lg shadow-sm">
                     <h1 className="text-2xl font-bold text-gray-800 mb-2">운행 상세 정보</h1>
                     <div className="flex flex-wrap items-center gap-x-6 gap-y-2 text-gray-600">
-                        <span className="flex items-center gap-2"><Clock className="w-4 h-4 text-blue-500"/>{formatDate(log.driveStartedAt)} ~ {formatDate(log.driveEndedAt)}</span>
-                        <span className="flex items-center gap-2"><Car className="w-4 h-4 text-blue-500"/>{log.carName} ({log.licenseNumber})</span>
-                        <span className="flex items-center gap-2"><User className="w-4 h-4 text-blue-500"/>{log.driverName || "미등록"}</span>
+                        <span className="flex items-center gap-2"><Clock className="w-4 h-4 text-blue-500" />{formatDate(log.driveStartedAt)} ~ {formatDate(log.driveEndedAt)}</span>
+                        <span className="flex items-center gap-2"><Car className="w-4 h-4 text-blue-500" />{log.carName} ({log.licenseNumber})</span>
+                        <span className="flex items-center gap-2"><User className="w-4 h-4 text-blue-500" />{log.driverName || "미등록"}</span>
                     </div>
                 </div>
             </header>
@@ -57,17 +57,17 @@ const DrivingLogDetailPage = () => {
                         <CardBody>
                             <div className="grid grid-cols-2 md:grid-cols-3 gap-4 text-center">
                                 <div className="p-3 bg-gray-50 rounded-lg">
-                                    <Route className="w-8 h-8 mx-auto text-gray-500 mb-1"/>
+                                    <Route className="w-8 h-8 mx-auto text-gray-500 mb-1" />
                                     <p className="text-sm font-medium text-gray-600">주행거리</p>
-                                    <p className="text-xl font-bold text-gray-800">{(log.nextMileageSum - log.previousMileageSum)/1000} km</p>
+                                    <p className="text-xl font-bold text-gray-800">{(log.nextMileageSum - log.previousMileageSum) / 1000} km</p>
                                 </div>
                                 <div className="p-3 bg-gray-50 rounded-lg">
-                                    <Clock className="w-8 h-8 mx-auto text-gray-500 mb-1"/>
+                                    <Clock className="w-8 h-8 mx-auto text-gray-500 mb-1" />
                                     <p className="text-sm font-medium text-gray-600">운행시간</p>
                                     <p className="text-xl font-bold text-gray-800">{formatDuration(log.driveStartedAt, log.driveEndedAt)}</p>
                                 </div>
                                 <div className="p-3 bg-gray-50 rounded-lg">
-                                    <Gauge className="w-8 h-8 mx-auto text-gray-500 mb-1"/>
+                                    <Gauge className="w-8 h-8 mx-auto text-gray-500 mb-1" />
                                     <p className="text-sm font-medium text-gray-600">평균 속도</p>
                                     <p className="text-xl font-bold text-gray-800">{log.speed} km/h</p>
                                 </div>
