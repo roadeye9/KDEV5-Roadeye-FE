@@ -1,5 +1,7 @@
 import React from 'react';
+
 import { createBrowserRouter, Outlet, RouterProvider } from 'react-router-dom';
+
 import { Toaster } from '@/components/ui/toaster';
 import AuthLayout from '@/layouts/AuthLayout';
 import PlatformLayout from '@/layouts/PlatformLayout';
@@ -21,8 +23,8 @@ const BrandingLayout = () => {
       <Outlet />
       <Toaster />
     </>
-  )
-}
+  );
+};
 
 const router = createBrowserRouter([
   {
@@ -31,10 +33,8 @@ const router = createBrowserRouter([
     children: [
       {
         path: '/',
-        children: [
-          { index: true, element: <LandingPage /> },
-        ],
-      },
+        children: [{ index: true, element: <LandingPage /> }]
+      }
     ]
   },
   {
@@ -75,7 +75,7 @@ const router = createBrowserRouter([
       {
         path: 'driving-log/:logId',
         element: <DrivingLogDetailPage />
-      },
+      }
     ]
   }
 ]);
@@ -83,4 +83,3 @@ const router = createBrowserRouter([
 export default function AppRoutes() {
   return <RouterProvider router={router} />;
 }
-

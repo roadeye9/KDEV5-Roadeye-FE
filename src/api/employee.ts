@@ -15,62 +15,67 @@ export interface UpdateEmployeeRequest {
 }
 
 interface PageRequest {
-    page: number;
-    size: number;
-    sort?: string[];
+  page: number;
+  size: number;
+  sort?: string[];
 }
 
 interface PageInfo {
-    size: number;
-    number: number;
-    totalElements: number;
-    totalPages: number;
+  size: number;
+  number: number;
+  totalElements: number;
+  totalPages: number;
 }
 
 export interface PageResponse<T> {
-    content: T[];
-    page: PageInfo;
+  content: T[];
+  page: PageInfo;
 }
 
 interface SignInRequest {
-    loginId: string;
-    password: string;
+  loginId: string;
+  password: string;
 }
 
 interface SignInResponse {
-    accessToken: string;
-    refreshToken: string;
+  accessToken: string;
+  refreshToken: string;
 }
 
 export const createEmployee = async (employeeData: CreateEmployeeRequest) => {
-    await axiosInstance.post<Employee>('/employees', employeeData, {
-        useTenant: true,
-    });
+  await axiosInstance.post<Employee>('/employees', employeeData, {
+    useTenant: true
+  });
 };
 
-
-export const updateEmployee = async (employeeId: number, payload: UpdateEmployeeRequest): Promise<Employee> => {
-    const response = await axiosInstance.put<Employee>(`/employees/${employeeId}`, payload, {
-        useTenant: true,
-    });
-    return response.data;
+export const updateEmployee = async (
+  employeeId: number,
+  payload: UpdateEmployeeRequest
+): Promise<Employee> => {
+  const response = await axiosInstance.put<Employee>(`/employees/${employeeId}`, payload, {
+    useTenant: true
+  });
+  return response.data;
 };
 
 export const deleteEmployee = async (employeeId: number) => {
-    await axiosInstance.delete(`/employees/${employeeId}`, {
-        useTenant: true,
-    });
+  await axiosInstance.delete(`/employees/${employeeId}`, {
+    useTenant: true
+  });
 };
 
-export const getEmployees = async (pageRequest: PageRequest, payload: { status?: string }): Promise<PageResponse<Employee>> => {
-    const response = await axiosInstance.get<PageResponse<Employee>>('/employees', {
-        params: { ...pageRequest, ...payload },
-        useTenant: true,
-    });
-    return response.data;
+export const getEmployees = async (
+  pageRequest: PageRequest,
+  payload: { status?: string }
+): Promise<PageResponse<Employee>> => {
+  const response = await axiosInstance.get<PageResponse<Employee>>('/employees', {
+    params: { ...pageRequest, ...payload },
+    useTenant: true
+  });
+  return response.data;
 };
 
 export const signIn = async (signInRequest: SignInRequest): Promise<SignInResponse> => {
-    const response = await axiosInstance.post<SignInResponse>('/employees/sign-in', signInRequest);
-    return response.data;
+  const response = await axiosInstance.post<SignInResponse>('/employees/sign-in', signInRequest);
+  return response.data;
 };

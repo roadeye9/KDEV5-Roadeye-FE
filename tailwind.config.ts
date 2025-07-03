@@ -1,5 +1,5 @@
-import { type Config } from 'tailwindcss';
 import { nextui } from '@nextui-org/react';
+import { type Config } from 'tailwindcss';
 import tailwindcssAnimate from 'tailwindcss-animate';
 
 export default {
@@ -10,7 +10,7 @@ export default {
     './components/**/*.{ts,tsx}',
     './app/**/*.{ts,tsx}',
     './src/**/*.{ts,tsx}',
-    "./node_modules/@nextui-org/theme/dist/**/*.{js,ts,jsx,tsx}",
+    './node_modules/@nextui-org/theme/dist/**/*.{js,ts,jsx,tsx}'
   ],
   theme: {
     container: {
@@ -77,8 +77,5 @@ export default {
       }
     }
   },
-  plugins: [
-    tailwindcssAnimate,
-    nextui()
-  ]
+  plugins: [tailwindcssAnimate, nextui()]
 } satisfies Config;

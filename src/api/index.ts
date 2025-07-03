@@ -3,7 +3,7 @@ import { toast } from 'sonner';
 
 const api = axios.create({
   baseURL: import.meta.env.VITE_API_URL,
-  withCredentials: true,
+  withCredentials: true
 });
 
 // 응답 인터셉터 추가
@@ -17,7 +17,7 @@ api.interceptors.response.use(
     if (error.response?.status === 403) {
       // 사용자에게 알림 표시 (sonner 스타일로 변경)
       toast.error('인증 실패', {
-        description: '세션이 만료되었거나 접근 권한이 없습니다. 다시 로그인해주세요.',
+        description: '세션이 만료되었거나 접근 권한이 없습니다. 다시 로그인해주세요.'
       });
 
       // 짧은 지연 후 로그인 페이지로 리디렉션
@@ -27,10 +27,10 @@ api.interceptors.response.use(
         window.location.href = '/login';
       }, 1500);
     }
-    
+
     // 다른 에러들은 그대로 반환하여 개별 핸들링
     return Promise.reject(error);
   }
 );
 
-export default api; 
+export default api;

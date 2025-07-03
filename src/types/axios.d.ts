@@ -5,4 +5,4 @@ declare module 'axios' {
     useTenant?: boolean;
     useAuth?: boolean;
   }
-} 
+}

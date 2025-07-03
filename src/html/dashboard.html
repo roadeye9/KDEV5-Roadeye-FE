@@ -1,161 +1,179 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="ko">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>RoadEye - 대시보드</title>
-    <link rel="stylesheet" href="css/style.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <link rel="stylesheet" href="css/style.css" />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"
+    />
     <script>
-        (function() {
-            window.__FIGMA_CHANNEL__ = 'd7tf0ifn';
-            const script = document.createElement('script');
-            script.src = 'https://www.figma.com/api/plugins/figma-to-html/inject.js';
-            document.head.appendChild(script);
-        })();
+      (function () {
+        window.__FIGMA_CHANNEL__ = 'd7tf0ifn';
+        const script = document.createElement('script');
+        script.src = 'https://www.figma.com/api/plugins/figma-to-html/inject.js';
+        document.head.appendChild(script);
+      })();
     </script>
-</head>
-<body>
+  </head>
+  <body>
     <div class="dashboard-container">
-        <!-- 사이드바 네비게이션 -->
-        <nav class="sidebar">
-            <div class="logo">
-                <a href="dashboard.html" class="logo-link">
-                    <i class="fas fa-car-side"></i>
-                    <h2>RoadEye</h2>
-                </a>
-            </div>
-            <ul class="nav-menu">
-                <li><a href="user-management.html"><i class="fas fa-users"></i>사용자 관리</a></li>
-                <li><a href="vehicle-management.html"><i class="fas fa-car"></i>차량 관리</a></li>
-                <li><a href="reservation-management.html"><i class="fas fa-calendar-alt"></i>예약 관리</a></li>
-                <li><a href="vehicle-monitoring.html"><i class="fas fa-map-marked-alt"></i>실시간 차량관제</a></li>
-                <li><a href="driving-logs.html"><i class="fas fa-clipboard-list"></i>운행일지</a></li>
-            </ul>
-            <div class="user-info">
-                <div class="user-profile">
-                    <i class="fas fa-user-circle"></i>
-                    <span class="user-name">김커널</span>
-                </div>
-                <button class="logout-btn" onclick="location.href='index.html'">
-                    <i class="fas fa-sign-out-alt"></i>
-                    로그아웃
-                </button>
-            </div>
-        </nav>
+      <!-- 사이드바 네비게이션 -->
+      <nav class="sidebar">
+        <div class="logo">
+          <a href="dashboard.html" class="logo-link">
+            <i class="fas fa-car-side"></i>
+            <h2>RoadEye</h2>
+          </a>
+        </div>
+        <ul class="nav-menu">
+          <li>
+            <a href="user-management.html"><i class="fas fa-users"></i>사용자 관리</a>
+          </li>
+          <li>
+            <a href="vehicle-management.html"><i class="fas fa-car"></i>차량 관리</a>
+          </li>
+          <li>
+            <a href="reservation-management.html"><i class="fas fa-calendar-alt"></i>예약 관리</a>
+          </li>
+          <li>
+            <a href="vehicle-monitoring.html"
+              ><i class="fas fa-map-marked-alt"></i>실시간 차량관제</a
+            >
+          </li>
+          <li>
+            <a href="driving-logs.html"><i class="fas fa-clipboard-list"></i>운행일지</a>
+          </li>
+        </ul>
+        <div class="user-info">
+          <div class="user-profile">
+            <i class="fas fa-user-circle"></i>
+            <span class="user-name">김커널</span>
+          </div>
+          <button class="logout-btn" onclick="location.href='index.html'">
+            <i class="fas fa-sign-out-alt"></i>
+            로그아웃
+          </button>
+        </div>
+      </nav>
 
-        <!-- 메인 컨텐츠 -->
-        <main class="main-content">
-            <header class="content-header">
-                <h1>
-                    <i class="fas fa-tachometer-alt"></i>
-                    대시보드
-                </h1>
-                <div class="header-actions">
-                    <span class="date">
-                        <i class="far fa-calendar-alt"></i>
-                        <span id="current-date">2024년 3월 21일</span>
-                    </span>
-                    <div class="notifications">
-                        <button class="notification-btn">
-                            <i class="far fa-bell"></i>
-                            <span class="notification-badge">3</span>
-                        </button>
-                    </div>
-                </div>
-            </header>
-
-            <!-- 대시보드 카드 -->
-            <div class="dashboard-cards">
-                <div class="card">
-                    <div class="card-icon">
-                        <i class="fas fa-car"></i>
-                    </div>
-                    <div class="card-content">
-                        <h3>총 차량</h3>
-                        <p class="number">15대</p>
-                    </div>
-                </div>
-                <div class="card">
-                    <div class="card-icon">
-                        <i class="fas fa-car-side"></i>
-                    </div>
-                    <div class="card-content">
-                        <h3>운행중인 차량</h3>
-                        <p class="number">5대</p>
-                    </div>
-                </div>
-                <div class="card">
-                    <div class="card-icon">
-                        <i class="fas fa-clock"></i>
-                    </div>
-                    <div class="card-content">
-                        <h3>예약 대기</h3>
-                        <p class="number">3건</p>
-                    </div>
-                </div>
-                <div class="card">
-                    <div class="card-icon">
-                        <i class="fas fa-calendar-check"></i>
-                    </div>
-                    <div class="card-content">
-                        <h3>금일 예약</h3>
-                        <p class="number">8건</p>
-                    </div>
-                </div>
+      <!-- 메인 컨텐츠 -->
+      <main class="main-content">
+        <header class="content-header">
+          <h1>
+            <i class="fas fa-tachometer-alt"></i>
+            대시보드
+          </h1>
+          <div class="header-actions">
+            <span class="date">
+              <i class="far fa-calendar-alt"></i>
+              <span id="current-date">2024년 3월 21일</span>
+            </span>
+            <div class="notifications">
+              <button class="notification-btn">
+                <i class="far fa-bell"></i>
+                <span class="notification-badge">3</span>
+              </button>
             </div>
+          </div>
+        </header>
 
-            <!-- 실시간 현황 -->
-            <div class="dashboard-sections">
-                <section class="reservation-status">
-                    <h2>
-                        <i class="fas fa-calendar"></i>
-                        예약 현황
-                    </h2>
-                    <div class="status-list">
-                        <div class="reservation-item">
-                            <div class="time">09:00 - 12:00</div>
-                            <div class="details">
-                                <div class="vehicle">차량: 서울 가 1234</div>
-                                <div class="user">예약자: 홍길동</div>
-                            </div>
-                            <div class="status pending">대기중</div>
-                        </div>
-                        <div class="reservation-item">
-                            <div class="time">13:00 - 15:00</div>
-                            <div class="details">
-                                <div class="vehicle">차량: 서울 나 5678</div>
-                                <div class="user">예약자: 김영희</div>
-                            </div>
-                            <div class="status approved">승인됨</div>
-                        </div>
-                    </div>
-                </section>
-                
-                <section class="vehicle-status">
-                    <h2>
-                        <i class="fas fa-map-marker-alt"></i>
-                        차량 현황
-                    </h2>
-                    <div class="status-map">
-                        <div class="map-placeholder">
-                            <i class="fas fa-map"></i>
-                            <p>지도 로딩중...</p>
-                        </div>
-                    </div>
-                </section>
+        <!-- 대시보드 카드 -->
+        <div class="dashboard-cards">
+          <div class="card">
+            <div class="card-icon">
+              <i class="fas fa-car"></i>
             </div>
-        </main>
+            <div class="card-content">
+              <h3>총 차량</h3>
+              <p class="number">15대</p>
+            </div>
+          </div>
+          <div class="card">
+            <div class="card-icon">
+              <i class="fas fa-car-side"></i>
+            </div>
+            <div class="card-content">
+              <h3>운행중인 차량</h3>
+              <p class="number">5대</p>
+            </div>
+          </div>
+          <div class="card">
+            <div class="card-icon">
+              <i class="fas fa-clock"></i>
+            </div>
+            <div class="card-content">
+              <h3>예약 대기</h3>
+              <p class="number">3건</p>
+            </div>
+          </div>
+          <div class="card">
+            <div class="card-icon">
+              <i class="fas fa-calendar-check"></i>
+            </div>
+            <div class="card-content">
+              <h3>금일 예약</h3>
+              <p class="number">8건</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- 실시간 현황 -->
+        <div class="dashboard-sections">
+          <section class="reservation-status">
+            <h2>
+              <i class="fas fa-calendar"></i>
+              예약 현황
+            </h2>
+            <div class="status-list">
+              <div class="reservation-item">
+                <div class="time">09:00 - 12:00</div>
+                <div class="details">
+                  <div class="vehicle">차량: 서울 가 1234</div>
+                  <div class="user">예약자: 홍길동</div>
+                </div>
+                <div class="status pending">대기중</div>
+              </div>
+              <div class="reservation-item">
+                <div class="time">13:00 - 15:00</div>
+                <div class="details">
+                  <div class="vehicle">차량: 서울 나 5678</div>
+                  <div class="user">예약자: 김영희</div>
+                </div>
+                <div class="status approved">승인됨</div>
+              </div>
+            </div>
+          </section>
+
+          <section class="vehicle-status">
+            <h2>
+              <i class="fas fa-map-marker-alt"></i>
+              차량 현황
+            </h2>
+            <div class="status-map">
+              <div class="map-placeholder">
+                <i class="fas fa-map"></i>
+                <p>지도 로딩중...</p>
+              </div>
+            </div>
+          </section>
+        </div>
+      </main>
     </div>
 
     <script>
-        // 현재 날짜 표시
-        function updateDate() {
-            const now = new Date();
-            const options = { year: 'numeric', month: 'long', day: 'numeric' };
-            document.getElementById('current-date').textContent = now.toLocaleDateString('ko-KR', options);
-        }
-        updateDate();
+      // 현재 날짜 표시
+      function updateDate() {
+        const now = new Date();
+        const options = { year: 'numeric', month: 'long', day: 'numeric' };
+        document.getElementById('current-date').textContent = now.toLocaleDateString(
+          'ko-KR',
+          options
+        );
+      }
+      updateDate();
     </script>
-</body>
-</html> 
+  </body>
+</html>
