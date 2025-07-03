@@ -29,12 +29,10 @@ export const EmployeePage = () => {
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [isRegisterModalOpen, setIsRegisterModalOpen] = useState(false);
 
-  // 수정 모달을 위한 상태
   const [editName, setEditName] = useState('');
   const [editPosition, setEditPosition] = useState('');
-  const [editStatus, setEditStatus] = useState(false); // true: ENABLE, false: DISABLE
+  const [editStatus, setEditStatus] = useState(false);
 
-  // 등록 모달을 위한 상태
   const [registerLoginId, setRegisterLoginId] = useState('');
   const [registerPassword, setRegisterPassword] = useState('');
   const [registerName, setRegisterName] = useState('');
@@ -114,20 +112,20 @@ export const EmployeePage = () => {
       <div className='flex h-screen flex-col bg-gray-50'>
         <header className='border-b bg-white p-4 text-lg font-bold'>사용자 관리</header>
 
-        {/* Controls */}
         <section className='border-b bg-white px-8 py-4'>
           <div className='flex flex-wrap items-center justify-between gap-4'>
             <span className='text-lg font-semibold text-gray-800'>
               총 {employees.data?.page?.totalElements ?? 0}명
             </span>
+
             <div className='ml-auto flex items-center gap-3'>
               <Select
                 className='w-40'
                 selectedKeys={status ? [status] : ['all']}
                 onChange={(e) => {
                   const value = e.target.value;
-                  setStatus(value === 'all' ? undefined : value); // 'all'이면 undefined로 설정
-                  pagination.onPageChange(1); // 필터 변경 시 페이지를 1로 초기화
+                  setStatus(value === 'all' ? undefined : value);
+                  pagination.onPageChange(1);
                 }}
                 aria-label='상태 필터'
               >
@@ -152,7 +150,6 @@ export const EmployeePage = () => {
           </div>
         </section>
 
-        {/* Table */}
         <div className='flex-1 overflow-y-auto bg-white px-8 py-6'>
           <table className='min-w-full rounded border bg-white shadow'>
             <thead className='sticky top-0 z-10 bg-gray-100'>
@@ -167,68 +164,16 @@ export const EmployeePage = () => {
               </tr>
             </thead>
             <tbody>
-              {(employees.data?.content ?? []).map((emp, index) => (
-                <tr
-                  key={emp.employeeId}
-                  className='cursor-pointer border-b last:border-b-0 hover:bg-gray-50'
-                  onClick={() => setSelectedEmployee(emp)}
-                >
-                  <td className='px-4 py-3 text-center text-gray-500'>
-                    {(pagination.currentPage - 1) * pagination.pageSize + index + 1}
-                  </td>
-                  <td className='flex items-center gap-2 px-4 py-3'>
-                    <i className='fas fa-user-circle text-lg text-gray-500' />
-                    <span>{emp.name}</span>
-                  </td>
-                  <td className='px-4 py-3'>{emp.loginId}</td>
-                  <td className='px-4 py-3'>
-                    {emp.position === 'Administrator' ? (
-                      <span className='inline-block rounded-full bg-blue-100 px-2 py-1 text-xs font-semibold text-blue-800'>
-                        관리자
-                      </span>
-                    ) : (
-                      <span className='inline-block rounded-full bg-gray-100 px-2 py-1 text-xs font-semibold text-gray-800'>
-                        일반
-                      </span>
-                    )}
-                  </td>
-                  <td className='px-4 py-3'>
-                    {emp.status === 'ACTIVE' ? (
-                      <span className='inline-flex items-center gap-1.5 rounded-full bg-green-100 px-3 py-1.5 text-xs font-medium text-green-700'>
-                        <span className='inline-block h-1.5 w-1.5 rounded-full bg-green-500'></span>
-                        활성화
-                      </span>
-                    ) : (
-                      <span className='inline-flex items-center gap-1.5 rounded-full bg-red-100 px-3 py-1.5 text-xs font-medium text-red-700'>
-                        <span className='inline-block h-1.5 w-1.5 rounded-full bg-red-500'></span>
-                        비활성화
-                      </span>
-                    )}
-                  </td>
-                  <td className='px-4 py-3'>{emp.createdAt?.slice(0, 10)}</td>
-                  <td className='px-4 py-3'>
-                    <i
-                      className='fas fa-edit cursor-pointer'
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        handleEditClick(emp);
-                      }}
-                    />
-                  </td>
-                </tr>
-              ))}
-              {(employees.data?.content?.length ?? 0) === 0 && (
-                <tr>
-                  <td colSpan={7} className='py-8 text-center text-gray-400'>
-                    사용자가 없습니다.
-                  </td>
-                </tr>
-              )}
+              <EmployeeTableBody
+                data={employees.data?.content ?? []}
+                page={pagination.currentPage}
+                onSelectItem={handleEditClick}
+                onSelectEdit={handleEditClick}
+              />
             </tbody>
           </table>
         </div>
 
-        {/* Pagination */}
         <Pagination
           currentPage={pagination.currentPage}
           pageSize={pagination.pageSize}
@@ -237,7 +182,6 @@ export const EmployeePage = () => {
         />
       </div>
 
-      {/* 사용자 정보 수정 모달 */}
       <Modal isOpen={isEditModalOpen} onOpenChange={setIsEditModalOpen}>
         <ModalContent>
           {(onClose) => (
@@ -280,7 +224,6 @@ export const EmployeePage = () => {
         </ModalContent>
       </Modal>
 
-      {/* 사용자 등록 모달 */}
       <Modal isOpen={isRegisterModalOpen} onOpenChange={setIsRegisterModalOpen}>
         <ModalContent>
           {(onClose) => (
@@ -335,5 +278,87 @@ export const EmployeePage = () => {
     </>
   );
 };
+
+function EmployeeTableBody({
+  data,
+  page,
+  onSelectItem,
+  onSelectEdit
+}: {
+  data: Employee[],
+  page: number,
+  onSelectItem: (employee: Employee) => void,
+  onSelectEdit: (employee: Employee) => void
+}) {
+  const pageSize = data.length;
+
+  if (data.length === 0) {
+    return (
+      <tr>
+        <td colSpan={7} className='py-8 text-center text-gray-400'>
+          사용자가 없습니다.
+        </td>
+      </tr>
+    )
+  }
+
+  return (
+    <>
+      {data.map((emp, index) => {
+        const trIdx = (page - 1) * pageSize + index + 1;
+
+        return (
+          <tr
+            key={emp.employeeId}
+            className='cursor-pointer border-b last:border-b-0 hover:bg-gray-50'
+            onClick={() => onSelectItem(emp)}
+          >
+            <td className='px-4 py-3 text-center text-gray-500'>
+              {trIdx}
+            </td>
+            <td className='flex items-center gap-2 px-4 py-3'>
+              <i className='fas fa-user-circle text-lg text-gray-500' />
+              <span>{emp.name}</span>
+            </td>
+            <td className='px-4 py-3'>{emp.loginId}</td>
+            <td className='px-4 py-3'>
+              {emp.position === 'Administrator' ? (
+                <span className='inline-block rounded-full bg-blue-100 px-2 py-1 text-xs font-semibold text-blue-800'>
+                  관리자
+                </span>
+              ) : (
+                <span className='inline-block rounded-full bg-gray-100 px-2 py-1 text-xs font-semibold text-gray-800'>
+                  일반
+                </span>
+              )}
+            </td>
+            <td className='px-4 py-3'>
+              {emp.status === 'ACTIVE' ? (
+                <span className='inline-flex items-center gap-1.5 rounded-full bg-green-100 px-3 py-1.5 text-xs font-medium text-green-700'>
+                  <span className='inline-block h-1.5 w-1.5 rounded-full bg-green-500'></span>
+                  활성화
+                </span>
+              ) : (
+                <span className='inline-flex items-center gap-1.5 rounded-full bg-red-100 px-3 py-1.5 text-xs font-medium text-red-700'>
+                  <span className='inline-block h-1.5 w-1.5 rounded-full bg-red-500'></span>
+                  비활성화
+                </span>
+              )}
+            </td>
+            <td className='px-4 py-3'>{emp.createdAt?.slice(0, 10)}</td>
+            <td className='px-4 py-3'>
+              <i
+                className='fas fa-edit cursor-pointer'
+                onClick={(e) => {
+                  e.stopPropagation();
+                  onSelectEdit(emp);
+                }} />
+            </td>
+          </tr>
+        );
+      })}
+    </>
+  )
+}
 
 export default EmployeePage;
