@@ -172,11 +172,10 @@ const VehiclePage = () => {
                   <div className='mb-1 flex items-center justify-between'>
                     <h3 className='truncate text-lg font-semibold text-gray-800'>{vehicle.name}</h3>
                     <span
-                      className={`flex items-center gap-1 rounded-full px-3 py-1 text-xs font-medium ${
-                        vehicle.ignitionStatus === 'ON'
-                          ? 'bg-green-100 text-green-700'
-                          : 'bg-gray-100 text-gray-700'
-                      }`}
+                      className={`flex items-center gap-1 rounded-full px-3 py-1 text-xs font-medium ${vehicle.ignitionStatus === 'ON'
+                        ? 'bg-green-100 text-green-700'
+                        : 'bg-gray-100 text-gray-700'
+                        }`}
                     >
                       <i
                         className={`fas fa-circle text-xs ${vehicle.ignitionStatus === 'ON' ? 'text-green-500' : 'text-gray-500'}`}
@@ -198,15 +197,6 @@ const VehiclePage = () => {
                     </span>
                   </div>
                 </div>
-                {/* <Button
-                                    size="sm"
-                                    variant="light"
-                                    color="primary"
-                                    startContent={<Edit className="w-4 h-4" />}
-                                    onClick={e => { e.stopPropagation(); handleEditClick(vehicle); }}
-                                >
-                                    수정
-                                </Button> */}
               </div>
             ))}
           </div>
@@ -242,11 +232,10 @@ const VehiclePage = () => {
                       {vehicleDetail.licenseNumber}
                     </span>
                     <span
-                      className={`flex items-center gap-1 rounded-full px-3 py-1 text-xs font-medium ${
-                        vehicleDetail.ignitionStatus === 'ON'
-                          ? 'bg-green-100 text-green-700'
-                          : 'bg-gray-100 text-gray-700'
-                      }`}
+                      className={`flex items-center gap-1 rounded-full px-3 py-1 text-xs font-medium ${vehicleDetail.ignitionStatus === 'ON'
+                        ? 'bg-green-100 text-green-700'
+                        : 'bg-gray-100 text-gray-700'
+                        }`}
                     >
                       <i
                         className={`fas fa-circle text-xs ${vehicleDetail.ignitionStatus === 'ON' ? 'text-green-500' : 'text-gray-500'}`}

@@ -27,6 +27,8 @@ export type Vehicle = {
   createAt: string;
   latitude: number;
   longitude: number;
+  mileageCurrent?: number;
+  ignitionStatus?: string;
 };
 
 export type CarIgnitionStatus = 'ON' | 'OFF';

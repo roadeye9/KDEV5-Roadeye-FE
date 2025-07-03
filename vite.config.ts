@@ -49,8 +49,5 @@ export default defineConfig({
         rewrite: (path) => path.replace(/^\/api/, '/api')
       }
     }
-  },
-  optimizeDeps: {
-    include: ['@react-spring/web'],
   }
 });
