@@ -6,7 +6,6 @@ import { Toaster } from '@/components/ui/toaster';
 import AuthLayout from '@/layouts/AuthLayout';
 import PlatformLayout from '@/layouts/PlatformLayout';
 import NotFoundPage from '@/routes/error/NotFound';
-import LandingPage from '@/routes/index';
 import Dashboard from '@/routes/manage/dashboard';
 import DrivingLogPage from '@/routes/manage/driving-log';
 import EmployeePage from '@/routes/manage/employees';
@@ -33,7 +32,7 @@ const router = createBrowserRouter([
     children: [
       {
         path: '/',
-        children: [{ index: true, element: <LandingPage /> }]
+        children: [{ index: true, element: <div>LandingPage</div> }]
       }
     ]
   },
