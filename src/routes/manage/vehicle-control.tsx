@@ -118,14 +118,17 @@ function VehicleControlPage() {
         <div className='flex w-80 flex-col border-r bg-white'>
           <div className='border-b p-5'>
             <div className='flex items-center justify-between'>
-              <h2 className='text-lg font-semibold text-gray-800'>운행중인 차량</h2>
-              <Button
-                isIconOnly
-                variant='light'
-                color='primary'
-                onClick={handleRefresh}
-                className='transition-transform duration-300 hover:rotate-180'
-              >
+              <div className='flex items-center gap-2'>
+                <h2 className='text-lg font-semibold text-gray-800'>운행중인 차량</h2>
+                <span className='text-md text-gray-600'>총 {vehicles?.length ?? 0}대</span>
+              </div>
+                <Button
+                  isIconOnly
+                  variant='light'
+                  color='primary'
+                  onClick={handleRefresh}
+                  className='transition-transform duration-300 hover:rotate-180'
+                >
                 <RefreshCw className='h-4 w-4' />
               </Button>
             </div>

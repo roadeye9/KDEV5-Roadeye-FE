@@ -10,6 +10,18 @@ export interface ListModel<T> {
   data: T[];
 }
 
+export interface CreateVehicleRequest {
+  name: string;
+  licenseNumber: string;
+  imageUrl: string;
+  mileageInitial: number;
+}
+
+export interface UpdateVehicleRequest {
+  name: string;
+  imageUrl: string;
+}
+
 export type Response<T> = {
   data: T;
 };
@@ -85,8 +97,10 @@ export const getVehiclesByStatus = async (status: 'ON' | 'OFF' | null) => {
   return data.data;
 };
 
-export const postVehicle = async (vehicle: Omit<Vehicle, 'id'> & { mileageInitial: number }) => {
-  await axiosInstance.post('/cars', vehicle);
+export const createVehicle = async (vehicle: CreateVehicleRequest) => {
+  await axiosInstance.post<Vehicle>('/cars', vehicle, {
+    useTenant: true
+  });
 };
 
 export const getVehicle = async (id: number) => {
@@ -101,14 +115,11 @@ export const deleteVehicle = async (id: number) => {
   await axiosInstance.delete(`/cars/${id}`);
 };
 
-export const patchVehicle = async ({
-  id,
-  vehicle
-}: {
-  id: number;
-  vehicle: Pick<Vehicle, 'name' | 'imageUrl'>;
-}) => {
-  await axiosInstance.patch(`/cars/${id}`, vehicle);
+export const updateVehicle = async (id: number, vehicle: UpdateVehicleRequest): Promise<Vehicle> => {
+  const response = await axiosInstance.patch<Vehicle>(`/cars/${id}`, vehicle, {
+    useTenant: true
+  });
+  return response.data;
 };
 
 export interface Period {

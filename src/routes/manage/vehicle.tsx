@@ -1,7 +1,7 @@
-import type { Vehicle } from '@/api/vehicle';
+import type { CreateVehicleRequest, UpdateVehicleRequest, Vehicle } from '@/api/vehicle';
 
 import Pagination from '@/components/common/Pagination';
-import { useVehicleDetailQuery } from '@/hooks/api/vehicle';
+import { useVehicleDetailQuery, useVehicleMutation, useVehicleUpdateMutation } from '@/hooks/api/vehicle';
 import { useVehicle } from '@/hooks/pages/useVehicle';
 
 import '@fortawesome/fontawesome-free/css/all.min.css';
@@ -19,8 +19,9 @@ import {
   Select,
   SelectItem
 } from '@nextui-org/react';
-import { Car, Hash, MapPin, Plus } from 'lucide-react';
+import { Car, Hash, ImageIcon, MapPin, Plus, UploadCloud } from 'lucide-react';
 import { Map, MapMarker } from 'react-kakao-maps-sdk';
+import { toast } from 'sonner';
 
 const VehiclePage = () => {
   const { vehicles, pagination, status, setStatus } = useVehicle();
@@ -32,6 +33,58 @@ const VehiclePage = () => {
     { enabled: !!selectedVehicle }
   );
   const [modalError, setModalError] = useState('');
+
+  const [imagePreview, setImagePreview] = useState<string | null>(null);
+  const [imageFile, setImageFile] = useState<File | null>(null);
+  const [inputName, setInputName] = useState('');
+  const [inputLicenseNumber, setInputLicenseNumber] = useState('');
+  const [inputMileage, setInputMileage] = useState('');
+
+  const { mutate: createVehicle } = useVehicleMutation();
+  const { mutate: updateVehicle } = useVehicleUpdateMutation();
+
+  const handleRegisterSave = () => {
+    if (!selectedVehicle) {
+      const payload: CreateVehicleRequest = {
+        name: inputName,
+        licenseNumber: inputLicenseNumber,
+        imageUrl: imagePreview ?? '',
+        mileageInitial: Number(inputMileage.replace(/,/g, '')) * 1000 // km → m
+      };
+      createVehicle(payload, {
+        onSuccess: () => {
+          toast.success('차량이 성공적으로 등록되었습니다.');
+          setIsModalOpen(false);
+        },
+        onError: (error) => {
+          toast.error('차량 등록에 실패했습니다.');
+          console.error('Creation failed:', error);
+        }
+      });
+    } else {
+      const payload: UpdateVehicleRequest = {
+        name: inputName,
+        imageUrl: imagePreview ?? ''
+      };
+      updateVehicle({ id: selectedVehicle.id, vehicle: payload }, {
+        onSuccess: () => {
+          toast.success('차량이 성공적으로 수정되었습니다.');
+          setIsModalOpen(false);
+        }
+      });
+    }
+  };
+
+  const handleOpenModal = (vehicle: Vehicle | null) => {
+    setSelectedVehicle(vehicle);
+    setIsModalOpen(true);
+    setModalError('');
+    setImagePreview(vehicle?.imageUrl ?? null);
+    setImageFile(null);
+    setInputName(vehicle?.name ?? '');
+    setInputLicenseNumber(vehicle?.licenseNumber ?? '');
+    setInputMileage(vehicle?.mileageCurrent ? ((vehicle.mileageCurrent / 1000).toLocaleString()) : '');
+  };
 
   return (
     <>
@@ -55,25 +108,81 @@ const VehiclePage = () => {
               </ModalHeader>
               <ModalBody>
                 <div className='space-y-4'>
-                  <Input
-                    label='차량 번호'
-                    placeholder='차량 번호를 입력하세요'
-                    defaultValue={selectedVehicle?.licenseNumber}
-                    startContent={<Hash className='text-blue-500' />}
-                  />
+                  {!selectedVehicle && (
+                    <Input
+                      label='차량 번호'
+                      placeholder='차량 번호를 입력하세요'
+                      value={inputLicenseNumber}
+                      onChange={e => setInputLicenseNumber(e.target.value)}
+                      startContent={<Hash className='text-blue-500' />}
+                    />
+                  )}
                   <Input
                     label='차량 이름'
                     placeholder='차량 이름을 입력하세요'
-                    defaultValue={selectedVehicle?.name}
+                    value={inputName}
+                    onChange={e => setInputName(e.target.value)}
                     startContent={<Car className='text-blue-500' />}
                   />
-                  <Input
-                    label='주행거리 (km)'
-                    type='number'
-                    placeholder='주행거리를 입력하세요'
-                    defaultValue={((selectedVehicle?.mileageCurrent ?? 0) / 1000).toLocaleString()}
-                    startContent={<MapPin className='text-blue-500' />}
-                  />
+                  {!selectedVehicle && (
+                    <Input
+                      label='주행거리 (km)'
+                      type='number'
+                      placeholder='주행거리를 입력하세요'
+                      value={inputMileage}
+                      onChange={e => setInputMileage(e.target.value.replace(/[^\d,]/g, ''))}
+                      startContent={<MapPin className='text-blue-500' />}
+                    />
+                  )}
+                  <div>
+                    <label className='block text-sm font-medium text-gray-700 mb-1'>차량 사진</label>
+                    <input
+                      type='file'
+                      accept='image/*'
+                      id='vehicle-image-upload'
+                      style={{ display: 'none' }}
+                      onChange={e => {
+                        const file = e.target.files?.[0];
+                        if (file) {
+                          setImageFile(file);
+                          setImagePreview(URL.createObjectURL(file));
+                        }
+                      }}
+                    />
+                    {imagePreview ? (
+                      <div className='mt-2 relative w-32 h-32'>
+                        <img
+                          src={imagePreview}
+                          alt='미리보기'
+                          className='w-full h-full object-cover rounded-lg shadow cursor-pointer transition duration-200'
+                          onClick={() => {
+                            const input = document.getElementById('vehicle-image-upload');
+                            if (input) (input as HTMLInputElement).click();
+                          }}
+                        />
+                        <div
+                          className='absolute inset-0 flex items-center justify-center rounded-lg bg-black bg-opacity-0 hover:bg-opacity-40 transition cursor-pointer'
+                          onClick={() => {
+                            const input = document.getElementById('vehicle-image-upload');
+                            if (input) (input as HTMLInputElement).click();
+                          }}
+                        >
+                          <span className='text-white text-sm font-semibold opacity-0 hover:opacity-100 transition'>변경</span>
+                        </div>
+                      </div>
+                    ) : (
+                      <div
+                        className='mt-2 flex flex-col items-center justify-center w-32 h-32 border-2 border-dashed border-gray-300 rounded-lg cursor-pointer hover:bg-gray-50 transition relative'
+                        onClick={() => {
+                          const input = document.getElementById('vehicle-image-upload');
+                          if (input) (input as HTMLInputElement).click();
+                        }}
+                      >
+                        <UploadCloud className='w-8 h-8 text-gray-400 mb-2' />
+                        <span className='text-gray-500 text-xs'>이미지 업로드</span>
+                      </div>
+                    )}
+                  </div>
                 </div>
                 {modalError && (
                   <div className='mt-2 text-center text-sm text-red-500'>{modalError}</div>
@@ -85,9 +194,7 @@ const VehiclePage = () => {
                 </Button>
                 <Button
                   color='primary'
-                  onPress={() =>
-                    setModalError('서버에 일시적인 오류가 발생했습니다. 잠시 후 다시 이용해주세요.')
-                  }
+                  onPress={handleRegisterSave}
                 >
                   {selectedVehicle ? '수정' : '등록'}
                 </Button>
@@ -136,10 +243,7 @@ const VehiclePage = () => {
               <Button
                 color='primary'
                 startContent={<Plus className='h-4 w-4' />}
-                onClick={() => {
-                  setSelectedVehicle(null);
-                  setIsModalOpen(true);
-                }}
+                onClick={() => handleOpenModal(null)}
               >
                 차량 등록
               </Button>
@@ -153,7 +257,7 @@ const VehiclePage = () => {
             {(vehicles.data?.data ?? []).map((vehicle: Vehicle, index: number) => (
               <div
                 key={vehicle.id || index}
-                className='group flex cursor-pointer items-center overflow-hidden rounded-2xl border border-gray-100 bg-white px-4 py-3 shadow-lg transition-all duration-300 hover:shadow-xl'
+                className='group flex cursor-pointer items-center overflow-hidden rounded-2xl border border-gray-100 bg-white px-4 py-3 shadow-lg transition-all duration-300 hover:shadow-xl relative'
                 onClick={() => {
                   setSelectedVehicle(vehicle);
                   setShowDetailPanel(true);
@@ -197,6 +301,15 @@ const VehiclePage = () => {
                     </span>
                   </div>
                 </div>
+                {/* Edit Button */}
+                <i
+                  className='fas fa-edit absolute top-2 right-2 z-10 h-7 w-7 flex items-center justify-center rounded-full bg-white text-gray-500 shadow cursor-pointer hover:text-blue-600 hover:shadow-md transition'
+                  onClick={e => {
+                    e.stopPropagation();
+                    handleOpenModal(vehicle);
+                  }}
+                  title='수정'
+                />
               </div>
             ))}
           </div>

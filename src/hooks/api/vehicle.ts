@@ -8,9 +8,11 @@ import {
   getVehiclesAll,
   getVehiclesByStatus,
   PageRequest,
-  patchVehicle,
-  postVehicle
+  updateVehicle,
+  createVehicle,
+  UpdateVehicleRequest
 } from '@/api/vehicle';
+import { queryClient } from '@/app';
 
 const REFETCH_INTERVAL = Number(import.meta.env.VITE_REFETCH_INTERVAL_MS);
 
@@ -19,7 +21,7 @@ export const VEHICLE_QUERY_KEY = {
   allDetails: ['vehicles-details'] as const,
   add: ['vehicle-add'] as const,
   delete: ['vehicle-delete'] as const,
-  patch: ['vehicle-patch'] as const,
+  update: ['vehicle-update'] as const,
   list: (params: PageRequest) => [...VEHICLE_QUERY_KEY.all, 'list', params] as const,
   byStatus: (status: 'ON' | 'OFF' | null) => ['vehicle', 'byStatus', status] as const
 };
@@ -55,7 +57,10 @@ export const useVehicleByStatusQuery = (status: 'ON' | 'OFF' | null, isActive: b
 export const useVehicleMutation = () => {
   return useMutation({
     mutationKey: VEHICLE_QUERY_KEY.add,
-    mutationFn: postVehicle
+    mutationFn: createVehicle,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: VEHICLE_QUERY_KEY.all });
+    }
   });
 };
 
@@ -66,10 +71,13 @@ export const useVehicleDeleteMutation = () => {
   });
 };
 
-export const useVehiclePatchMutation = () => {
+export const useVehicleUpdateMutation = () => {
   return useMutation({
-    mutationKey: VEHICLE_QUERY_KEY.patch,
-    mutationFn: patchVehicle
+    mutationKey: VEHICLE_QUERY_KEY.update,
+    mutationFn: ({ id, vehicle }: { id: number, vehicle: UpdateVehicleRequest }) => updateVehicle(id, vehicle),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: VEHICLE_QUERY_KEY.all });
+    }
   });
 };
 
