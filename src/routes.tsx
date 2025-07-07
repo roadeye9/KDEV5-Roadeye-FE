@@ -1,6 +1,6 @@
 import React from 'react';
 
-import { createBrowserRouter, Outlet, RouterProvider } from 'react-router-dom';
+import { createBrowserRouter, Navigate, Outlet, RouterProvider } from 'react-router-dom';
 
 import { Toaster } from '@/components/ui/toaster';
 import AuthLayout from '@/layouts/AuthLayout';
@@ -16,40 +16,28 @@ const VehiclePage = React.lazy(() => import('@/routes/manage/vehicle'));
 const VehicleControlPage = React.lazy(() => import('@/routes/manage/vehicle-control'));
 const DrivingLogDetailPage = React.lazy(() => import('@/routes/manage/driving-log.$id'));
 
-const BrandingLayout = () => {
-  return (
-    <>
-      <Outlet />
-      <Toaster />
-    </>
-  );
-};
-
 const router = createBrowserRouter([
   {
-    element: <BrandingLayout />,
     errorElement: <NotFoundPage />,
     children: [
       {
         path: '/',
-        children: [{ index: true, element: <div>LandingPage</div> }]
+        children: [
+          {
+            index: true,
+            element: <Navigate to="/manage/dashboard" replace />
+          },
+          {
+            path: '/login',
+            element: <LoginPage />
+          },
+        ],
       }
-    ]
-  },
-  {
-    element: <AuthLayout />,
-    errorElement: <NotFoundPage />,
-    children: [
-      {
-        path: '/login',
-        element: <LoginPage />
-      }
-    ]
+    ],
   },
   {
     path: '/manage',
     element: <PlatformLayout />,
-    errorElement: <NotFoundPage />,
     children: [
       {
         path: 'dashboard',
