@@ -44,6 +44,6 @@ export const getSessionInfo = async () => {
 
   return {
     ...ret,
-    isExpired: () => ret.expireAt < Date.now()
+    isExpired: () => !ret.expireAt || ret.expireAt < Date.now()
   };
 };
