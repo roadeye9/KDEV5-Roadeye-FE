@@ -1,9 +1,7 @@
 import React from 'react';
 
-import { createBrowserRouter, Navigate, Outlet, RouterProvider } from 'react-router-dom';
+import { createBrowserRouter, Navigate, RouterProvider } from 'react-router-dom';
 
-import { Toaster } from '@/components/ui/toaster';
-import AuthLayout from '@/layouts/AuthLayout';
 import PlatformLayout from '@/layouts/PlatformLayout';
 import NotFoundPage from '@/routes/error/NotFound';
 import Dashboard from '@/routes/manage/dashboard';
