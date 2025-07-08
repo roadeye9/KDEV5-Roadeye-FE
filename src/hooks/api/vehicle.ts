@@ -1,4 +1,4 @@
-import { useMutation, useQuery } from '@tanstack/react-query';
+import { useMutation, useQuery, useSuspenseQuery } from '@tanstack/react-query';
 
 import {
   CarIgnitionStatus,
@@ -32,7 +32,7 @@ export interface VehicleQueryParams extends PageRequest {
 }
 
 export const useVehicleQuery = (params: VehicleQueryParams) => {
-  return useQuery({
+  return useSuspenseQuery({
     queryKey: VEHICLE_QUERY_KEY.list(params),
     queryFn: () => getVehicles(params, { status: params.status })
   });

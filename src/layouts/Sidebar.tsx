@@ -5,6 +5,7 @@ import { Car, FileText, LayoutDashboard, LogOut, MapPin, Truck, UserCog } from '
 import { NavLink, useNavigate } from 'react-router-dom';
 
 import { useEmployeeMyQuery } from '@/hooks/api/employee';
+import { Delay } from '@suspensive/react';
 
 const MENU_ITEMS = [
   {
@@ -43,7 +44,11 @@ const Sidebar = () => {
           <MenuItem key={item.url} item={item} />
         ))}
       </div>
-      <Suspense fallback={<div>Loading...</div>}>
+      <Suspense fallback={(
+        <Delay ms={300}>
+          <div>Loading...</div>
+        </Delay>
+      )}>
         <UserInfo />
       </Suspense>
     </div>
@@ -70,8 +75,7 @@ function MenuItem({ item }: { item: (typeof MENU_ITEMS)[number] }) {
       key={item.url}
       to={item.url}
       className={({ isActive }) =>
-        `flex h-12 w-full items-center gap-3 rounded-lg px-3 text-gray-700 transition-colors ${
-          isActive ? 'bg-blue-100 font-bold text-blue-600' : 'hover:bg-blue-50 hover:text-blue-600'
+        `flex h-12 w-full items-center gap-3 rounded-lg px-3 text-gray-700 transition-colors ${isActive ? 'bg-blue-100 font-bold text-blue-600' : 'hover:bg-blue-50 hover:text-blue-600'
         }`
       }
     >
