@@ -49,8 +49,7 @@ export type DrivingHistoryListResponse = ListModel<DrivingHistory>;
 
 export const getDrivingHistoryPage = async (pageRequest: PageRequest) => {
   const response = await axiosInstance.get<PageResponse<DrivingHistory>>('/driving', {
-    params: pageRequest,
-    useTenant: true
+    params: pageRequest
   });
   const ret = response.data;
   return {

@@ -98,17 +98,13 @@ export const getVehiclesByStatus = async (status: 'ON' | 'OFF' | null) => {
 };
 
 export const createVehicle = async (vehicle: CreateVehicleRequest) => {
-  await axiosInstance.post<Vehicle>('/cars', vehicle, {
-    useTenant: true
-  });
+  await axiosInstance.post<Vehicle>('/cars', vehicle);
 };
 
 export const getVehicle = async (id: number) => {
-  const {
-    data: { data }
-  } = await axiosInstance.get<Response<VehicleDetails>>(`/cars/${id}`);
+  const { data } = await axiosInstance.get<Response<VehicleDetails>>(`/cars/${id}`);
 
-  return data;
+  return data.data;
 };
 
 export const deleteVehicle = async (id: number) => {
@@ -116,9 +112,7 @@ export const deleteVehicle = async (id: number) => {
 };
 
 export const updateVehicle = async (id: number, vehicle: UpdateVehicleRequest): Promise<Vehicle> => {
-  const response = await axiosInstance.patch<Vehicle>(`/cars/${id}`, vehicle, {
-    useTenant: true
-  });
+  const response = await axiosInstance.patch<Vehicle>(`/cars/${id}`, vehicle);
   return response.data;
 };
 

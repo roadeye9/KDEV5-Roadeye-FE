@@ -17,14 +17,11 @@ export const signIn = async (form: SignInForm) => {
     headers: {
       'X-Company-Id': form.tenantId
     },
-    useTenant: false
   });
 };
 
 export const getMy = async (): Promise<Employee> => {
-  const response = await axiosInstance.get<Employee>('/employees/my', {
-    useTenant: true
-  });
+  const response = await axiosInstance.get<Employee>('/employees/my');
   return response.data;
 };
 

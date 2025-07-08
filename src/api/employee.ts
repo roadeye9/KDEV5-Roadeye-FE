@@ -43,25 +43,19 @@ interface SignInResponse {
 }
 
 export const createEmployee = async (employeeData: CreateEmployeeRequest) => {
-  await axiosInstance.post<Employee>('/employees', employeeData, {
-    useTenant: true
-  });
+  await axiosInstance.post<Employee>('/employees', employeeData);
 };
 
 export const updateEmployee = async (
   employeeId: number,
   payload: UpdateEmployeeRequest
 ): Promise<Employee> => {
-  const response = await axiosInstance.put<Employee>(`/employees/${employeeId}`, payload, {
-    useTenant: true
-  });
+  const response = await axiosInstance.put<Employee>(`/employees/${employeeId}`, payload);
   return response.data;
 };
 
 export const deleteEmployee = async (employeeId: number) => {
-  await axiosInstance.delete(`/employees/${employeeId}`, {
-    useTenant: true
-  });
+  await axiosInstance.delete(`/employees/${employeeId}`);
 };
 
 export const getEmployees = async (
@@ -69,8 +63,7 @@ export const getEmployees = async (
   payload: { status?: string }
 ): Promise<PageResponse<Employee>> => {
   const response = await axiosInstance.get<PageResponse<Employee>>('/employees', {
-    params: { ...pageRequest, ...payload },
-    useTenant: true
+    params: { ...pageRequest, ...payload }
   });
   return response.data;
 };
