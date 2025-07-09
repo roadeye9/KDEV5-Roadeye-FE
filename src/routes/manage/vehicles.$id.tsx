@@ -3,12 +3,17 @@ import { useNavigate, useParams } from "react-router-dom";
 import { useVehicleDetailQuery } from "@/hooks/api/vehicle";
 import TrackingMap from "@/components/manage/tracking/TrackingMap";
 import { useDrivingHistoryQuery } from "@/hooks/api/location";
+import { Expand } from "lucide-react";
 
 function VehicleDetailsPage({ id }: { id: number }) {
     const navigate = useNavigate();
 
     const { data: vehicle } = useVehicleDetailQuery(id);
     const { data: drivingHistory } = useDrivingHistoryQuery(id);
+
+    const handleExpand = () => {
+        navigate(`/manage/tracking/${id}`)
+    }
 
     return (
         <div className='animate-slide-in fixed right-0 top-0 z-50 h-full w-full max-w-md overflow-y-auto border-l border-gray-200 bg-white p-8 shadow-2xl'>
@@ -87,7 +92,11 @@ function VehicleDetailsPage({ id }: { id: number }) {
                                 level={6}
                                 zoomControl={false}
                                 mapTypeControl={false}
-                            />
+                            >
+                                <div className="absolute top-0 left-0 z-10 p-2 hover:cursor-pointer" onClick={handleExpand} >
+                                    <Expand className="w-6 h-6" />
+                                </div>
+                            </TrackingMap>
                         </div>
                     </div>
                 </div>
