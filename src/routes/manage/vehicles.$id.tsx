@@ -76,11 +76,7 @@ function VehicleDetailsPage({ id }: { id: number }) {
                                             points: drivingHistory?.map((history) => ({
                                                 lat: history.latitude,
                                                 lng: history.longitude
-                                            })) ?? [],
-                                            style: {
-                                                strokeColor: '#000000',
-                                                strokeWeight: 2
-                                            }
+                                            })) ?? []
                                         }
                                     }
                                 ]}

@@ -10,24 +10,30 @@ export type TrackPoint = LatLng & {
     timestamp?: Date; // 이 지점에 도달한 시간
 }
 
+export type PathStyle = {
+    strokeColor: string;
+    strokeWeight: number;
+}
+
+export type MarkerStyle = {
+    image?: {
+        src: string;
+        size: { width: number; height: number };
+        offset: { x: number; y: number };
+    };
+}
+
 export type TrackingVehicle = {
     id: string | number;
     label?: string;
     position: TrackPoint;
     path?: {
         points: TrackPoint[];
-        style: Partial<{
-            strokeColor: string;
-            strokeWeight: number;
-        }>;
+        style?: PathStyle;
         display?: boolean;
     };
     marker?: {
-        image?: {
-            src: string;
-            size: { width: number; height: number };
-            offset: { x: number; y: number };
-        };
+        image?: MarkerStyle['image'];
         display?: boolean;
     };
     onClick?: (vehicle: TrackingVehicle) => void;
@@ -37,6 +43,12 @@ interface TrackingMapProps {
     center: TrackPoint;
     level: number;
     vehicles?: TrackingVehicle[];
+    defaultOptions?: Partial<{
+        path: {
+            style?: PathStyle;
+        };
+        marker: MarkerStyle;
+    }>;
     onVehicleClick?: (vehicle: TrackingVehicle) => void;
     onCenterChange?: (center: LatLng) => void;
 }
@@ -46,7 +58,15 @@ const TrackingMap = ({
     level,
     vehicles = [],
     onVehicleClick,
-    onCenterChange
+    onCenterChange,
+    defaultOptions = {
+        path: {
+            style: {
+                strokeColor: '#FF0000',
+                strokeWeight: 4
+            }
+        }
+    }
 }: TrackingMapProps) => {
     useKakaoLoader();
 
@@ -85,8 +105,8 @@ const TrackingMap = ({
                             {vehicle.path && vehicle.path.display !== false && vehicle.path.points.length > 0 && (
                                 <Polyline
                                     path={vehicle.path.points}
-                                    strokeColor={vehicle.path.style?.strokeColor || 'blue'}
-                                    strokeWeight={vehicle.path.style?.strokeWeight || 2}
+                                    strokeColor={vehicle.path.style?.strokeColor ?? defaultOptions?.path?.style?.strokeColor}
+                                    strokeWeight={vehicle.path.style?.strokeWeight ?? defaultOptions?.path?.style?.strokeWeight}
                                 />
                             )}
                         </div>
@@ -105,8 +125,8 @@ const TrackingMap = ({
                             vehicles[0].path && vehicles[0].path.display !== false && vehicles[0].path.points.length > 0 && (
                                 <Polyline
                                     path={vehicles[0].path.points}
-                                    strokeColor={vehicles[0].path.style?.strokeColor || 'blue'}
-                                    strokeWeight={vehicles[0].path.style?.strokeWeight || 2}
+                                    strokeColor={vehicles[0].path.style?.strokeColor ?? defaultOptions?.path?.style?.strokeColor}
+                                    strokeWeight={vehicles[0].path.style?.strokeWeight ?? defaultOptions?.path?.style?.strokeWeight}
                                 />
                             )
                         }

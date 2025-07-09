@@ -254,10 +254,6 @@ function TrackingDetailPage({ vehicleId }: { vehicleId: number }) {
                         position: { lat: center.lat, lng: center.lng },
                         path: {
                             points: path,
-                            style: {
-                                strokeColor: 'blue',
-                                strokeWeight: 2
-                            },
                             display: true
                         },
                         marker: {
