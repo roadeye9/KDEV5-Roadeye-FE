@@ -13,13 +13,11 @@ export interface ListModel<T> {
 export interface CreateVehicleRequest {
   name: string;
   licenseNumber: string;
-  imageUrl: string;
   mileageInitial: number;
 }
 
 export interface UpdateVehicleRequest {
   name: string;
-  imageUrl: string;
 }
 
 export type Response<T> = {

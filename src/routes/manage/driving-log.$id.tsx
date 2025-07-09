@@ -1,11 +1,11 @@
 import { Button, Card, CardBody, CardHeader } from '@nextui-org/react';
 import { ArrowLeft, Car, Clock, Gauge, MapPin, Route, User } from 'lucide-react';
 import { CustomOverlayMap, Map, Polyline } from 'react-kakao-maps-sdk';
-import { useLocation, useNavigate, useParams } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 
 import { useDrivingHistoryPathQuery, useDrivingHistoryQuery } from '@/hooks/api/drivingHistory';
 import useKakaoLoader from '@/hooks/useKakaoLoader';
-import { formatDate, formatDuration, getDateDiff } from '@/utils/dateUtils';
+import { formatDate, getDateDiff } from '@/utils/dateUtils';
 
 type Point = {
   lat: number;

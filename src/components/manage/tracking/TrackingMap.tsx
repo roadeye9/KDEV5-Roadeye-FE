@@ -1,3 +1,4 @@
+import useKakaoLoader from '@/hooks/useKakaoLoader';
 import { Map, MapMarker, MapTypeControl, Polyline, ZoomControl, MarkerClusterer } from 'react-kakao-maps-sdk';
 
 export type LatLng = {
@@ -47,9 +48,11 @@ const TrackingMap = ({
     onVehicleClick,
     onCenterChange
 }: TrackingMapProps) => {
+    useKakaoLoader();
+
     return (
         <Map
-            className='flex-1'
+            className='w-full h-full'
             key={level}
             center={center}
             level={level}

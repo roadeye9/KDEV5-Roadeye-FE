@@ -12,7 +12,10 @@ import EmployeeRegisterPage from './routes/manage/employees.register';
 
 const LoginPage = React.lazy(() => import('@/routes/login'));
 
-const VehiclePage = React.lazy(() => import('@/routes/manage/vehicle'));
+const VehicleListPage = React.lazy(() => import('@/routes/manage/vehicles'));
+const VehicleDetailsPage = React.lazy(() => import('@/routes/manage/vehicles.$id'));
+const VehicleNewPage = React.lazy(() => import('@/routes/manage/vehicles.new'));
+const VehicleEditPage = React.lazy(() => import('@/routes/manage/vehicles.$id.edit'));
 
 const TrackingPage = React.lazy(() => import('@/routes/manage/tracking'));
 const TrackingDetailPage = React.lazy(() => import('@/routes/manage/tracking.$id'));
@@ -61,8 +64,22 @@ const router = createBrowserRouter([
         ]
       },
       {
-        path: 'vehicle',
-        element: <VehiclePage />
+        path: 'vehicles',
+        element: <VehicleListPage />,
+        children: [
+          {
+            path: 'new',
+            element: <VehicleNewPage />
+          },
+          {
+            path: ':id',
+            element: <VehicleDetailsPage />
+          },
+          {
+            path: ':id/edit',
+            element: <VehicleEditPage />
+          }
+        ]
       },
       {
         path: 'tracking',

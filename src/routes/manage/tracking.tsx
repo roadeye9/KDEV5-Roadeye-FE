@@ -1,6 +1,5 @@
 import { Vehicle, VehicleDetails } from '@/api/vehicle';
 import { useVehicleByStatusQuery } from '@/hooks/api/vehicle';
-import useKakaoLoader from '@/hooks/useKakaoLoader';
 import useMapCenter from '@/hooks/useMapCenter';
 
 import '@fortawesome/fontawesome-free/css/all.min.css';
@@ -21,7 +20,6 @@ function hasLatLng(vehicle: Vehicle | VehicleDetails): vehicle is VehicleDetails
 }
 
 function TrackingPage() {
-  useKakaoLoader();
   const navigate = useNavigate();
 
   const { data: vehicles, refetch: refetchAll } = useVehicleByStatusQuery('ON', true);

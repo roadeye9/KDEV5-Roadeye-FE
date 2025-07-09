@@ -1,41 +1,41 @@
-import { useState } from 'react';
-
 import { useVehicleQuery } from '../api/vehicle';
 
-export const useVehicle = () => {
-  const [page, setPage] = useState(0);
-  const [pageSize, setPageSize] = useState(10);
-  const [status, setStatus] = useState<'ON' | 'OFF' | undefined>(undefined);
-
-  const { data, isLoading, error } = useVehicleQuery({
+export const useVehicle = ({
+  page,
+  pageSize,
+  filter
+}: {
+  page: number,
+  pageSize: number,
+  filter: Partial<{
+    status: 'ON' | 'OFF' | 'ALL'
+  }>
+}) => {
+  const { data, ...others } = useVehicleQuery({
     page,
     size: pageSize,
-    status: status
+    status: filter.status === 'ALL' ? undefined : filter.status
   });
 
-  const handlePageChange = (newPage: number) => {
-    setPage(newPage - 1); // NextUI의 페이지네이션은 1부터 시작하므로 0-based로 변환
-  };
-
-  const handlePageSizeChange = (newSize: number) => {
-    setPageSize(newSize);
-    setPage(0); // 페이지 크기가 변경되면 첫 페이지로 이동
+  if (!data) return {
+    data: [],
+    ...others,
+    pagination: {
+      current: page + 1,
+      pageSize,
+      totalPage: 0,
+      totalElements: 0
+    },
   };
 
   return {
-    vehicles: {
-      data,
-      isLoading,
-      error
-    },
+    data: data.data,
+    ...others,
     pagination: {
-      currentPage: page + 1, // 1-based로 변환
+      current: page + 1,
       pageSize,
-      totalElements: data?.pageInfo.total ?? 0,
-      onPageChange: handlePageChange,
-      onPageSizeChange: handlePageSizeChange
+      totalPage: Math.ceil(data.pageInfo.total / pageSize),
+      totalElements: data.pageInfo.total
     },
-    status,
-    setStatus
   };
 };

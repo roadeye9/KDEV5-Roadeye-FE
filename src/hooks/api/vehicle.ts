@@ -1,4 +1,4 @@
-import { useMutation, useQuery, useSuspenseQuery } from '@tanstack/react-query';
+import { keepPreviousData, useMutation, useQuery, useSuspenseQuery } from '@tanstack/react-query';
 
 import {
   CarIgnitionStatus,
@@ -31,18 +31,27 @@ export interface VehicleQueryParams extends PageRequest {
   ignitionStatus?: CarIgnitionStatus;
 }
 
-export const useVehicleQuery = (params: VehicleQueryParams) => {
-  return useSuspenseQuery({
-    queryKey: VEHICLE_QUERY_KEY.list(params),
-    queryFn: () => getVehicles(params, { status: params.status })
-  });
-};
-
 export const useVehicleAllQuery = () => {
   return useQuery({
     queryKey: VEHICLE_QUERY_KEY.allDetails,
     queryFn: getVehiclesAll,
     refetchInterval: REFETCH_INTERVAL
+  });
+};
+
+export const useVehicleQuery = (params: VehicleQueryParams) => {
+  return useQuery({
+    queryKey: VEHICLE_QUERY_KEY.list(params),
+    queryFn: () => getVehicles(params, { status: params.status }),
+    placeholderData: keepPreviousData
+  });
+};
+
+
+export const useVehicleDetailQuery = (vehicleId: number) => {
+  return useSuspenseQuery({
+    queryKey: ['vehicle', { id: vehicleId }],
+    queryFn: () => getVehicle(vehicleId),
   });
 };
 
@@ -78,13 +87,5 @@ export const useVehicleUpdateMutation = () => {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: VEHICLE_QUERY_KEY.all });
     }
-  });
-};
-
-export const useVehicleDetailQuery = (vehicleId: number | null, options = {}) => {
-  return useSuspenseQuery({
-    queryKey: ['vehicle', vehicleId],
-    queryFn: () => getVehicle(vehicleId!),
-    ...options,
   });
 };

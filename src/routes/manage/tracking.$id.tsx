@@ -3,7 +3,6 @@ import TrackingHeader from '@/components/manage/tracking/Header';
 import TrackingMap from '@/components/manage/tracking/TrackingMap';
 import { useDrivingHistoryQuery } from '@/hooks/api/location';
 import { useVehicleDetailQuery } from '@/hooks/api/vehicle';
-import useKakaoLoader from '@/hooks/useKakaoLoader';
 import useMapCenter from '@/hooks/useMapCenter';
 import { Button } from '@nextui-org/react';
 import { ArrowLeft, RefreshCw } from 'lucide-react';
@@ -151,8 +150,6 @@ const VehicleDetailContent = ({
 
 function TrackingDetailPage({ vehicleId }: { vehicleId: number }) {
     const navigate = useNavigate();
-
-    useKakaoLoader();
 
     const [center, setCenter] = useMapCenter();
     const [mapLevel, setMapLevel] = useState(4);
