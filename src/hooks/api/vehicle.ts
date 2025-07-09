@@ -86,8 +86,5 @@ export const useVehicleDetailQuery = (vehicleId: number | null, options = {}) =>
     queryKey: ['vehicle', vehicleId],
     queryFn: () => getVehicle(vehicleId!),
     ...options,
-    refetchInterval: REFETCH_INTERVAL,
-    staleTime: 400, // 400ms 이상 지연될 때만 로딩 화면 표시
-    gcTime: 5 * 60 * 1000 // 5분 캐시
   });
 };

@@ -10,14 +10,8 @@ import { useNavigate } from 'react-router-dom';
 
 import { Button, Checkbox } from '@nextui-org/react';
 import { RefreshCw, User } from 'lucide-react';
-import {
-  Map,
-  MapMarker,
-  MapTypeControl,
-  MarkerClusterer,
-  ZoomControl
-} from 'react-kakao-maps-sdk';
 import TrackingHeader from '@/components/manage/tracking/Header';
+import TrackingMap, { TrackingVehicle } from '@/components/manage/tracking/TrackingMap';
 
 function hasLatLng(vehicle: Vehicle | VehicleDetails): vehicle is VehicleDetails {
   return (
@@ -43,7 +37,7 @@ function TrackingPage() {
     }
   }, [vehicles]);
 
-  const handleVehicleSelect = (vehicle: VehicleDetails) => {
+  const handleVehicleSelect = (vehicle: VehicleDetails | TrackingVehicle) => {
     setIsNavigating(true);
     // 애니메이션 시작 후 라우트 이동
     setTimeout(() => {
@@ -137,30 +131,25 @@ function TrackingPage() {
           </div>
         </div>
 
-        <Map
-          className='flex-1'
-          key={mapLevel}
+        <TrackingMap
           center={center}
           level={mapLevel}
-        >
-          <MapTypeControl position={'TOPRIGHT'} />
-          <ZoomControl position={'BOTTOMRIGHT'} />
-          <MarkerClusterer averageCenter={true} minLevel={9} minClusterSize={1}>
-            {vehicles
-              ?.filter((vehicle) => visibleVehicles.has(vehicle.id) && hasLatLng(vehicle))
-              .map((vehicle) => {
-                const v = vehicle as VehicleDetails;
-                return (
-                  <MapMarker
-                    key={v.id}
-                    position={{ lat: v.latitude, lng: v.longitude }}
-                    onClick={() => handleVehicleSelect(v)}
-                  />
-                );
-              })
-            }
-          </MarkerClusterer>
-        </Map>
+          vehicles={vehicles
+            ?.filter((vehicle) => visibleVehicles.has(vehicle.id) && hasLatLng(vehicle))
+            .map((vehicle) => {
+              const v = vehicle as VehicleDetails;
+              return {
+                id: v.id,
+                label: v.name,
+                position: { lat: v.latitude, lng: v.longitude },
+                marker: {
+                  display: true
+                },
+                onClick: handleVehicleSelect
+              };
+            })}
+          onVehicleClick={handleVehicleSelect}
+        />
       </div>
     </div>
   );

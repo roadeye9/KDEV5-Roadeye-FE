@@ -1,33 +1,22 @@
-import { DrivingLocationDetail } from '@/api/location';
+import { VehicleDetails } from '@/api/vehicle';
+import TrackingHeader from '@/components/manage/tracking/Header';
+import TrackingMap from '@/components/manage/tracking/TrackingMap';
 import { useDrivingHistoryQuery } from '@/hooks/api/location';
 import { useVehicleDetailQuery } from '@/hooks/api/vehicle';
-import { VehicleDetails } from '@/api/vehicle';
 import useKakaoLoader from '@/hooks/useKakaoLoader';
 import useMapCenter from '@/hooks/useMapCenter';
+import { Button } from '@nextui-org/react';
+import { ArrowLeft, RefreshCw } from 'lucide-react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useNavigate, useParams } from 'react-router-dom';
 
 import '@fortawesome/fontawesome-free/css/all.min.css';
 
-import { useEffect, useState } from 'react';
-import { useNavigate, useParams } from 'react-router-dom';
-
-import { Button } from '@nextui-org/react';
-import { ArrowLeft, RefreshCw } from 'lucide-react';
-import {
-    Map,
-    MapMarker,
-    MapTypeControl,
-    Polyline,
-    ZoomControl
-} from 'react-kakao-maps-sdk';
-import TrackingHeader from '@/components/manage/tracking/Header';
-
 const VehicleDetailContent = ({
     vehicleDetail,
-    path,
     isLoading
 }: {
-    vehicleDetail: VehicleDetails;
-    path: Path;
+        vehicleDetail: VehicleDetails;
     isLoading: boolean;
 }) => {
     if (isLoading) {
@@ -125,7 +114,7 @@ const VehicleDetailContent = ({
                     <div>
                         <label className='text-xs text-gray-500'>속도</label>
                         <p className='text-sm text-gray-800'>
-                            {path[path.length - 1]?.speed || 60} km/h
+                            {vehicleDetail?.speed || '??'} km/h
                         </p>
                     </div>
                     <div>
@@ -158,69 +147,64 @@ const VehicleDetailContent = ({
             )}
         </div>
     );
-};
-
-type Point = {
-    lat: number;
-    lng: number;
-};
-type Path = (Point & { speed: number })[];
-
-function getPath(drivingHistory: DrivingLocationDetail[]): Path {
-    return drivingHistory.map((item) => ({
-        lat: item.latitude,
-        lng: item.longitude,
-        speed: item.speed
-    }));
 }
 
-function TrackingDetailPage() {
-    useKakaoLoader();
+function TrackingDetailPage({ vehicleId }: { vehicleId: number }) {
     const navigate = useNavigate();
-    const { id } = useParams<{ id: string }>();
-    const vehicleId = parseInt(id || '0');
 
-    const [path, setPath] = useState<Path>([]);
+    useKakaoLoader();
+
     const [center, setCenter] = useMapCenter();
     const [mapLevel, setMapLevel] = useState(4);
-    const [isNavigating, setIsNavigating] = useState(false);
+
     const [isEntering, setIsEntering] = useState(true);
-
-    const { data: drivingHistory } = useDrivingHistoryQuery(vehicleId);
-    const { data: vehicleDetail, refetch: refetchDetail, isLoading: isVehicleDetailLoading } = useVehicleDetailQuery(vehicleId);
-
+    const [isNavigating, setIsNavigating] = useState(false);
     useEffect(() => {
-        // 페이지 진입 애니메이션
         const timer = setTimeout(() => {
             setIsEntering(false);
         }, 100);
         return () => clearTimeout(timer);
     }, []);
 
+    const {
+        data: vehicleDetail,
+        isLoading: isVehicleDetailLoading,
+        refetch: refetchDetail,
+    } = useVehicleDetailQuery(vehicleId);
     useEffect(() => {
         if (vehicleDetail) {
             setCenter({ lat: vehicleDetail.latitude, lng: vehicleDetail.longitude });
             setMapLevel(4);
         }
-    }, [vehicleDetail, setCenter]);
+    }, [vehicleDetail]);
 
-    useEffect(() => {
-        if (drivingHistory) {
-            setPath(getPath(drivingHistory));
-        }
+    const {
+        data: drivingHistory,
+        isLoading: isDrivingHistoryLoading,
+        refetch: refetchDrivingHistory,
+    } = useDrivingHistoryQuery(vehicleId);
+    const path = useMemo(() => {
+        if (!drivingHistory) return [];
+
+        return drivingHistory.map((item) => ({
+            lat: item.latitude,
+            lng: item.longitude,
+            speed: item.speed
+        }));
     }, [drivingHistory]);
+
+    const handleRefetch = useCallback(() => {
+        if (isVehicleDetailLoading || isDrivingHistoryLoading) return;
+
+        refetchDetail();
+        refetchDrivingHistory();
+    }, [isVehicleDetailLoading, isDrivingHistoryLoading]);
 
     const handleBackToList = () => {
         setIsNavigating(true);
-        // 애니메이션 시작 후 라우트 이동
         setTimeout(() => {
             navigate('/manage/tracking');
-        }, 300); // 애니메이션 지속 시간과 동일
-    };
-
-    const handleRefresh = () => {
-        console.log('refetchDetail');
-        refetchDetail();
+        }, 300);
     };
 
     return (
@@ -248,7 +232,7 @@ function TrackingDetailPage() {
                                     isIconOnly
                                     variant='light'
                                     color='primary'
-                                    onClick={handleRefresh}
+                                    onPress={handleRefetch}
                                     className='transition-transform duration-300 hover:rotate-180'
                                 >
                                     <RefreshCw className='h-4 w-4' />
@@ -260,30 +244,42 @@ function TrackingDetailPage() {
                     <div className={`h-full overflow-y-auto p-5 transition-transform duration-300 ${isEntering ? 'translate-x-full' : isNavigating ? 'translate-x-full' : 'translate-x-0'}`}>
                         <VehicleDetailContent
                             vehicleDetail={vehicleDetail}
-                            path={path}
                             isLoading={isVehicleDetailLoading}
                         />
                     </div>
                 </div>
 
-                <Map
-                    className='flex-1'
-                    key={mapLevel}
+                <TrackingMap
                     center={center}
                     level={mapLevel}
-                >
-                    <MapTypeControl position={'TOPRIGHT'} />
-                    <ZoomControl position={'BOTTOMRIGHT'} />
-                    {path.length > 0 && (
-                        <>
-                            <MapMarker position={path[path.length - 1]} />
-                            <Polyline path={path} strokeColor={'blue'} strokeWeight={2} />
-                        </>
-                    )}
-                </Map>
+                    vehicles={[{
+                        id: vehicleId,
+                        position: { lat: center.lat, lng: center.lng },
+                        path: {
+                            points: path,
+                            style: {
+                                strokeColor: 'blue',
+                                strokeWeight: 2
+                            },
+                            display: true
+                        },
+                        marker: {
+                            display: true
+                        }
+                    }]}
+                />
             </div>
         </div>
     );
 }
 
-export default TrackingDetailPage; 
+export default function () {
+    const { id } = useParams<{ id: string }>();
+    const vehicleId = parseInt(id || '');
+
+    if (isNaN(vehicleId)) {
+        throw new Error('Invalid vehicle ID');
+    }
+
+    return <TrackingDetailPage vehicleId={vehicleId} />;
+}
