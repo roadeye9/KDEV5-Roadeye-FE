@@ -7,7 +7,7 @@ export interface Employee {
   name: string;
   position: string;
   createdAt: string;
-  status: string;
+  status: 'ACTIVE' | 'DISABLED';
 }
 
 export const signIn = async (form: { 

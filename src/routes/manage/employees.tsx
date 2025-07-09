@@ -1,111 +1,47 @@
 import { Employee } from '@/api/auth';
-import { CreateEmployeeRequest, UpdateEmployeeRequest } from '@/api/employee';
 import Pagination from '@/components/common/Pagination';
-import { useEmployeeMutation } from '@/hooks/api/employee';
-import { useEmployee, useUpdateEmployee } from '@/hooks/pages/useEmployee';
-
-import '@fortawesome/fontawesome-free/css/all.min.css';
-
-import { useEffect, useState } from 'react';
-
+import { useEmployeesPage } from '@/hooks/api/useEmployeesPage';
 import {
   Button,
-  Input,
-  Modal,
-  ModalBody,
-  ModalContent,
-  ModalFooter,
-  ModalHeader,
   Select,
-  SelectItem,
-  Switch
+  SelectItem
 } from '@nextui-org/react';
 import { User } from 'lucide-react';
-import { toast } from 'sonner';
+import { Outlet, useLocation, useNavigate } from 'react-router-dom';
+import '@fortawesome/fontawesome-free/css/all.min.css';
+import z from 'zod';
+import { useEffect, useState } from 'react';
+
+const statuses = [
+  { label: '전체 상태', value: 'ALL' },
+  { label: '활성', value: 'ACTIVE' },
+  { label: '비활성', value: 'DISABLED' }
+] as const;
+
+const filterSchema = z.object({
+  status: z.enum(['ALL', 'ACTIVE', 'DISABLED']).default('ALL')
+});
 
 export const EmployeePage = () => {
-  const { employees, pagination, status, setStatus } = useEmployee();
-  const [selectedEmployee, setSelectedEmployee] = useState<Employee | null>(null);
-  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
-  const [isRegisterModalOpen, setIsRegisterModalOpen] = useState(false);
+  const navigate = useNavigate();
+  const location = useLocation();
 
-  const [editName, setEditName] = useState('');
-  const [editPosition, setEditPosition] = useState('');
-  const [editStatus, setEditStatus] = useState(false);
+  const [filter, setFilter] = useState<z.infer<typeof filterSchema>>(filterSchema.parse({
+    status: 'ALL'
+  }));
 
-  const [registerLoginId, setRegisterLoginId] = useState('');
-  const [registerPassword, setRegisterPassword] = useState('');
-  const [registerName, setRegisterName] = useState('');
-  const [registerPosition, setRegisterPosition] = useState('');
-
-  const { updateEmployee } = useUpdateEmployee();
-  const { mutate: createEmployee } = useEmployeeMutation();
-
-  const handleEditClick = (employee: Employee) => {
-    setSelectedEmployee(employee);
-    setEditName(employee.name);
-    setEditPosition(employee.position);
-    setEditStatus(employee.status === 'ACTIVE');
-    setIsEditModalOpen(true);
-
-    console.log(employee);
-  };
-
-  const handleRegisterClick = () => {
-    setRegisterLoginId('');
-    setRegisterPassword('');
-    setRegisterName('');
-    setRegisterPosition('');
-    setIsRegisterModalOpen(true);
-  };
-
-  const handleSaveChanges = () => {
-    if (!selectedEmployee) return;
-
-    const payload: UpdateEmployeeRequest = {
-      name: editName,
-      position: editPosition,
-      status: editStatus ? 'ENABLE' : 'DISABLE'
-    };
-
-    updateEmployee(
-      { employeeId: selectedEmployee.employeeId, payload },
-      {
-        onSuccess: () => {
-          toast.success('사용자 정보가 성공적으로 업데이트되었습니다.');
-          setIsEditModalOpen(false);
-        },
-        onError: (error) => {
-          toast.error('사용자 정보 업데이트에 실패했습니다.');
-          console.error('Update failed:', error);
-        }
-      }
-    );
-  };
-
-  const handleRegisterSave = () => {
-    const payload: CreateEmployeeRequest = {
-      loginId: registerLoginId,
-      password: registerPassword,
-      name: registerName,
-      position: registerPosition
-    };
-
-    createEmployee(payload, {
-      onSuccess: () => {
-        toast.success('사용자가 성공적으로 등록되었습니다.');
-        setIsRegisterModalOpen(false);
-      },
-      onError: (error) => {
-        toast.error('사용자 등록에 실패했습니다.');
-        console.error('Creation failed:', error);
-      }
-    });
-  };
+  const {
+    data: employees,
+    pagination,
+    refetch,
+    changePage,
+  } = useEmployeesPage(filter.status);
 
   useEffect(() => {
-    pagination.onPageChange(1);
-  }, [status]);
+    if (location.state?.refetch) {
+      refetch();
+    }
+  }, [location.state]);
 
   return (
     <>
@@ -115,34 +51,26 @@ export const EmployeePage = () => {
         <section className='border-b bg-white px-8 py-4'>
           <div className='flex flex-wrap items-center justify-between gap-4'>
             <span className='text-lg font-semibold text-gray-800'>
-              총 {employees.data?.page?.totalElements ?? 0}명
+              총 {pagination.totalElements}명
             </span>
 
             <div className='ml-auto flex items-center gap-3'>
               <Select
                 className='w-40'
-                selectedKeys={status ? [status] : ['all']}
-                onChange={(e) => {
-                  const value = e.target.value;
-                  setStatus(value === 'all' ? undefined : value);
-                  pagination.onPageChange(1);
-                }}
+                selectedKeys={[filter.status]}
+                onChange={(e) => setFilter({ ...filter, status: e.target.value as z.infer<typeof filterSchema>['status'] })}
                 aria-label='상태 필터'
               >
-                <SelectItem key='all' value='all'>
-                  전체 상태
-                </SelectItem>
-                <SelectItem key='ACTIVE' value='ACTIVE'>
-                  활성
-                </SelectItem>
-                <SelectItem key='DISABLED' value='DISABLED'>
-                  비활성
-                </SelectItem>
+                {statuses.map((status) => (
+                  <SelectItem key={status.value} value={status.value}>
+                    {status.label}
+                  </SelectItem>
+                ))}
               </Select>
               <Button
                 color='primary'
                 startContent={<User className='h-4 w-4' />}
-                onClick={handleRegisterClick}
+                onPress={() => navigate('/manage/employees/register')}
               >
                 사용자 등록
               </Button>
@@ -165,116 +93,22 @@ export const EmployeePage = () => {
             </thead>
             <tbody>
               <EmployeeTableBody
-                data={employees.data?.content ?? []}
-                page={pagination.currentPage}
-                onSelectItem={handleEditClick}
-                onSelectEdit={handleEditClick}
+                data={employees}
+                page={pagination.current}
               />
             </tbody>
           </table>
         </div>
 
         <Pagination
-          currentPage={pagination.currentPage}
-          pageSize={pagination.pageSize}
+          currentPage={pagination.current}
+          pageSize={pagination.size}
           totalElements={pagination.totalElements}
-          onPageChange={pagination.onPageChange}
+          onPageChange={(page) => changePage(page - 1)}
         />
       </div>
 
-      <Modal isOpen={isEditModalOpen} onOpenChange={setIsEditModalOpen}>
-        <ModalContent>
-          {(onClose) => (
-            <>
-              <ModalHeader className='flex flex-col gap-1'>사용자 정보 수정</ModalHeader>
-              <ModalBody>
-                <Input
-                  label='이름'
-                  value={editName}
-                  onChange={(e) => setEditName(e.target.value)}
-                  fullWidth
-                />
-                <Select
-                  label='직책'
-                  placeholder='직책을 선택하세요'
-                  selectedKeys={editPosition ? [editPosition] : []}
-                  onChange={(e) => setEditPosition(e.target.value)}
-                >
-                  <SelectItem key='normal' value='normal'>
-                    일반
-                  </SelectItem>
-                  <SelectItem key='Administrator' value='Administrator'>
-                    관리자
-                  </SelectItem>
-                </Select>
-                <Switch isSelected={editStatus} onValueChange={setEditStatus} color='success'>
-                  {editStatus ? '활성' : '비활성'}
-                </Switch>
-              </ModalBody>
-              <ModalFooter>
-                <Button color='danger' variant='light' onClick={onClose}>
-                  취소
-                </Button>
-                <Button color='primary' onClick={handleSaveChanges}>
-                  저장
-                </Button>
-              </ModalFooter>
-            </>
-          )}
-        </ModalContent>
-      </Modal>
-
-      <Modal isOpen={isRegisterModalOpen} onOpenChange={setIsRegisterModalOpen}>
-        <ModalContent>
-          {(onClose) => (
-            <>
-              <ModalHeader className='flex flex-col gap-1'>사용자 등록</ModalHeader>
-              <ModalBody>
-                <Input
-                  label='아이디'
-                  value={registerLoginId}
-                  onChange={(e) => setRegisterLoginId(e.target.value)}
-                  fullWidth
-                />
-                <Input
-                  label='비밀번호'
-                  type='password'
-                  value={registerPassword}
-                  onChange={(e) => setRegisterPassword(e.target.value)}
-                  fullWidth
-                />
-                <Input
-                  label='이름'
-                  value={registerName}
-                  onChange={(e) => setRegisterName(e.target.value)}
-                  fullWidth
-                />
-                <Select
-                  label='직책'
-                  placeholder='직책을 선택하세요'
-                  selectedKeys={registerPosition ? [registerPosition] : []}
-                  onChange={(e) => setRegisterPosition(e.target.value)}
-                >
-                  <SelectItem key='normal' value='normal'>
-                    일반
-                  </SelectItem>
-                  <SelectItem key='Administrator' value='Administrator'>
-                    관리자
-                  </SelectItem>
-                </Select>
-              </ModalBody>
-              <ModalFooter>
-                <Button color='danger' variant='light' onClick={onClose}>
-                  취소
-                </Button>
-                <Button color='primary' onClick={handleRegisterSave}>
-                  저장
-                </Button>
-              </ModalFooter>
-            </>
-          )}
-        </ModalContent>
-      </Modal>
+      <Outlet />
     </>
   );
 };
@@ -282,83 +116,120 @@ export const EmployeePage = () => {
 function EmployeeTableBody({
   data,
   page,
-  onSelectItem,
-  onSelectEdit
 }: {
   data: Employee[],
-  page: number,
-  onSelectItem: (employee: Employee) => void,
-  onSelectEdit: (employee: Employee) => void
+    page: number,
 }) {
-  const pageSize = data.length;
-
   if (data.length === 0) {
-    return (
-      <tr>
-        <td colSpan={7} className='py-8 text-center text-gray-400'>
-          사용자가 없습니다.
-        </td>
-      </tr>
-    )
+    return <EmptyEmployeeRow />;
   }
 
   return (
     <>
-      {data.map((emp, index) => {
-        const trIdx = (page - 1) * pageSize + index + 1;
-
-        return (
-          <tr
-            key={emp.employeeId}
-            className='cursor-pointer border-b last:border-b-0 hover:bg-gray-50'
-            onClick={() => onSelectItem(emp)}
-          >
-            <td className='px-4 py-3 text-center text-gray-500'>
-              {trIdx}
-            </td>
-            <td className='flex items-center gap-2 px-4 py-3'>
-              <i className='fas fa-user-circle text-lg text-gray-500' />
-              <span>{emp.name}</span>
-            </td>
-            <td className='px-4 py-3'>{emp.loginId}</td>
-            <td className='px-4 py-3'>
-              {emp.position === 'Administrator' ? (
-                <span className='inline-block rounded-full bg-blue-100 px-2 py-1 text-xs font-semibold text-blue-800'>
-                  관리자
-                </span>
-              ) : (
-                <span className='inline-block rounded-full bg-gray-100 px-2 py-1 text-xs font-semibold text-gray-800'>
-                  일반
-                </span>
-              )}
-            </td>
-            <td className='px-4 py-3'>
-              {emp.status === 'ACTIVE' ? (
-                <span className='inline-flex items-center gap-1.5 rounded-full bg-green-100 px-3 py-1.5 text-xs font-medium text-green-700'>
-                  <span className='inline-block h-1.5 w-1.5 rounded-full bg-green-500'></span>
-                  활성화
-                </span>
-              ) : (
-                <span className='inline-flex items-center gap-1.5 rounded-full bg-red-100 px-3 py-1.5 text-xs font-medium text-red-700'>
-                  <span className='inline-block h-1.5 w-1.5 rounded-full bg-red-500'></span>
-                  비활성화
-                </span>
-              )}
-            </td>
-            <td className='px-4 py-3'>{emp.createdAt?.slice(0, 10)}</td>
-            <td className='px-4 py-3'>
-              <i
-                className='fas fa-edit cursor-pointer'
-                onClick={(e) => {
-                  e.stopPropagation();
-                  onSelectEdit(emp);
-                }} />
-            </td>
-          </tr>
-        );
-      })}
+      {data.map((emp, index) => (
+        <EmployeeTableRow
+          key={emp.employeeId}
+          employee={emp}
+          index={index}
+          page={page}
+          pageSize={data.length}
+        />
+      ))}
     </>
-  )
+  );
+}
+
+function EmptyEmployeeRow() {
+  return (
+    <tr>
+      <td colSpan={7} className='py-8 text-center text-gray-400'>
+        사용자가 없습니다.
+      </td>
+    </tr>
+  );
+}
+
+function EmployeeTableRow({
+  employee,
+  index,
+  page,
+  pageSize,
+}: {
+  employee: Employee,
+  index: number,
+  page: number,
+  pageSize: number,
+}) {
+  const navigate = useNavigate();
+
+  const handleEditClick = (employee: Employee) => {
+    navigate(`/manage/employees/${employee.employeeId}/edit`);
+  };
+
+  const trIdx = (page - 1) * pageSize + index + 1;
+
+  return (
+    <tr
+      className='cursor-pointer border-b last:border-b-0 hover:bg-gray-50'
+      onClick={() => handleEditClick(employee)}
+    >
+      <td className='px-4 py-3 text-center text-gray-500'>
+        {trIdx}
+      </td>
+      <td className='flex items-center gap-2 px-4 py-3'>
+        <i className='fas fa-user-circle text-lg text-gray-500' />
+        <span>{employee.name}</span>
+      </td>
+      <td className='px-4 py-3'>{employee.loginId}</td>
+      <td className='px-4 py-3'>
+        <PositionBadge position={employee.position} />
+      </td>
+      <td className='px-4 py-3'>
+        <StatusBadge status={employee.status} />
+      </td>
+      <td className='px-4 py-3'>{employee.createdAt?.slice(0, 10)}</td>
+      <td className='px-4 py-3'>
+        <i
+          className='fas fa-edit cursor-pointer'
+          onClick={() => handleEditClick(employee)}
+        />
+      </td>
+    </tr>
+  );
+}
+
+function PositionBadge({ position }: { position: string }) {
+  if (position === 'Administrator') {
+    return (
+      <span className='inline-block rounded-full bg-blue-100 px-2 py-1 text-xs font-semibold text-blue-800'>
+        관리자
+      </span>
+    );
+  }
+
+  return (
+    <span className='inline-block rounded-full bg-gray-100 px-2 py-1 text-xs font-semibold text-gray-800'>
+      일반
+    </span>
+  );
+}
+
+function StatusBadge({ status }: { status: string }) {
+  if (status === 'ACTIVE') {
+    return (
+      <span className='inline-flex items-center gap-1.5 rounded-full bg-green-100 px-3 py-1.5 text-xs font-medium text-green-700'>
+        <span className='inline-block h-1.5 w-1.5 rounded-full bg-green-500'></span>
+        활성화
+      </span>
+    );
+  }
+
+  return (
+    <span className='inline-flex items-center gap-1.5 rounded-full bg-red-100 px-3 py-1.5 text-xs font-medium text-red-700'>
+      <span className='inline-block h-1.5 w-1.5 rounded-full bg-red-500'></span>
+      비활성화
+    </span>
+  );
 }
 
 export default EmployeePage;

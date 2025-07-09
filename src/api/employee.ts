@@ -9,9 +9,7 @@ export interface CreateEmployeeRequest {
 }
 
 export interface UpdateEmployeeRequest {
-  name: string;
-  position: string;
-  status: 'ENABLE' | 'DISABLE';
+  status?: 'ACTIVE' | 'DISABLED';
 }
 
 interface PageRequest {
@@ -32,15 +30,23 @@ export interface PageResponse<T> {
   page: PageInfo;
 }
 
-interface SignInRequest {
-  loginId: string;
-  password: string;
-}
+export const getEmployeePage = async (
+  payload: { status?: 'ALL' | 'ACTIVE' | 'DISABLED' },
+  pageRequest: PageRequest,
+) => {
+  if (payload.status === 'ALL') {
+    delete payload.status;
+  }
+  const response = await axiosInstance.get<PageResponse<Employee>>('/employees', {
+    params: { ...pageRequest, ...payload }
+  });
+  return response.data;
+};
 
-interface SignInResponse {
-  accessToken: string;
-  refreshToken: string;
-}
+export const getEmployee = async (employeeId: number): Promise<Employee> => {
+  const response = await axiosInstance.get<Employee>(`/employees/${employeeId}`);
+  return response.data;
+};
 
 export const createEmployee = async (employeeData: CreateEmployeeRequest) => {
   await axiosInstance.post<Employee>('/employees', employeeData);
@@ -56,19 +62,4 @@ export const updateEmployee = async (
 
 export const deleteEmployee = async (employeeId: number) => {
   await axiosInstance.delete(`/employees/${employeeId}`);
-};
-
-export const getEmployees = async (
-  pageRequest: PageRequest,
-  payload: { status?: string }
-): Promise<PageResponse<Employee>> => {
-  const response = await axiosInstance.get<PageResponse<Employee>>('/employees', {
-    params: { ...pageRequest, ...payload }
-  });
-  return response.data;
-};
-
-export const signIn = async (signInRequest: SignInRequest): Promise<SignInResponse> => {
-  const response = await axiosInstance.post<SignInResponse>('/employees/sign-in', signInRequest);
-  return response.data;
 };

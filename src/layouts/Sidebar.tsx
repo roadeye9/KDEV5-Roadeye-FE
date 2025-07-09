@@ -4,9 +4,8 @@ import { Avatar, Button } from '@nextui-org/react';
 import { Car, FileText, LayoutDashboard, LogOut, MapPin, Truck, UserCog } from 'lucide-react';
 import { NavLink, useNavigate } from 'react-router-dom';
 
-import { useEmployeeMyQuery } from '@/hooks/api/employee';
+import { useEmployeeMyQuery } from '@/hooks/api/employees';
 import { Delay } from '@suspensive/react';
-import { useMyInfoQuery } from '@/hooks/api/auth';
 
 const MENU_ITEMS = [
   {
@@ -17,7 +16,7 @@ const MENU_ITEMS = [
   {
     icon: UserCog,
     label: '직원 관리',
-    url: '/manage/employee'
+    url: '/manage/employees'
   },
   {
     icon: Truck,

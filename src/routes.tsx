@@ -7,6 +7,8 @@ import NotFoundPage from '@/routes/error/NotFound';
 import Dashboard from '@/routes/manage/dashboard';
 import DrivingLogPage from '@/routes/manage/driving-log';
 import EmployeePage from '@/routes/manage/employees';
+import EmployeeEditPage from './routes/manage/employees.$id.edit';
+import EmployeeRegisterPage from './routes/manage/employees.register';
 
 const LoginPage = React.lazy(() => import('@/routes/login'));
 
@@ -42,8 +44,18 @@ const router = createBrowserRouter([
         element: <Dashboard />
       },
       {
-        path: 'employee',
-        element: <EmployeePage />
+        path: 'employees',
+        element: <EmployeePage />,
+        children: [
+          {
+            path: "register",
+            element: <EmployeeRegisterPage />
+          },
+          {
+            path: ':id/edit',
+            element: <EmployeeEditPage />
+          }
+        ]
       },
       {
         path: 'vehicle',
