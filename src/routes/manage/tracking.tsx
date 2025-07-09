@@ -4,10 +4,10 @@ import useMapCenter from '@/hooks/useMapCenter';
 
 import '@fortawesome/fontawesome-free/css/all.min.css';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 
-import { Button, Checkbox } from '@nextui-org/react';
+import { Button, Checkbox, Input } from '@nextui-org/react';
 import { RefreshCw, User } from 'lucide-react';
 import TrackingHeader from '@/components/manage/tracking/Header';
 import TrackingMap, { TrackingVehicle } from '@/components/manage/tracking/TrackingMap';
@@ -22,14 +22,24 @@ function hasLatLng(vehicle: Vehicle | VehicleDetails): vehicle is VehicleDetails
 function TrackingPage() {
   const navigate = useNavigate();
 
-  const { data: vehicles, refetch: refetchAll } = useVehicleByStatusQuery('ON', true);
   const [center] = useMapCenter();
   const [mapLevel] = useState(12);
+
+  const [searchText, setSearchText] = useState('');
+  const { data: vehicles, refetch: refetchAll } = useVehicleByStatusQuery('ON', true);
+
+  const filteredVehicles = useMemo(() => {
+    if (!searchText) return vehicles;
+
+    return vehicles?.filter((vehicle) => {
+      return vehicle.name.includes(searchText) || vehicle.licenseNumber.includes(searchText);
+    });
+  }, [vehicles, searchText]);
+
   const [visibleVehicles, setVisibleVehicles] = useState<Set<number>>(new Set());
   const [isNavigating, setIsNavigating] = useState(false);
 
   useEffect(() => {
-    // 모든 차량을 기본적으로 지도에 표시
     if (vehicles) {
       setVisibleVehicles(new Set(vehicles.map((v) => v.id)));
     }
@@ -37,12 +47,11 @@ function TrackingPage() {
 
   const handleVehicleSelect = (vehicle: VehicleDetails | TrackingVehicle) => {
     setIsNavigating(true);
-    // 애니메이션 시작 후 라우트 이동
     setTimeout(() => {
       navigate(`/manage/tracking/${vehicle.id}`, {
         state: { vehicle }
       });
-    }, 300); // 애니메이션 지속 시간과 동일
+    }, 300);
   };
 
   const toggleVehicleVisibility = (vehicleId: number) => {
@@ -86,8 +95,19 @@ function TrackingPage() {
             </div>
           </div>
 
+          <div className='p-5'>
+            <Input
+              placeholder='차량 이름 또는 번호 검색'
+              onKeyUp={(e) => {
+                if (e.key === 'Enter') {
+                  setSearchText(e.currentTarget.value);
+                }
+              }}
+            />
+          </div>
+
           <div className={`h-full space-y-4 overflow-y-auto p-5 transition-transform duration-300 ${isNavigating ? '-translate-x-full' : 'translate-x-0'}`}>
-            {vehicles?.map((vehicle) => (
+            {filteredVehicles?.map((vehicle) => (
               <div
                 key={vehicle.id}
                 className='cursor-pointer rounded-lg bg-gray-50 p-4 transition-all duration-300 hover:-translate-y-1 hover:bg-gray-100'
