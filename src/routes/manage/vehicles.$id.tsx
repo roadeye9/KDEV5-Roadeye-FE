@@ -85,6 +85,8 @@ function VehicleDetailsPage({ id }: { id: number }) {
                                     lng: vehicle.longitude
                                 }}
                                 level={6}
+                                zoomControl={false}
+                                mapTypeControl={false}
                             />
                         </div>
                     </div>

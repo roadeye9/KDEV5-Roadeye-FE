@@ -39,6 +39,16 @@ export type TrackingVehicle = {
     onClick?: (vehicle: TrackingVehicle) => void;
 }
 
+const defaultZoomControl = {
+    position: 'BOTTOMRIGHT',
+    visible: true
+} as const;
+
+const defaultMapTypeControl = {
+    position: 'TOPRIGHT',
+    visible: true
+} as const;
+
 interface TrackingMapProps {
     center: TrackPoint;
     level: number;
@@ -49,6 +59,8 @@ interface TrackingMapProps {
         };
         marker: MarkerStyle;
     }>;
+    zoomControl?: boolean | typeof defaultZoomControl;
+    mapTypeControl?: boolean | typeof defaultMapTypeControl;
     onVehicleClick?: (vehicle: TrackingVehicle) => void;
     onCenterChange?: (center: LatLng) => void;
 }
@@ -57,6 +69,8 @@ const TrackingMap = ({
     center,
     level,
     vehicles = [],
+    zoomControl = true,
+    mapTypeControl = true,
     onVehicleClick,
     onCenterChange,
     defaultOptions = {
@@ -77,6 +91,9 @@ const TrackingMap = ({
 }: TrackingMapProps) => {
     useKakaoLoader();
 
+    const mapTypeOptions = typeof mapTypeControl === 'boolean' && mapTypeControl ? defaultMapTypeControl : mapTypeControl;
+    const zoomOptions = typeof zoomControl === 'boolean' && zoomControl ? defaultZoomControl : zoomControl;
+
     return (
         <Map
             className='w-full h-full'
@@ -88,8 +105,8 @@ const TrackingMap = ({
                 onCenterChange?.({ lat: c.getLat(), lng: c.getLng() });
             }}
         >
-            <MapTypeControl position={'TOPRIGHT'} />
-            <ZoomControl position={'BOTTOMRIGHT'} />
+            {mapTypeOptions && <MapTypeControl {...mapTypeOptions} />}
+            {zoomOptions && <ZoomControl {...zoomOptions} />}
 
             {/* 차량 마커와 경로 표시 */}
             {vehicles.length > 1 && (
