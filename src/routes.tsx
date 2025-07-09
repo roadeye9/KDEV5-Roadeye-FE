@@ -1,13 +1,13 @@
 import React from 'react';
-
 import { createBrowserRouter, Navigate, RouterProvider } from 'react-router-dom';
 
-import PlatformLayout from '@/layouts/PlatformLayout';
-import NotFoundPage from '@/routes/error/NotFound';
-import Dashboard from '@/routes/manage/dashboard';
-import DrivingLogPage from '@/routes/manage/driving-log';
+const PlatformLayout = React.lazy(() => import('@/layouts/PlatformLayout'));
+const NotFoundPage = React.lazy(() => import('@/routes/error/NotFound'));
+
 
 const LoginPage = React.lazy(() => import('@/routes/login'));
+
+const Dashboard = React.lazy(() => import('@/routes/manage/dashboard'));
 
 const EmployeePage = React.lazy(() => import('@/routes/manage/employees'));
 const EmployeeEditPage = React.lazy(() => import('@/routes/manage/employees.$id.edit'));
@@ -21,6 +21,7 @@ const VehicleEditPage = React.lazy(() => import('@/routes/manage/vehicles.$id.ed
 const TrackingPage = React.lazy(() => import('@/routes/manage/tracking'));
 const TrackingDetailPage = React.lazy(() => import('@/routes/manage/tracking.$id'));
 
+const DrivingLogPage = React.lazy(() => import('@/routes/manage/driving-log'));
 const DrivingLogDetailPage = React.lazy(() => import('@/routes/manage/driving-log.$id'));
 
 const router = createBrowserRouter([
