@@ -64,6 +64,13 @@ const TrackingMap = ({
             style: {
                 strokeColor: '#FF0000',
                 strokeWeight: 4
+            },
+        },
+        marker: {
+            image: {
+                src: '/images/carMarker.png',
+                size: { width: 64, height: 64 },
+                offset: { x: 0, y: 0 }
             }
         }
     }
@@ -97,7 +104,7 @@ const TrackingMap = ({
                                         vehicle.onClick?.(vehicle);
                                         onVehicleClick?.(vehicle);
                                     }}
-                                    image={vehicle.marker?.image}
+                                    image={vehicle.marker?.image ?? defaultOptions?.marker?.image}
                                 />
                             )}
 
@@ -119,7 +126,7 @@ const TrackingMap = ({
                     <>
                         <MapMarker
                             position={vehicles[0].position}
-                            image={vehicles[0].marker?.image}
+                            image={vehicles[0].marker?.image ?? defaultOptions?.marker?.image}
                         />
                         {
                             vehicles[0].path && vehicles[0].path.display !== false && vehicles[0].path.points.length > 0 && (
