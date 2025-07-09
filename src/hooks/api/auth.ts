@@ -4,21 +4,29 @@ import { getMy, getSessionInfo, signIn } from '@/api/auth';
 
 export const useSignInMutation = () => {
   return useMutation({
-    mutationFn: signIn
+    mutationFn: signIn,
   });
 };
 
-export const useMyMutation = () => {
-  return useMutation({
-    mutationFn: getMy,
-    onSuccess: (data) => {
-      console.log(data);
-    }
+export const useMyInfoQuery = (enabled: boolean = false) => {
+  return useQuery({
+    queryKey: ['auth:myInfo'],
+    queryFn: getMy,
+    enabled,
+    meta: {
+      persist: true,
+    },
   });
 };
-export const useSessionInfoQuery = () => {
+export const useSessionInfoQuery = (enabled: boolean = false) => {
   return useQuery({
-    queryKey: ['sessionInfo'],
-    queryFn: getSessionInfo
+    queryKey: ['auth:session'],
+    queryFn: getSessionInfo,
+    refetchInterval: 5 * 60 * 1000, // 5분
+    refetchIntervalInBackground: true,
+    enabled,
+    meta: {
+      persist: true,
+    },
   });
 };

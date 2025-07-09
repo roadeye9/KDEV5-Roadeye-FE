@@ -1,4 +1,4 @@
-import { differenceInYears, differenceInMonths, differenceInDays, differenceInHours, differenceInMinutes, differenceInSeconds, differenceInMilliseconds } from 'date-fns';
+import { differenceInHours, differenceInMinutes, differenceInSeconds, differenceInMilliseconds } from 'date-fns';
 
 export const formatDate = (date?: string | Date) => {
   if (!date) return '';
@@ -40,4 +40,11 @@ export const getDateDiff = (start: string | Date, end: string | Date) => {
     seconds: differenceInSeconds(endDate, startDate),
     milliseconds: differenceInMilliseconds(endDate, startDate)
   }
+};
+
+export const isExpired = (expireAt?: Date | string | number) => {
+  if (!expireAt)
+    return true;
+  const expire = typeof expireAt === 'string' || typeof expireAt === 'number' ? new Date(expireAt) : expireAt;
+  return expire.getTime() < Date.now();
 };

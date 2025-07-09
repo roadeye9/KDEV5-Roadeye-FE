@@ -6,6 +6,7 @@ import { NavLink, useNavigate } from 'react-router-dom';
 
 import { useEmployeeMyQuery } from '@/hooks/api/employee';
 import { Delay } from '@suspensive/react';
+import { useMyInfoQuery } from '@/hooks/api/auth';
 
 const MENU_ITEMS = [
   {

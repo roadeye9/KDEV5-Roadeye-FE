@@ -1,5 +1,3 @@
-import { SignInForm } from '@/hooks/pages/useSignIn';
-
 import { axiosInstance } from './axiosInstance';
 
 export interface Employee {
@@ -12,10 +10,14 @@ export interface Employee {
   status: string;
 }
 
-export const signIn = async (form: SignInForm) => {
+export const signIn = async (form: { 
+  companyId: number; 
+  username: string; 
+  password: string
+}) => {
   await axiosInstance.post('/auth/sign-in', form, {
     headers: {
-      'X-Company-Id': form.tenantId
+      'X-Company-Id': form.companyId
     },
   });
 };
@@ -39,8 +41,5 @@ export const getSessionInfo = async () => {
     expireAt: Date.parse(data.expireAt),
   } as const;
 
-  return {
-    ...ret,
-    isExpired: () => !ret.expireAt || ret.expireAt < Date.now()
-  };
+  return ret;
 };
