@@ -21,7 +21,7 @@ const MENU_ITEMS = [
   {
     icon: Truck,
     label: '차량 관리',
-    url: '/manage/vehicle'
+    url: '/manage/vehicles'
   },
   {
     icon: MapPin,
