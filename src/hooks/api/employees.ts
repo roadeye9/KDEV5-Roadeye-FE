@@ -1,4 +1,4 @@
-import { useMutation, useQueryClient, useSuspenseQuery } from '@tanstack/react-query';
+import { keepPreviousData, useMutation, useQuery, useQueryClient, useSuspenseQuery } from '@tanstack/react-query';
 
 import { getMy, type Employee } from '@/api/auth';
 import {
@@ -26,9 +26,10 @@ export const EMPLOYEE_QUERY_KEY = {
 };
 
 export const useEmployeesPageQuery = ({ page, size, status }: { page: number, size: number, status: 'ALL' | 'ACTIVE' | 'DISABLED' }) => {
-  return useSuspenseQuery({
+  return useQuery({
     queryKey: ['employee', { page, size, status} ],
     queryFn: () => getEmployeePage({ status }, { page, size }),
+    placeholderData: keepPreviousData
   });
 };
 

@@ -1,16 +1,16 @@
 import { Employee } from '@/api/auth';
 import Pagination from '@/components/common/Pagination';
-import { useEmployeesPage } from '@/hooks/api/useEmployeesPage';
+import { useEmployeesPage } from '@/hooks/pages/useEmployeesPage';
 import {
   Button,
   Select,
   SelectItem
 } from '@nextui-org/react';
 import { User } from 'lucide-react';
-import { Outlet, useLocation, useNavigate } from 'react-router-dom';
+import { Outlet, useNavigate } from 'react-router-dom';
 import '@fortawesome/fontawesome-free/css/all.min.css';
 import z from 'zod';
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 
 const statuses = [
   { label: '전체 상태', value: 'ALL' },
@@ -22,89 +22,57 @@ const filterSchema = z.object({
   status: z.enum(['ALL', 'ACTIVE', 'DISABLED']).default('ALL')
 });
 
-export const EmployeePage = () => {
-  const navigate = useNavigate();
-  const location = useLocation();
+const tableHeaders = [
+  { label: '번호', key: 'id', width: 'w-16' },
+  { label: '이름', key: 'name', width: 'w-24' },
+  { label: '아이디', key: 'loginId', width: 'w-24' },
+  { label: '직책', key: 'position', width: 'w-24' },
+  { label: '상태', key: 'status', width: 'w-24' },
+  { label: '생성일', key: 'createdAt', width: 'w-24' },
+  { label: '관리', key: 'actions', width: 'w-24' },
+] as const;
 
+export const EmployeePage = () => {
+  const [page, setPage] = useState(0);
+  const [pageSize] = useState(10);
   const [filter, setFilter] = useState<z.infer<typeof filterSchema>>(filterSchema.parse({
     status: 'ALL'
   }));
 
-  const {
-    data: employees,
-    pagination,
-    refetch,
-    changePage,
-  } = useEmployeesPage(filter.status);
-
-  useEffect(() => {
-    if (location.state?.refetch) {
-      refetch();
-    }
-  }, [location.state]);
-
   return (
     <>
-      <div className='flex h-screen flex-col bg-gray-50'>
+      <div className='h-full flex flex-col bg-gray-50'>
         <header className='border-b bg-white p-4 text-lg font-bold'>사용자 관리</header>
 
-        <section className='border-b bg-white px-8 py-4'>
-          <div className='flex flex-wrap items-center justify-between gap-4'>
-            <span className='text-lg font-semibold text-gray-800'>
-              총 {pagination.totalElements}명
-            </span>
-
-            <div className='ml-auto flex items-center gap-3'>
-              <Select
-                className='w-40'
-                selectedKeys={[filter.status]}
-                onChange={(e) => setFilter({ ...filter, status: e.target.value as z.infer<typeof filterSchema>['status'] })}
-                aria-label='상태 필터'
-              >
-                {statuses.map((status) => (
-                  <SelectItem key={status.value} value={status.value}>
-                    {status.label}
-                  </SelectItem>
-                ))}
-              </Select>
-              <Button
-                color='primary'
-                startContent={<User className='h-4 w-4' />}
-                onPress={() => navigate('/manage/employees/register')}
-              >
-                사용자 등록
-              </Button>
-            </div>
-          </div>
-        </section>
+        <EmployeeListHeader
+          page={page}
+          pageSize={pageSize}
+          status={filter.status}
+          onStatusChange={(status) => setFilter({ ...filter, status })}
+        />
 
         <div className='flex-1 overflow-y-auto bg-white px-8 py-6'>
           <table className='min-w-full rounded border bg-white shadow'>
-            <thead className='sticky top-0 z-10 bg-gray-100'>
+            <thead className='bg-gray-100'>
               <tr className='text-sm text-gray-700'>
-                <th className='w-16 px-4 py-3 text-left font-semibold'>번호</th>
-                <th className='px-4 py-3 text-left font-semibold'>이름</th>
-                <th className='px-4 py-3 text-left font-semibold'>아이디</th>
-                <th className='px-4 py-3 text-left font-semibold'>직책</th>
-                <th className='px-4 py-3 text-left font-semibold'>상태</th>
-                <th className='px-4 py-3 text-left font-semibold'>생성일</th>
-                <th className='px-4 py-3 text-left font-semibold'>관리</th>
+                {tableHeaders.map((header) => (
+                  <th key={header.key} className={`px-4 py-3 text-left font-semibold ${header.width}`}>{header.label}</th>
+                ))}
               </tr>
             </thead>
-            <tbody>
-              <EmployeeTableBody
-                data={employees}
-                page={pagination.current}
-              />
-            </tbody>
+            <EmployeeTableBody
+              page={page}
+              pageSize={pageSize}
+              filter={filter}
+            />
           </table>
         </div>
 
-        <Pagination
-          currentPage={pagination.current}
-          pageSize={pagination.size}
-          totalElements={pagination.totalElements}
-          onPageChange={(page) => changePage(page - 1)}
+        <EmployeeListPagination
+          page={page}
+          pageSize={pageSize}
+          status={filter.status}
+          onPageChange={setPage}
         />
       </div>
 
@@ -113,19 +81,74 @@ export const EmployeePage = () => {
   );
 };
 
-function EmployeeTableBody({
-  data,
+function EmployeeListHeader({
   page,
+  pageSize,
+  status,
+  onStatusChange
 }: {
-  data: Employee[],
-    page: number,
+  page: number,
+  pageSize: number,
+  status: 'ALL' | 'ACTIVE' | 'DISABLED',
+  onStatusChange: (status: 'ALL' | 'ACTIVE' | 'DISABLED') => void
 }) {
+  const navigate = useNavigate();
+
+  const { pagination } = useEmployeesPage({ page, pageSize, filter: { status } })
+
+  return (
+    <section className='border-b bg-white px-8 py-4'>
+
+      <div className='flex flex-wrap items-center justify-between gap-4'>
+        <span className='text-lg font-semibold text-gray-800'>
+          총 {pagination.totalElements}명
+        </span>
+
+        <div className='ml-auto flex items-center gap-3'>
+          <Select
+            className='w-40'
+            selectedKeys={[status]}
+            onChange={(e) => onStatusChange(e.target.value as z.infer<typeof filterSchema>['status'])}
+            aria-label='상태 필터'
+          >
+            {statuses.map((status) => (
+              <SelectItem key={status.value} value={status.value}>
+                {status.label}
+              </SelectItem>
+            ))}
+          </Select>
+          <Button
+            color='primary'
+            startContent={<User className='h-4 w-4' />}
+            onPress={() => navigate('/manage/employees/register')}
+          >
+            사용자 등록
+          </Button>
+        </div>
+      </div>
+    </section>
+  )
+}
+
+function EmployeeTableBody({
+  page,
+  pageSize,
+  filter,
+}: {
+    page: number,
+    pageSize: number,
+    filter: Partial<{
+      status: 'ALL' | 'ACTIVE' | 'DISABLED'
+    }>
+}) {
+  const { data } = useEmployeesPage({ page, pageSize, filter })
+
   if (data.length === 0) {
-    return <EmptyEmployeeRow />;
+    return <EmptyEmployeeRow colSpan={tableHeaders.length} />;
   }
 
   return (
-    <>
+    <tbody>
       {data.map((emp, index) => (
         <EmployeeTableRow
           key={emp.employeeId}
@@ -135,14 +158,14 @@ function EmployeeTableBody({
           pageSize={data.length}
         />
       ))}
-    </>
+    </tbody>
   );
 }
 
-function EmptyEmployeeRow() {
+function EmptyEmployeeRow({ colSpan }: { colSpan: number }) {
   return (
     <tr>
-      <td colSpan={7} className='py-8 text-center text-gray-400'>
+      <td colSpan={colSpan} className='py-8 text-center text-gray-400'>
         사용자가 없습니다.
       </td>
     </tr>
@@ -166,7 +189,7 @@ function EmployeeTableRow({
     navigate(`/manage/employees/${employee.employeeId}/edit`);
   };
 
-  const trIdx = (page - 1) * pageSize + index + 1;
+  const trIdx = (page) * pageSize + index + 1;
 
   return (
     <tr
@@ -196,6 +219,29 @@ function EmployeeTableRow({
       </td>
     </tr>
   );
+}
+
+function EmployeeListPagination({
+  page,
+  pageSize,
+  status,
+  onPageChange
+}: {
+  page: number,
+  pageSize: number,
+  status: 'ALL' | 'ACTIVE' | 'DISABLED',
+  onPageChange: (page: number) => void
+}) {
+  const { pagination } = useEmployeesPage({ page, pageSize, filter: { status } })
+
+  return (
+    <Pagination
+      currentPage={pagination.current}
+      pageSize={pagination.pageSize}
+      totalElements={pagination.totalElements}
+      onPageChange={(page) => onPageChange(page - 1)}
+    />
+  )
 }
 
 function PositionBadge({ position }: { position: string }) {
