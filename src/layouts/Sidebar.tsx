@@ -26,7 +26,7 @@ const MENU_ITEMS = [
   {
     icon: MapPin,
     label: '차량 관제',
-    url: '/manage/vehicle-control'
+    url: '/manage/tracking'
   },
   {
     icon: FileText,
