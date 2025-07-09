@@ -6,11 +6,12 @@ import PlatformLayout from '@/layouts/PlatformLayout';
 import NotFoundPage from '@/routes/error/NotFound';
 import Dashboard from '@/routes/manage/dashboard';
 import DrivingLogPage from '@/routes/manage/driving-log';
-import EmployeePage from '@/routes/manage/employees';
-import EmployeeEditPage from './routes/manage/employees.$id.edit';
-import EmployeeRegisterPage from './routes/manage/employees.register';
 
 const LoginPage = React.lazy(() => import('@/routes/login'));
+
+const EmployeePage = React.lazy(() => import('@/routes/manage/employees'));
+const EmployeeEditPage = React.lazy(() => import('@/routes/manage/employees.$id.edit'));
+const EmployeeCreatePage = React.lazy(() => import('@/routes/manage/employees.new'));
 
 const VehicleListPage = React.lazy(() => import('@/routes/manage/vehicles'));
 const VehicleDetailsPage = React.lazy(() => import('@/routes/manage/vehicles.$id'));
@@ -54,8 +55,8 @@ const router = createBrowserRouter([
         element: <EmployeePage />,
         children: [
           {
-            path: "register",
-            element: <EmployeeRegisterPage />
+            path: "new",
+            element: <EmployeeCreatePage />
           },
           {
             path: ':id/edit',

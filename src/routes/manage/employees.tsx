@@ -120,7 +120,7 @@ function EmployeeListHeader({
           <Button
             color='primary'
             startContent={<User className='h-4 w-4' />}
-            onPress={() => navigate('/manage/employees/register')}
+            onPress={() => navigate('/manage/employees/new')}
           >
             사용자 등록
           </Button>
