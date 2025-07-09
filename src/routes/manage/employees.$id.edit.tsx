@@ -64,7 +64,7 @@ function EmployeeEditPage({ employeeId }: { employeeId: number }) {
     };
 
     const onCancel = () => {
-        navigate("/manage/employees", { state: { refetch: true } });
+        navigate("/manage/employees", { state: { refetch: false } });
     }
 
     return (

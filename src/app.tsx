@@ -4,7 +4,13 @@ import { PersistQueryClientProvider, type PersistQueryClientOptions } from '@tan
 import AppRoutes from './routes';
 import { createIDBPersister } from './lib/persister';
 
-export const queryClient = new QueryClient();
+export const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: {
+      staleTime: 1000 * 60 * 1, // 1 minute,
+    }
+  }
+});
 
 const persistOptions: OmitKeyof<PersistQueryClientOptions, 'queryClient'> = {
   persister: createIDBPersister(),
