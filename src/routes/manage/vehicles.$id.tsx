@@ -88,7 +88,7 @@ function VehicleDetailsPage({ id }: { id: number }) {
                                     lat: vehicle.latitude,
                                     lng: vehicle.longitude
                                 }}
-                                level={5}
+                                level={6}
                             />
                         </div>
                     </div>

@@ -65,7 +65,7 @@ const TrackingMap = ({
             <ZoomControl position={'BOTTOMRIGHT'} />
 
             {/* 차량 마커와 경로 표시 */}
-            {vehicles.length > 0 && (
+            {vehicles.length > 1 && (
                 <MarkerClusterer averageCenter={true} minLevel={9} minClusterSize={1}>
                     {vehicles.map((vehicle) => (
                         <div key={vehicle.id}>
@@ -93,6 +93,26 @@ const TrackingMap = ({
                     ))}
                 </MarkerClusterer>
             )}
+
+            {
+                vehicles.length === 1 && (
+                    <>
+                        <MapMarker
+                            position={vehicles[0].position}
+                            image={vehicles[0].marker?.image}
+                        />
+                        {
+                            vehicles[0].path && vehicles[0].path.display !== false && vehicles[0].path.points.length > 0 && (
+                                <Polyline
+                                    path={vehicles[0].path.points}
+                                    strokeColor={vehicles[0].path.style?.strokeColor || 'blue'}
+                                    strokeWeight={vehicles[0].path.style?.strokeWeight || 2}
+                                />
+                            )
+                        }
+                    </>
+                )
+            }
         </Map>
     );
 };
