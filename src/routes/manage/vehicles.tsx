@@ -161,7 +161,7 @@ function VehicleListItem({ vehicle }: { vehicle: Vehicle }) {
         title='수정'
       />
     </div>
-  )
+  )  
 }
 
 function VehicleListPagination({

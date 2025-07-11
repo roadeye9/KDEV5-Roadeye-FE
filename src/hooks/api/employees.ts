@@ -4,6 +4,7 @@ import { getMy, type Employee } from '@/api/auth';
 import {
   createEmployee,
   getEmployee,
+  getEmployeeCount,
   getEmployeePage,
   updateEmployee,
   UpdateEmployeeRequest
@@ -23,6 +24,7 @@ export const EMPLOYEE_QUERY_KEY = {
   add: ['employee', 'add'] as const,
   update: ['employee', 'update'] as const,
   my: ['employee', 'my'] as const,
+  count: ['employee', 'count'] as const,
 };
 
 export const useEmployeesPageQuery = ({ page, size, status }: { page: number, size: number, status: 'ALL' | 'ACTIVE' | 'DISABLED' }) => {
@@ -45,6 +47,13 @@ export const useEmployeeMyQuery = () => {
   return useSuspenseQuery({
     queryKey: EMPLOYEE_QUERY_KEY.my,
     queryFn: getMy
+  });
+};
+
+export const useEmployeeCountQuery = () => {
+  return useQuery({
+    queryKey: EMPLOYEE_QUERY_KEY.count,
+    queryFn: getEmployeeCount
   });
 };
 

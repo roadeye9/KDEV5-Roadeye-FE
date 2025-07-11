@@ -1,7 +1,7 @@
 import { Suspense } from 'react';
 
 import { Avatar, Button } from '@nextui-org/react';
-import { Car, FileText, LayoutDashboard, LogOut, MapPin, Truck, UserCog } from 'lucide-react';
+import { Car, FileText, LayoutDashboard, LogOut, MapPin, Truck, UserCog, BarChart } from 'lucide-react';
 import { NavLink, useNavigate } from 'react-router-dom';
 
 import { useEmployeeMyQuery } from '@/hooks/api/employees';
@@ -32,6 +32,11 @@ const MENU_ITEMS = [
     icon: FileText,
     label: '운행 일지',
     url: '/manage/driving-log'
+  },
+  {
+    icon: BarChart,
+    label: '통계',
+    url: '/manage/statistics'
   }
 ] as const;
 

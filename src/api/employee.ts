@@ -25,6 +25,18 @@ interface PageInfo {
   totalPages: number;
 }
 
+interface EmployeeStatusCount {
+  totalEmployee: number;
+  activeEmployee: number;
+  inactiveEmployee: number;
+  adminEmployee: number;
+  normalEmployee: number;
+}
+
+export type Response<T> = {
+  data: T;
+};
+
 export interface PageResponse<T> {
   content: T[];
   page: PageInfo;
@@ -46,6 +58,11 @@ export const getEmployeePage = async (
 export const getEmployee = async (employeeId: number): Promise<Employee> => {
   const response = await axiosInstance.get<Employee>(`/employees/${employeeId}`);
   return response.data;
+};
+
+export const getEmployeeCount = async (): Promise<EmployeeStatusCount> => {
+  const { data } = await axiosInstance.get<Response<EmployeeStatusCount>>('/employees/status/count');
+  return data.data;
 };
 
 export const createEmployee = async (employeeData: CreateEmployeeRequest) => {
