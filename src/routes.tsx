@@ -24,7 +24,7 @@ const TrackingDetailPage = React.lazy(() => import('@/routes/manage/tracking.$id
 const DrivingLogPage = React.lazy(() => import('@/routes/manage/driving-log'));
 const DrivingLogDetailPage = React.lazy(() => import('@/routes/manage/driving-log.$id'));
 
-const StatisticsPage = React.lazy(() => import('@/routes/manage/Statistics'));
+const StatisticsPage = React.lazy(() => import('@/routes/manage/statistics'));
 
 const router = createBrowserRouter([
   {
