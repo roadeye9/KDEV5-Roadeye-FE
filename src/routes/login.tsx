@@ -75,6 +75,7 @@ const LoginPage = () => {
             </Label>
             <Input
               {...form.register('password')}
+              type='password'
               className='mt-1 block w-full border-gray-200 bg-gray-50'
               placeholder='비밀번호를 입력해주세요'
             />
