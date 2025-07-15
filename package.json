@@ -73,5 +73,8 @@
   "lint-staged": {
     "src/**/*.{html,css,scss,ts,tsx}": "npx prettier --write",
     "src/**/*.{ts,tsx}": "npx eslint"
+  },
+  "overrides": {
+    "rollup": "4.43.0"
   }
 }
