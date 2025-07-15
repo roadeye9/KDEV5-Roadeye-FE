@@ -2,22 +2,19 @@ import { useState } from 'react';
 
 import { Card, CardBody, CardHeader } from '@nextui-org/react';
 import { CircleParking, MapPin, Truck, Wrench, UserCheck, UserX, UserCog, Users } from 'lucide-react';
-import { Map, MapMarker, MarkerClusterer } from 'react-kakao-maps-sdk';
 
-import { useCarIgnitionCount, useDrivingLogMonthlyCount } from '@/hooks/api/dashboard';
+import { useCarIgnitionCount } from '@/hooks/api/dashboard';
 import { useVehicleAllQuery } from '@/hooks/api/vehicle';
-import useKakaoLoader from '@/hooks/useKakaoLoader';
 import { useEmployeeCountQuery } from '@/hooks/api/employees';
+import TrackingMap from '@/components/manage/tracking/TrackingMap';
 
 const Dashboard = () => {
-  useKakaoLoader();
   const [mapCenter] = useState({ lat: 36.5, lng: 127.5 });
-  const [openVehicleId, setOpenVehicleId] = useState<number | null>(null);
+
   const { data: runningCount } = useCarIgnitionCount('ON', 'ACTIVE');
   const { data: idleCount } = useCarIgnitionCount('OFF', 'ACTIVE');
   const { data: repairCount } = useCarIgnitionCount('OFF', 'DISABLED');
-  const { data: monthlyStats } = useDrivingLogMonthlyCount();
-  const { data: vehicles, isLoading } = useVehicleAllQuery();
+  const { data: vehicles } = useVehicleAllQuery();
   const { data: employeeCount } = useEmployeeCountQuery();
 
   return (
@@ -120,34 +117,17 @@ const Dashboard = () => {
               </h2>
             </CardHeader>
             <CardBody className='p-0'>
-              <Map
+              <TrackingMap
                 center={mapCenter}
-                style={{
-                  width: '100%',
-                  height: '100%',
-                  minHeight: '500px',
-                  borderRadius: '0 0 14px 14px'
-                }}
                 level={12}
-                onClick={() => setOpenVehicleId(null)}
-              >
-                <MarkerClusterer averageCenter={true} minLevel={10} minClusterSize={1}>
-                  {!isLoading &&
-                    vehicles?.map((vehicle) => (
-                      <MapMarker
-                        key={vehicle.id}
-                        position={{ lat: vehicle.latitude, lng: vehicle.longitude }}
-                        onClick={() => setOpenVehicleId(vehicle.id)}
-                      >
-                        {openVehicleId === vehicle.id && (
-                          <div style={{ padding: '5px', color: '#000', textAlign: 'center' }}>
-                            {vehicle.name}
-                          </div>
-                        )}
-                      </MapMarker>
-                    ))}
-                </MarkerClusterer>
-              </Map>
+                vehicles={vehicles?.map((vehicle) => ({
+                  id: vehicle.id,
+                  position: { lat: vehicle.latitude, lng: vehicle.longitude },
+                  marker: {
+                    display: true
+                  }
+                }))}
+              />
             </CardBody>
           </Card>
         </div>
