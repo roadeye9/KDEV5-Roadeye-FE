@@ -167,12 +167,6 @@ function TrackingDetailPage({ vehicleId }: { vehicleId: number }) {
         data: vehicle,
         isLoading: isVehicleDetailLoading,
     } = useVehicleDetailQuery(vehicleId);
-    useEffect(() => {
-        if (vehicle) {
-            setCenter({ lat: vehicle.latitude, lng: vehicle.longitude });
-            setMapLevel(4);
-        }
-    }, [vehicle]);
 
     const {
         data: drivingHistory,
@@ -212,6 +206,12 @@ function TrackingDetailPage({ vehicleId }: { vehicleId: number }) {
             lng: last.lng
         };
     }, [drivingHistory, vehicle]);
+    useEffect(() => {
+        if (lastLocation) {
+            setCenter({ lat: lastLocation.lat, lng: lastLocation.lng });
+            setMapLevel(4);
+        }
+    }, [lastLocation]);
 
     return (
         <div className='flex h-screen flex-col'>
