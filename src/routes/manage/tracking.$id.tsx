@@ -1,7 +1,7 @@
 import { VehicleDetails } from '@/api/vehicle';
 import TrackingHeader from '@/components/manage/tracking/Header';
 import TrackingMap from '@/components/manage/tracking/TrackingMap';
-import { useDrivingHistoryQuery } from '@/hooks/api/location';
+import { useDrivingHistoryOfCarQuery } from '@/hooks/api/location';
 import { useVehicleDetailQuery } from '@/hooks/api/vehicle';
 import useMapCenter from '@/hooks/useMapCenter';
 import { Button } from '@nextui-org/react';
@@ -15,7 +15,7 @@ const VehicleDetailContent = ({
     vehicleDetail,
     isLoading
 }: {
-        vehicleDetail: VehicleDetails;
+    vehicleDetail: VehicleDetails;
     isLoading: boolean;
 }) => {
     if (isLoading) {
@@ -164,36 +164,33 @@ function TrackingDetailPage({ vehicleId }: { vehicleId: number }) {
     }, []);
 
     const {
-        data: vehicleDetail,
+        data: vehicle,
         isLoading: isVehicleDetailLoading,
-        refetch: refetchDetail,
     } = useVehicleDetailQuery(vehicleId);
     useEffect(() => {
-        if (vehicleDetail) {
-            setCenter({ lat: vehicleDetail.latitude, lng: vehicleDetail.longitude });
+        if (vehicle) {
+            setCenter({ lat: vehicle.latitude, lng: vehicle.longitude });
             setMapLevel(4);
         }
-    }, [vehicleDetail]);
+    }, [vehicle]);
 
     const {
         data: drivingHistory,
         isLoading: isDrivingHistoryLoading,
         refetch: refetchDrivingHistory,
-    } = useDrivingHistoryQuery(vehicleId);
+    } = useDrivingHistoryOfCarQuery(vehicleId);
     const path = useMemo(() => {
         if (!drivingHistory) return [];
 
         return drivingHistory.map((item) => ({
-            lat: item.latitude,
-            lng: item.longitude,
+            lat: item.lat,
+            lng: item.lng,
             speed: item.speed
         }));
     }, [drivingHistory]);
 
     const handleRefetch = useCallback(() => {
         if (isVehicleDetailLoading || isDrivingHistoryLoading) return;
-
-        refetchDetail();
         refetchDrivingHistory();
     }, [isVehicleDetailLoading, isDrivingHistoryLoading]);
 
@@ -204,11 +201,23 @@ function TrackingDetailPage({ vehicleId }: { vehicleId: number }) {
         }, 300);
     };
 
+    const lastLocation = useMemo(() => {
+        const last = drivingHistory?.[drivingHistory.length - 1];
+        if (!last) return {
+            lat: vehicle?.latitude,
+            lng: vehicle?.longitude
+        };
+        return {
+            lat: last.lat,
+            lng: last.lng
+        };
+    }, [drivingHistory, vehicle]);
+
     return (
         <div className='flex h-screen flex-col'>
             <TrackingHeader
                 title="차량 상세 관제"
-                subtitle={vehicleDetail?.name || '불러오는 중...'}
+                subtitle={vehicle?.name || '불러오는 중...'}
             />
 
             <div className='flex flex-1 overflow-hidden'>
@@ -240,7 +249,7 @@ function TrackingDetailPage({ vehicleId }: { vehicleId: number }) {
 
                     <div className={`h-full overflow-y-auto p-5 transition-transform duration-300 ${isEntering ? 'translate-x-full' : isNavigating ? 'translate-x-full' : 'translate-x-0'}`}>
                         <VehicleDetailContent
-                            vehicleDetail={vehicleDetail}
+                            vehicleDetail={vehicle}
                             isLoading={isVehicleDetailLoading}
                         />
                     </div>
@@ -251,7 +260,10 @@ function TrackingDetailPage({ vehicleId }: { vehicleId: number }) {
                     level={mapLevel}
                     vehicles={[{
                         id: vehicleId,
-                        position: { lat: center.lat, lng: center.lng },
+                        position: { 
+                            lat: lastLocation.lat,
+                            lng: lastLocation.lng
+                        },
                         path: {
                             points: path,
                             display: true

@@ -39,14 +39,14 @@ export type DrivingHistory = {
 export type DrivingLocationDetail = {
   id: number;
   drivingId: number;
-  latitude: number;
-  longitude: number;
+  lat: number;
+  lng: number;
   datetime: string; // LocalDateTime → string
   speed: number;
   createdAt: string; // LocalDateTime → string
 };
 
-export const getLocationHistory = async (id: number) => {
+export const getLocationHistoryOfCar = async (id: number) => {
   const { data } = await axiosInstance.get<ListModel<DrivingLocationDetail>>(`/driving/car/${id}`);
 
   return data.data;

@@ -2,14 +2,14 @@ import { useNavigate, useParams } from "react-router-dom";
 
 import { useVehicleDetailQuery } from "@/hooks/api/vehicle";
 import TrackingMap from "@/components/manage/tracking/TrackingMap";
-import { useDrivingHistoryQuery } from "@/hooks/api/location";
+import { useDrivingHistoryOfCarQuery } from "@/hooks/api/location";
 import { Expand } from "lucide-react";
 
 function VehicleDetailsPage({ id }: { id: number }) {
     const navigate = useNavigate();
 
     const { data: vehicle } = useVehicleDetailQuery(id);
-    const { data: drivingHistory } = useDrivingHistoryQuery(id);
+    const { data: drivingHistory } = useDrivingHistoryOfCarQuery(id);
 
     const handleExpand = () => {
         navigate(`/manage/tracking/${id}`)
@@ -79,8 +79,8 @@ function VehicleDetailsPage({ id }: { id: number }) {
                                         },
                                         path: {
                                             points: drivingHistory?.map((history) => ({
-                                                lat: history.latitude,
-                                                lng: history.longitude
+                                                lat: history.lat,
+                                                lng: history.lng
                                             })) ?? []
                                         }
                                     }
