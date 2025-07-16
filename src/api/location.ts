@@ -39,8 +39,8 @@ export type DrivingHistory = {
 export type DrivingLocationDetail = {
   id: number;
   drivingId: number;
-  lat: number;
-  lng: number;
+  latitude: number;
+  longitude: number;
   datetime: string; // LocalDateTime → string
   speed: number;
   createdAt: string; // LocalDateTime → string

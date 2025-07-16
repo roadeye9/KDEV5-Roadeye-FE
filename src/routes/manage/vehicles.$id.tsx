@@ -79,8 +79,8 @@ function VehicleDetailsPage({ id }: { id: number }) {
                                         },
                                         path: {
                                             points: drivingHistory?.map((history) => ({
-                                                lat: history.lat,
-                                                lng: history.lng
+                                                lat: history.latitude,
+                                                lng: history.longitude
                                             })) ?? []
                                         }
                                     }

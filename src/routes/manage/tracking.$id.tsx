@@ -177,8 +177,8 @@ function TrackingDetailPage({ vehicleId }: { vehicleId: number }) {
         if (!drivingHistory) return [];
 
         return drivingHistory.map((item) => ({
-            lat: item.lat,
-            lng: item.lng,
+            lat: item.latitude,
+            lng: item.longitude,
             speed: item.speed
         }));
     }, [drivingHistory]);
@@ -195,17 +195,24 @@ function TrackingDetailPage({ vehicleId }: { vehicleId: number }) {
         }, 300);
     };
 
-    const lastLocation = useMemo(() => {
+    const [lastLocation, setLastLocation] = useState<{ lat: number, lng: number } | null>(null);
+    useEffect(() => {
+        if (!drivingHistory || !vehicle) return;
+
         const last = drivingHistory?.[drivingHistory.length - 1];
-        if (!last) return {
-            lat: vehicle?.latitude,
-            lng: vehicle?.longitude
-        };
-        return {
-            lat: last.lat,
-            lng: last.lng
-        };
-    }, [drivingHistory, vehicle]);
+        if (!last) {
+            setLastLocation({
+                lat: vehicle?.latitude,
+                lng: vehicle?.longitude
+            });
+        }
+        else {
+            setLastLocation({
+                lat: last.latitude,
+                lng: last.longitude
+            });
+        }
+    }, [drivingHistory, vehicle])
     useEffect(() => {
         if (lastLocation) {
             setCenter({ lat: lastLocation.lat, lng: lastLocation.lng });
@@ -261,8 +268,8 @@ function TrackingDetailPage({ vehicleId }: { vehicleId: number }) {
                     vehicles={[{
                         id: vehicleId,
                         position: { 
-                            lat: lastLocation.lat,
-                            lng: lastLocation.lng
+                            lat: lastLocation?.lat || 0,
+                            lng: lastLocation?.lng || 0
                         },
                         path: {
                             points: path,
