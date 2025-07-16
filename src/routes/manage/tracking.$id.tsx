@@ -187,6 +187,15 @@ function TrackingDetailPage({ vehicleId }: { vehicleId: number }) {
         if (isVehicleDetailLoading || isDrivingHistoryLoading) return;
         refetchDrivingHistory();
     }, [isVehicleDetailLoading, isDrivingHistoryLoading]);
+    
+    useEffect(() => {
+        const interval = 30000;
+        const timer = setInterval(() => {
+            handleRefetch();
+        }, interval);
+
+        return () => clearInterval(timer);
+    }, [])
 
     const handleBackToList = () => {
         setIsNavigating(true);
