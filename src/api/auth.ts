@@ -22,6 +22,10 @@ export const signIn = async (form: {
   });
 };
 
+export const signOut = async () => {
+  return await axiosInstance.post('/auth/sign-out');
+};
+
 export const getMy = async (): Promise<Employee> => {
   const response = await axiosInstance.get<Employee>('/employees/my');
   return response.data;

@@ -6,6 +6,8 @@ import { NavLink, useNavigate } from 'react-router-dom';
 
 import { useEmployeeMyQuery } from '@/hooks/api/employees';
 import { Delay } from '@suspensive/react';
+import { useMutation } from '@tanstack/react-query';
+import { useSignOutMutation } from '@/hooks/api/auth';
 
 const MENU_ITEMS = [
   {
@@ -97,10 +99,15 @@ function MenuItem({ item }: { item: (typeof MENU_ITEMS)[number] }) {
 function UserInfo() {
   const navigate = useNavigate();
 
+  const { mutate: signOut } = useSignOutMutation();
   const { data: userInfo } = useEmployeeMyQuery();
 
   const handleLogout = () => {
-    navigate('/login');
+    signOut(undefined, {
+      onSuccess: () => {
+        navigate('/login');
+      }
+    });
   };
 
   return (
@@ -117,7 +124,7 @@ function UserInfo() {
         color='danger'
         size='sm'
         className='w-full justify-start gap-2 text-gray-600 hover:text-red-600'
-        onClick={handleLogout}
+        onPress={handleLogout}
       >
         <LogOut size={16} />
         <span>로그아웃</span>
