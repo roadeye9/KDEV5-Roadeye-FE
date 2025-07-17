@@ -73,6 +73,7 @@ export const useUpdateEmployeeMutation = (employeeId: number) => {
     mutationFn: (payload: UpdateEmployeeRequest) => updateEmployee(employeeId, payload),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: EMPLOYEE_QUERY_KEY.details(employeeId) });
+      queryClient.invalidateQueries({ queryKey: EMPLOYEE_QUERY_KEY.list });
     }
   });
 };

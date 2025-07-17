@@ -2,6 +2,7 @@ import { useState } from 'react';
 
 import { Card, CardBody, CardHeader } from '@nextui-org/react';
 import { CircleParking, MapPin, Truck, Wrench, UserCheck, UserX, UserCog, Users } from 'lucide-react';
+import { Link } from "react-router-dom";
 
 import { useCarIgnitionCount } from '@/hooks/api/dashboard';
 import { useVehicleAllQuery } from '@/hooks/api/vehicle';
@@ -23,7 +24,10 @@ const Dashboard = () => {
         {/* 왼쪽 영역 (차량 현황 + 월별 통계) */}
         <div className='space-y-6 lg:col-span-2'>
           {/* 차량 현황판 */}
-          <Card className='shadow-lg'>
+          <Link to="/manage/vehicles" style={{ textDecoration: "none" }}>
+          <Card
+              className='shadow-lg cursor-pointer hover:shadow-2xl hover:scale-[1.02] transition mb-6'
+            >
             <CardHeader>
               <h2 className='text-xl font-semibold text-gray-800'>차량 현황판</h2>
             </CardHeader>
@@ -56,8 +60,12 @@ const Dashboard = () => {
               </div>
             </CardBody>
           </Card>
+          </Link>
           {/* 직원 현황판 */}
-          <Card className='shadow-xl rounded-2xl border-0 bg-white'>
+          <Link to="/manage/vehicles" style={{ textDecoration: "none" }}>
+          <Card
+              className='shadow-lg cursor-pointer hover:shadow-2xl hover:scale-[1.02] transition'
+            >
             <CardHeader className='flex flex-col md:flex-row md:items-center md:justify-between gap-2 border-b'>
               <div>
                 <h2 className='text-xl font-semibold text-gray-800'>직원 현황판</h2>
@@ -105,6 +113,7 @@ const Dashboard = () => {
               </div>
             </CardBody>
           </Card>
+          </Link>
         </div>
 
         {/* 오른쪽 영역 (지도) */}

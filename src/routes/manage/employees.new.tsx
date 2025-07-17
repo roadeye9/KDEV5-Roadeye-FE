@@ -15,6 +15,7 @@ import z from 'zod';
 import { zodResolver } from "@hookform/resolvers/zod"
 import { useForm } from 'react-hook-form';
 import { useNavigate } from 'react-router-dom';
+import { useEmployeeMutation } from '@/hooks/api/employees';
 
 
 const schema = z.object({
@@ -26,6 +27,7 @@ const schema = z.object({
 
 function EmployeeRegisterPage() {
     const navigate = useNavigate();
+    const { mutate: createEmployee, status } = useEmployeeMutation();
     
     const { register, handleSubmit, formState: { errors } } = useForm<z.infer<typeof schema>>({
         resolver: zodResolver(schema),
@@ -38,7 +40,7 @@ function EmployeeRegisterPage() {
     })
 
     const onSubmit = (data: z.infer<typeof schema>) => {
-        console.log(data);
+        createEmployee(data);
     }
 
     const onCancel = () => {
@@ -96,7 +98,7 @@ function EmployeeRegisterPage() {
                         <Button color='danger' variant='light' onClick={onCancel}>
                             취소
                         </Button>
-                        <Button color='primary' type='submit' >
+                        <Button color='primary' type='submit' isLoading={status === 'pending'}>
                             저장
                         </Button>
                     </ModalFooter>
