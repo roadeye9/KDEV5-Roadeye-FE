@@ -46,7 +46,7 @@ export type DrivingLocationDetail = {
   createdAt: string; // LocalDateTime → string
 };
 
-export const getLocationHistory = async (id: number) => {
+export const getLocationHistoryOfCar = async (id: number) => {
   const { data } = await axiosInstance.get<ListModel<DrivingLocationDetail>>(`/driving/car/${id}`);
 
   return data.data;

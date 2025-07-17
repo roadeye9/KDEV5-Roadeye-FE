@@ -1,7 +1,7 @@
 import { VehicleDetails } from '@/api/vehicle';
 import TrackingHeader from '@/components/manage/tracking/Header';
 import TrackingMap from '@/components/manage/tracking/TrackingMap';
-import { useDrivingHistoryQuery } from '@/hooks/api/location';
+import { useDrivingHistoryOfCarQuery } from '@/hooks/api/location';
 import { useVehicleDetailQuery } from '@/hooks/api/vehicle';
 import useMapCenter from '@/hooks/useMapCenter';
 import { Button } from '@nextui-org/react';
@@ -15,7 +15,7 @@ const VehicleDetailContent = ({
     vehicleDetail,
     isLoading
 }: {
-        vehicleDetail: VehicleDetails;
+    vehicleDetail: VehicleDetails;
     isLoading: boolean;
 }) => {
     if (isLoading) {
@@ -164,22 +164,15 @@ function TrackingDetailPage({ vehicleId }: { vehicleId: number }) {
     }, []);
 
     const {
-        data: vehicleDetail,
+        data: vehicle,
         isLoading: isVehicleDetailLoading,
-        refetch: refetchDetail,
     } = useVehicleDetailQuery(vehicleId);
-    useEffect(() => {
-        if (vehicleDetail) {
-            setCenter({ lat: vehicleDetail.latitude, lng: vehicleDetail.longitude });
-            setMapLevel(4);
-        }
-    }, [vehicleDetail]);
 
     const {
         data: drivingHistory,
         isLoading: isDrivingHistoryLoading,
         refetch: refetchDrivingHistory,
-    } = useDrivingHistoryQuery(vehicleId);
+    } = useDrivingHistoryOfCarQuery(vehicleId);
     const path = useMemo(() => {
         if (!drivingHistory) return [];
 
@@ -192,10 +185,17 @@ function TrackingDetailPage({ vehicleId }: { vehicleId: number }) {
 
     const handleRefetch = useCallback(() => {
         if (isVehicleDetailLoading || isDrivingHistoryLoading) return;
-
-        refetchDetail();
         refetchDrivingHistory();
     }, [isVehicleDetailLoading, isDrivingHistoryLoading]);
+    
+    useEffect(() => {
+        const interval = 30000;
+        const timer = setInterval(() => {
+            handleRefetch();
+        }, interval);
+
+        return () => clearInterval(timer);
+    }, [])
 
     const handleBackToList = () => {
         setIsNavigating(true);
@@ -204,11 +204,36 @@ function TrackingDetailPage({ vehicleId }: { vehicleId: number }) {
         }, 300);
     };
 
+    const [lastLocation, setLastLocation] = useState<{ lat: number, lng: number } | null>(null);
+    useEffect(() => {
+        if (!drivingHistory || !vehicle) return;
+
+        const last = drivingHistory?.[drivingHistory.length - 1];
+        if (!last) {
+            setLastLocation({
+                lat: vehicle?.latitude,
+                lng: vehicle?.longitude
+            });
+        }
+        else {
+            setLastLocation({
+                lat: last.latitude,
+                lng: last.longitude
+            });
+        }
+    }, [drivingHistory, vehicle])
+    useEffect(() => {
+        if (lastLocation) {
+            setCenter({ lat: lastLocation.lat, lng: lastLocation.lng });
+            setMapLevel(4);
+        }
+    }, [lastLocation]);
+
     return (
         <div className='flex h-screen flex-col'>
             <TrackingHeader
                 title="차량 상세 관제"
-                subtitle={vehicleDetail?.name || '불러오는 중...'}
+                subtitle={vehicle?.name || '불러오는 중...'}
             />
 
             <div className='flex flex-1 overflow-hidden'>
@@ -240,7 +265,7 @@ function TrackingDetailPage({ vehicleId }: { vehicleId: number }) {
 
                     <div className={`h-full overflow-y-auto p-5 transition-transform duration-300 ${isEntering ? 'translate-x-full' : isNavigating ? 'translate-x-full' : 'translate-x-0'}`}>
                         <VehicleDetailContent
-                            vehicleDetail={vehicleDetail}
+                            vehicleDetail={vehicle}
                             isLoading={isVehicleDetailLoading}
                         />
                     </div>
@@ -251,7 +276,10 @@ function TrackingDetailPage({ vehicleId }: { vehicleId: number }) {
                     level={mapLevel}
                     vehicles={[{
                         id: vehicleId,
-                        position: { lat: center.lat, lng: center.lng },
+                        position: { 
+                            lat: lastLocation?.lat || 0,
+                            lng: lastLocation?.lng || 0
+                        },
                         path: {
                             points: path,
                             display: true
