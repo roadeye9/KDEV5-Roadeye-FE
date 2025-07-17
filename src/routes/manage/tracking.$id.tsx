@@ -191,7 +191,7 @@ function TrackingDetailPage({ vehicleId }: { vehicleId: number }) {
     useEffect(() => {
         const interval = 30000;
         const timer = setInterval(() => {
-            handleRefetch();
+            refetchDrivingHistory();
         }, interval);
 
         return () => clearInterval(timer);
