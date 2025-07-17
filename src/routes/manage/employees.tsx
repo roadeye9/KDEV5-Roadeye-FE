@@ -7,10 +7,10 @@ import {
   SelectItem
 } from '@nextui-org/react';
 import { User } from 'lucide-react';
-import { Outlet, useNavigate } from 'react-router-dom';
+import { Outlet, useLocation, useNavigate } from 'react-router-dom';
 import '@fortawesome/fontawesome-free/css/all.min.css';
 import z from 'zod';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 
 const statuses = [
   { label: '전체 상태', value: 'ALL' },
@@ -141,7 +141,15 @@ function EmployeeTableBody({
       status: 'ALL' | 'ACTIVE' | 'DISABLED'
     }>
 }) {
-  const { data } = useEmployeesPage({ page, pageSize, filter })
+  const { state } = useLocation();
+
+  const { data, refetch } = useEmployeesPage({ page, pageSize, filter })
+
+  useEffect(() => {
+    if (state?.refetch) {
+      refetch();
+    }
+  }, [])
 
   if (data.length === 0) {
     return <EmptyEmployeeRow colSpan={tableHeaders.length} />;
