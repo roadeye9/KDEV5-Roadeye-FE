@@ -1,3 +1,4 @@
+import { queryClient } from '@/app';
 import { axiosInstance } from './axiosInstance';
 
 export interface Employee {
@@ -10,9 +11,9 @@ export interface Employee {
   status: 'ACTIVE' | 'DISABLED';
 }
 
-export const signIn = async (form: { 
-  companyId: number; 
-  username: string; 
+export const signIn = async (form: {
+  companyId: number;
+  username: string;
   password: string
 }) => {
   await axiosInstance.post('/auth/sign-in', form, {
@@ -23,7 +24,11 @@ export const signIn = async (form: {
 };
 
 export const signOut = async () => {
-  return await axiosInstance.post('/auth/sign-out');
+  return await axiosInstance.post('/auth/sign-out')
+    .then(((res) => {
+      queryClient.clear();
+      return res;
+    }));
 };
 
 export const getMy = async (): Promise<Employee> => {
